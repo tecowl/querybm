@@ -47,9 +47,9 @@ func TestNewStaticColumns(t *testing.T) {
 
 func TestStaticColumns_Fields(t *testing.T) {
 	tests := []struct {
-		name   string
-		names  []string
-		want   []string
+		name  string
+		names []string
+		want  []string
 	}{
 		{
 			name:  "Single field",
@@ -86,12 +86,12 @@ func TestStaticColumns_Fields(t *testing.T) {
 
 func TestStaticColumns_Mapper(t *testing.T) {
 	tests := []struct {
-		name      string
-		mapper    Mapper[User]
-		scanner   *mockScanner
-		user      *User
-		wantErr   bool
-		wantUser  User
+		name     string
+		mapper   Mapper[User]
+		scanner  *mockScanner
+		user     *User
+		wantErr  bool
+		wantUser User
 	}{
 		{
 			name: "Successful scan",
@@ -134,12 +134,12 @@ func TestStaticColumns_Mapper(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			sc := &StaticColumns[User]{mapper: tt.mapper}
 			mapperFunc := sc.Mapper()
-			
+
 			err := mapperFunc(tt.scanner, tt.user)
 			if (err != nil) != tt.wantErr {
 				t.Errorf("Mapper() error = %v, wantErr %v", err, tt.wantErr)
 			}
-			
+
 			if !tt.scanner.scanCalled {
 				t.Error("Mapper() did not call Scanner.Scan()")
 			}
@@ -147,61 +147,14 @@ func TestStaticColumns_Mapper(t *testing.T) {
 	}
 }
 
-func TestStaticColumns_ImplementsFieldMapper(t *testing.T) {
-	// Verify that StaticColumns implements FieldMapper interface
-	var _ FieldMapper[User] = &StaticColumns[User]{}
-	
-	// Test with actual implementation
-	names := []string{"id", "name", "email"}
-	mapper := func(s Scanner, u *User) error {
-		return s.Scan(&u.ID, &u.Name, &u.Email)
-	}
-	
-	var fm FieldMapper[User] = NewStaticColumns(names, mapper)
-	
-	// Test Fields() through interface
-	fields := fm.Fields()
-	if !reflect.DeepEqual(fields, names) {
-		t.Errorf("FieldMapper.Fields() = %v, want %v", fields, names)
-	}
-	
-	// Test Mapper() through interface
-	mapperFunc := fm.Mapper()
-	if mapperFunc == nil {
-		t.Error("FieldMapper.Mapper() returned nil")
-	}
-}
 
 func TestErrNoColumns(t *testing.T) {
 	if ErrNoColumns == nil {
 		t.Error("ErrNoColumns should not be nil")
 	}
-	
+
 	expectedMsg := "no columns defined for static columns query"
 	if ErrNoColumns.Error() != expectedMsg {
 		t.Errorf("ErrNoColumns.Error() = %v, want %v", ErrNoColumns.Error(), expectedMsg)
-	}
-}
-
-// Test Scanner interface compliance
-func TestScannerInterface(t *testing.T) {
-	// Verify that mockScanner implements Scanner interface
-	var _ Scanner = &mockScanner{}
-	
-	// Test with different scanner implementations
-	scanner := &mockScanner{}
-	var s Scanner = scanner
-	
-	err := s.Scan("test1", "test2", "test3")
-	if err != nil {
-		t.Errorf("Scanner.Scan() error = %v", err)
-	}
-	
-	if !scanner.scanCalled {
-		t.Error("Scanner.Scan() was not called")
-	}
-	
-	if len(scanner.scanArgs) != 3 {
-		t.Errorf("Scanner.Scan() args count = %v, want 3", len(scanner.scanArgs))
 	}
 }

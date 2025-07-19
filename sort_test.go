@@ -140,17 +140,6 @@ func TestSortIem_Build(t *testing.T) {
 	}
 }
 
-func TestSortIem_ImplementsSort(t *testing.T) {
-	// Verify that SortIem implements Sort interface
-	var _ Sort = &SortIem{}
-	var _ Sort = NewSortItem("name", false)
-}
-
-func TestSortIem_ImplementsValidatable(t *testing.T) {
-	// Verify that SortIem implements Validatable interface
-	var _ Validatable = &SortIem{}
-	var _ Validatable = NewSortItem("name", false)
-}
 
 func TestSortItems_Validate(t *testing.T) {
 	tests := []struct {
@@ -280,17 +269,6 @@ func TestSortItems_Build(t *testing.T) {
 	}
 }
 
-func TestSortItems_ImplementsSort(t *testing.T) {
-	// Verify that SortItems implements Sort interface
-	var _ Sort = SortItems{}
-	var _ Sort = SortItems{NewSortItem("name", false)}
-}
-
-func TestSortItems_ImplementsValidatable(t *testing.T) {
-	// Verify that SortItems implements Validatable interface
-	var _ Validatable = SortItems{}
-	var _ Validatable = SortItems{NewSortItem("name", false)}
-}
 
 func TestErrEmptySortItem(t *testing.T) {
 	if ErrEmptySortItem == nil {

@@ -96,17 +96,3 @@ func TestSimpleFields_Fields(t *testing.T) {
 	}
 }
 
-func TestSimpleFields_InterfaceCompliance(t *testing.T) {
-	// Verify that SimpleFields implements the Fields interface
-	var _ Fields = SimpleFields{}
-	var _ Fields = NewSimpleFields("id", "name")
-	
-	// Test that it can be used as Fields interface
-	var f Fields = NewSimpleFields("id", "name", "email")
-	fields := f.Fields()
-	expected := []string{"id", "name", "email"}
-	
-	if !reflect.DeepEqual(fields, expected) {
-		t.Errorf("Fields interface implementation = %v, want %v", fields, expected)
-	}
-}

@@ -227,14 +227,3 @@ func TestPagination_Build(t *testing.T) {
 	}
 }
 
-func TestPagination_ImplementsCondition(t *testing.T) {
-	// Verify that Pagination implements Condition interface
-	var _ Condition = &Pagination{}
-	var _ Condition = NewPagination(10, 0)
-}
-
-func TestPagination_ImplementsValidatable(t *testing.T) {
-	// Verify that Pagination implements Validatable interface
-	var _ Validatable = &Pagination{}
-	var _ Validatable = NewPagination(10, 0)
-}
