@@ -1,0 +1,289 @@
+package statement
+
+import (
+	"reflect"
+	"testing"
+
+	"github.com/tecowl/querybm/expr"
+)
+
+func TestNewStatement(t *testing.T) {
+	fields := NewSimpleFields("id", "name", "email")
+	s := NewStatement("users", fields)
+
+	if s.Table.content != "users" {
+		t.Errorf("NewStatement() table = %v, want %v", s.Table.content, "users")
+	}
+	if !reflect.DeepEqual(s.Fields, fields) {
+		t.Errorf("NewStatement() fields = %v, want %v", s.Fields, fields)
+	}
+	if s.Where == nil {
+		t.Errorf("NewStatement() Where should not be nil")
+	}
+	if s.Sort == nil {
+		t.Errorf("NewStatement() Sort should not be nil")
+	}
+	if s.Pagination == nil {
+		t.Errorf("NewStatement() Pagination should not be nil")
+	}
+}
+
+func TestStatement_Build_SimpleSelect(t *testing.T) {
+	tests := []struct {
+		name       string
+		statement  *Statement
+		wantSQL    string
+		wantValues []any
+	}{
+		{
+			name: "Simple SELECT without conditions",
+			statement: NewStatement("users",
+				NewSimpleFields("id", "name", "email"),
+			),
+			wantSQL:    "SELECT id, name, email FROM users",
+			wantValues: []any{},
+		},
+		{
+			name: "SELECT with single field",
+			statement: NewStatement("products",
+				NewSimpleFields("count(*)"),
+			),
+			wantSQL:    "SELECT count(*) FROM products",
+			wantValues: []any{},
+		},
+		{
+			name: "SELECT all fields",
+			statement: NewStatement("orders",
+				NewSimpleFields("*"),
+			),
+			wantSQL:    "SELECT * FROM orders",
+			wantValues: []any{},
+		},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			gotSQL, gotValues := tt.statement.Build()
+			if gotSQL != tt.wantSQL {
+				t.Errorf("Build() SQL = %v, want %v", gotSQL, tt.wantSQL)
+			}
+			if !reflect.DeepEqual(gotValues, tt.wantValues) {
+				t.Errorf("Build() values = %v, want %v", gotValues, tt.wantValues)
+			}
+		})
+	}
+}
+
+func TestStatement_Build_WithWhere(t *testing.T) {
+	tests := []struct {
+		name       string
+		setup      func() *Statement
+		wantSQL    string
+		wantValues []any
+	}{
+		{
+			name: "SELECT with single WHERE condition",
+			setup: func() *Statement {
+				s := NewStatement("users", NewSimpleFields("id", "name"))
+				s.Where.Add(expr.Field("status", expr.Eq("active")))
+				return s
+			},
+			wantSQL:    "SELECT id, name FROM users WHERE status = ?",
+			wantValues: []any{"active"},
+		},
+		{
+			name: "SELECT with multiple WHERE conditions",
+			setup: func() *Statement {
+				s := NewStatement("users", NewSimpleFields("*"))
+				s.Where.Add(expr.Field("age", expr.Gte(18)))
+				s.Where.Add(expr.Field("status", expr.Eq("active")))
+				return s
+			},
+			wantSQL:    "SELECT * FROM users WHERE (age >= ?) AND (status = ?)",
+			wantValues: []any{18, "active"},
+		},
+		{
+			name: "SELECT with IN condition",
+			setup: func() *Statement {
+				s := NewStatement("products", NewSimpleFields("id", "name", "price"))
+				s.Where.Add(expr.Field("category_id", expr.In(1, 2, 3)))
+				return s
+			},
+			wantSQL:    "SELECT id, name, price FROM products WHERE category_id IN (?,?,?)",
+			wantValues: []any{1, 2, 3},
+		},
+		{
+			name: "SELECT with LIKE condition",
+			setup: func() *Statement {
+				s := NewStatement("users", NewSimpleFields("id", "email"))
+				s.Where.Add(expr.Field("email", expr.LikeContains("@example")))
+				return s
+			},
+			wantSQL:    "SELECT id, email FROM users WHERE email LIKE ?",
+			wantValues: []any{"%@example%"},
+		},
+		{
+			name: "SELECT with IS NULL condition",
+			setup: func() *Statement {
+				s := NewStatement("users", NewSimpleFields("id", "name"))
+				s.Where.Add(expr.Field("deleted_at", expr.IsNull()))
+				return s
+			},
+			wantSQL:    "SELECT id, name FROM users WHERE deleted_at IS NULL",
+			wantValues: []any{},
+		},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			s := tt.setup()
+			gotSQL, gotValues := s.Build()
+			if gotSQL != tt.wantSQL {
+				t.Errorf("Build() SQL = %v, want %v", gotSQL, tt.wantSQL)
+			}
+			if !reflect.DeepEqual(gotValues, tt.wantValues) {
+				t.Errorf("Build() values = %v, want %v", gotValues, tt.wantValues)
+			}
+		})
+	}
+}
+
+func TestStatement_Build_WithSort(t *testing.T) {
+	tests := []struct {
+		name       string
+		setup      func() *Statement
+		wantSQL    string
+		wantValues []any
+	}{
+		{
+			name: "SELECT with single ORDER BY",
+			setup: func() *Statement {
+				s := NewStatement("users", NewSimpleFields("id", "name"))
+				s.Sort.Add("created_at DESC")
+				return s
+			},
+			wantSQL:    "SELECT id, name FROM users ORDER BY created_at DESC",
+			wantValues: []any{},
+		},
+		{
+			name: "SELECT with multiple ORDER BY",
+			setup: func() *Statement {
+				s := NewStatement("products", NewSimpleFields("*"))
+				s.Sort.Add("category_id")
+				s.Sort.Add("price DESC")
+				return s
+			},
+			wantSQL:    "SELECT * FROM products ORDER BY category_id, price DESC",
+			wantValues: []any{},
+		},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			s := tt.setup()
+			gotSQL, gotValues := s.Build()
+			if gotSQL != tt.wantSQL {
+				t.Errorf("Build() SQL = %v, want %v", gotSQL, tt.wantSQL)
+			}
+			if !reflect.DeepEqual(gotValues, tt.wantValues) {
+				t.Errorf("Build() values = %v, want %v", gotValues, tt.wantValues)
+			}
+		})
+	}
+}
+
+func TestStatement_Build_WithPagination(t *testing.T) {
+	tests := []struct {
+		name       string
+		setup      func() *Statement
+		wantSQL    string
+		wantValues []any
+	}{
+		{
+			name: "SELECT with LIMIT",
+			setup: func() *Statement {
+				s := NewStatement("users", NewSimpleFields("id", "name"))
+				s.Pagination.Add("LIMIT ?", 10)
+				return s
+			},
+			wantSQL:    "SELECT id, name FROM users LIMIT ?",
+			wantValues: []any{10},
+		},
+		{
+			name: "SELECT with LIMIT and OFFSET",
+			setup: func() *Statement {
+				s := NewStatement("products", NewSimpleFields("*"))
+				s.Pagination.Add("LIMIT ?", 20)
+				s.Pagination.Add("OFFSET ?", 40)
+				return s
+			},
+			wantSQL:    "SELECT * FROM products LIMIT ? OFFSET ?",
+			wantValues: []any{20, 40},
+		},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			s := tt.setup()
+			gotSQL, gotValues := s.Build()
+			if gotSQL != tt.wantSQL {
+				t.Errorf("Build() SQL = %v, want %v", gotSQL, tt.wantSQL)
+			}
+			if !reflect.DeepEqual(gotValues, tt.wantValues) {
+				t.Errorf("Build() values = %v, want %v", gotValues, tt.wantValues)
+			}
+		})
+	}
+}
+
+func TestStatement_Build_Complex(t *testing.T) {
+	tests := []struct {
+		name       string
+		setup      func() *Statement
+		wantSQL    string
+		wantValues []any
+	}{
+		{
+			name: "SELECT with WHERE, ORDER BY, and LIMIT",
+			setup: func() *Statement {
+				s := NewStatement("users", NewSimpleFields("id", "name", "email"))
+				s.Where.Add(expr.Field("status", expr.Eq("active")))
+				s.Where.Add(expr.Field("age", expr.Gte(18)))
+				s.Sort.Add("created_at DESC")
+				s.Pagination.Add("LIMIT ?", 10)
+				return s
+			},
+			wantSQL:    "SELECT id, name, email FROM users WHERE (status = ?) AND (age >= ?) ORDER BY created_at DESC LIMIT ?",
+			wantValues: []any{"active", 18, 10},
+		},
+		{
+			name: "Complex query with multiple conditions and sorting",
+			setup: func() *Statement {
+				s := NewStatement("products", NewSimpleFields("id", "name", "price", "category_id"))
+				s.Where.Add(expr.Field("price", expr.Lt(1000)))
+				s.Where.Add(expr.Field("category_id", expr.In(1, 2, 3)))
+				s.Where.Add(expr.Field("deleted_at", expr.IsNull()))
+				s.Sort.Add("category_id")
+				s.Sort.Add("price ASC")
+				s.Pagination.Add("LIMIT ?", 20)
+				s.Pagination.Add("OFFSET ?", 100)
+				return s
+			},
+			wantSQL:    "SELECT id, name, price, category_id FROM products WHERE (price < ?) AND (category_id IN (?,?,?)) AND (deleted_at IS NULL) ORDER BY category_id, price ASC LIMIT ? OFFSET ?",
+			wantValues: []any{1000, 1, 2, 3, 20, 100},
+		},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			s := tt.setup()
+			gotSQL, gotValues := s.Build()
+			if gotSQL != tt.wantSQL {
+				t.Errorf("Build() SQL = %v, want %v", gotSQL, tt.wantSQL)
+			}
+			if !reflect.DeepEqual(gotValues, tt.wantValues) {
+				t.Errorf("Build() values = %v, want %v", gotValues, tt.wantValues)
+			}
+		})
+	}
+}
