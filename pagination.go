@@ -1,7 +1,7 @@
 package querybm
 
 import (
-	"biz/queries/querybm/statement"
+	"github.com/tecowl/querybm/statement"
 )
 
 var DefaultPagination = &Pagination{

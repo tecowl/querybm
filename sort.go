@@ -1,8 +1,9 @@
 package querybm
 
 import (
-	"biz/queries/querybm/statement"
 	"fmt"
+
+	"github.com/tecowl/querybm/statement"
 )
 
 type Sort interface {

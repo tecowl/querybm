@@ -1,10 +1,11 @@
 package querybm
 
 import (
-	"biz/queries/querybm/statement"
 	"context"
 	"database/sql"
 	"fmt"
+
+	"github.com/tecowl/querybm/statement"
 )
 
 type Query[M any, C Condition, S Sort] struct {

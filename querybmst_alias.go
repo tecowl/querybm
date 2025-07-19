@@ -1,6 +1,6 @@
 package querybm
 
-import "biz/queries/querybm/statement"
+import "github.com/tecowl/querybm/statement"
 
 type (
 	Statement = statement.Statement

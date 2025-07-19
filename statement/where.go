@@ -1,7 +1,7 @@
 package statement
 
 import (
-	"biz/queries/querybm/expr"
+	"github.com/tecowl/querybm/expr"
 )
 
 type WhereBlock struct {
