@@ -4,7 +4,7 @@
 name: "querybm-mysql-test"
 services:
   mysql:
-    image: mysql:9.3.0
+    image: mysql:${MYSQL_VERSION}
     hostname: mysql
     restart: always
     environment:
@@ -15,30 +15,6 @@ services:
       - "${MYSQL_PORT}:3306"
     volumes:
       - ./conf.d:/etc/mysql/conf.d
-    networks:
-      - network1
-
-  wait4x:
-    image: wait4x/wait4x:latest
-    command:
-      - mysql
-      - "root@tcp(mysql:${MYSQL_PORT})/${MYSQL_DATABASE}"
-    depends_on:
-      - mysql
-    networks:
-      - network1
-
-  migration:
-    image: mysql:9.3.0
-    command:
-      - /bin/bash
-      - "-c"
-      - "mysql -h mysql -P ${MYSQL_PORT} ${MYSQL_DATABASE} < /schema.sql"
-    volumes:
-      - ./schema.sql:/schema.sql
-    depends_on:
-      wait4x:
-        condition: service_completed_successfully
     networks:
       - network1
 
