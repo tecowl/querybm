@@ -34,7 +34,7 @@ func (c *Conditions) String() string {
 	return sb.String()
 }
 func (c *Conditions) Values() []any {
-	var values []any
+	values := []any{}
 	for _, item := range c.items {
 		values = append(values, item.Values()...)
 	}

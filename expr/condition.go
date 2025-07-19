@@ -55,7 +55,12 @@ func (c *inCondition) String() string {
 
 func (c *inCondition) Values() []any { return c.values }
 
-func In(values ...any) ConditionBody { return &inCondition{values: values} }
+func In(values ...any) ConditionBody {
+	if values == nil {
+		values = []any{}
+	}
+	return &inCondition{values: values}
+}
 func EqOrIn(values ...any) ConditionBody {
 	if len(values) == 1 {
 		return Eq(values[0])
@@ -92,4 +97,9 @@ func (fc *FieldCondition) String() string {
 	}
 	return fmt.Sprintf("%s %s", fc.Name, fc.Body.String())
 }
-func (fc *FieldCondition) Values() []any { return fc.Body.Values() }
+func (fc *FieldCondition) Values() []any {
+	if fc.Body == nil {
+		return []any{}
+	}
+	return fc.Body.Values()
+}

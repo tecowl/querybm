@@ -233,7 +233,7 @@ func TestFieldCondition(t *testing.T) {
 			name:       "Field with nil body",
 			field:      Field("test", nil),
 			wantString: "",
-			wantValues: nil,
+			wantValues: []any{},
 		},
 	}
 
