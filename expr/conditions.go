@@ -1,0 +1,42 @@
+package expr
+
+import "strings"
+
+type Conditions struct {
+	items     []ConditionExpr
+	connector string
+}
+
+var _ ConditionExpr = (*Conditions)(nil)
+
+func NewConditions(connector string, items ...ConditionExpr) *Conditions {
+	return &Conditions{items: items, connector: connector}
+}
+func And(conditions ...ConditionExpr) ConditionExpr { return NewConditions(" AND ", conditions...) }
+func Or(conditions ...ConditionExpr) ConditionExpr  { return NewConditions(" OR ", conditions...) }
+
+func (c *Conditions) String() string {
+	switch len(c.items) {
+	case 0:
+		return ""
+	case 1:
+		return c.items[0].String()
+	}
+	var sb strings.Builder
+	for i, item := range c.items {
+		if i > 0 {
+			sb.WriteString(c.connector)
+		}
+		sb.WriteString("(")
+		sb.WriteString(item.String())
+		sb.WriteString(")")
+	}
+	return sb.String()
+}
+func (c *Conditions) Values() []any {
+	var values []any
+	for _, item := range c.items {
+		values = append(values, item.Values()...)
+	}
+	return values
+}
