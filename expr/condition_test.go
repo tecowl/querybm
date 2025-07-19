@@ -235,15 +235,21 @@ func TestFieldCondition(t *testing.T) {
 			wantString: "",
 			wantValues: []any{},
 		},
+		{
+			name:       "Field with empty In condition",
+			field:      Field("test", In()),
+			wantString: "",
+			wantValues: []any{},
+		},
 	}
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			if got := tt.field.String(); got != tt.wantString {
-				t.Errorf("String() = %v, want %v", got, tt.wantString)
+				t.Errorf("String() = %q, want %q", got, tt.wantString)
 			}
 			if got := tt.field.Values(); !reflect.DeepEqual(got, tt.wantValues) {
-				t.Errorf("Values() = %v, want %v", got, tt.wantValues)
+				t.Errorf("Values() = %+v, want %+v", got, tt.wantValues)
 			}
 		})
 	}
