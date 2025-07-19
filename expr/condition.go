@@ -95,7 +95,11 @@ func (fc *FieldCondition) String() string {
 	if fc.Body == nil {
 		return ""
 	}
-	return fmt.Sprintf("%s %s", fc.Name, fc.Body.String())
+	body := fc.Body.String()
+	if body == "" {
+		return ""
+	}
+	return fmt.Sprintf("%s %s", fc.Name, body)
 }
 func (fc *FieldCondition) Values() []any {
 	if fc.Body == nil {
