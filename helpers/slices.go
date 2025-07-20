@@ -43,3 +43,7 @@ func SliceAll[T any](slice []T, fn func(T) bool) bool {
 	}
 	return true
 }
+
+func SliceBind[T comparable, U, V any](slice []T, f func([]T, U) V) func(U) V {
+	return func(arg U) V { return f(slice, arg) }
+}
