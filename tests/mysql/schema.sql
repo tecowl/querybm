@@ -1,10 +1,9 @@
 -- https://github.com/sqlc-dev/sqlc/blob/main/examples/booktest/mysql/schema.sql
 CREATE TABLE authors (
           author_id integer NOT NULL AUTO_INCREMENT PRIMARY KEY,
-          name text NOT NULL
+          name text NOT NULL,
+          INDEX idx_authors_name (name(255))
 ) ENGINE=InnoDB;
-
-CREATE INDEX authors_name_idx ON authors(name(255));
 
 CREATE TABLE books (
           book_id integer NOT NULL AUTO_INCREMENT PRIMARY KEY,
@@ -14,14 +13,7 @@ CREATE TABLE books (
           title text NOT NULL,
           yr integer NOT NULL DEFAULT 2000,
           available datetime NOT NULL DEFAULT NOW(),
-          tags text NOT NULL
-          -- CONSTRAINT FOREIGN KEY (author_id) REFERENCES authors(author_id)
+          tags text NOT NULL,
+          INDEX idx_books_title_yr (title(255), yr),
+          CONSTRAINT fk_books_author_id FOREIGN KEY (author_id) REFERENCES authors(author_id)
 ) ENGINE=InnoDB;
-
-CREATE INDEX books_title_idx ON books(title(255), yr);
-
-/*
-CREATE FUNCTION say_hello(s text) RETURNS text
-  DETERMINISTIC
-  RETURN CONCAT('hello ', s);
-*/
