@@ -13,8 +13,9 @@ import (
 type BooksBookType string
 
 const (
-	BooksBookTypeFICTION    BooksBookType = "FICTION"
-	BooksBookTypeNONFICTION BooksBookType = "NONFICTION"
+	BooksBookTypeMAGAZINE  BooksBookType = "MAGAZINE"
+	BooksBookTypePAPERBACK BooksBookType = "PAPERBACK"
+	BooksBookTypeHARDCOVER BooksBookType = "HARDCOVER"
 )
 
 func (e *BooksBookType) Scan(src interface{}) error {
