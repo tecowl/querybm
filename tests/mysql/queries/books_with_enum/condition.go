@@ -24,8 +24,8 @@ func (c *Condition) Build(s *querybm.Statement) {
 	if c.IsbnPrefix != "" {
 		s.Where.Add(Field("isbn", LikeStartsWith(c.IsbnPrefix)))
 	}
-	if len(c.BookTypes) > 0 && !slices.All(c.BookTypes, slices.Bind(c.BookTypes, slices.Contains)) {
-		s.Where.Add(Field("book_type", EqOrIn(slices.Generalize(c.BookTypes))))
+	if len(c.BookTypes) > 0 && !slices.All(BookTypeAll, slices.Bind(c.BookTypes, slices.Contains)) {
+		s.Where.Add(Field("book_type", EqOrIn(slices.Generalize(c.BookTypes)...)))
 	}
 	if c.Title != "" {
 		s.Where.Add(Field("title", LikeContains(c.Title)))
