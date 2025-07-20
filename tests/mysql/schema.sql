@@ -10,7 +10,7 @@ CREATE TABLE books (
           book_id integer NOT NULL AUTO_INCREMENT PRIMARY KEY,
           author_id integer NOT NULL,
           isbn varchar(255) NOT NULL DEFAULT '' UNIQUE,
-          book_type ENUM('FICTION', 'NONFICTION') NOT NULL DEFAULT 'FICTION',
+          book_type ENUM('MAGAZINE', 'PAPERBACK', 'HARDCOVER') NOT NULL DEFAULT 'PAPERBACK',
           title text NOT NULL,
           yr integer NOT NULL DEFAULT 2000,
           available datetime NOT NULL DEFAULT NOW(),
