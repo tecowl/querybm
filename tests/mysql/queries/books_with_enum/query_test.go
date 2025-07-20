@@ -40,7 +40,7 @@ func TestQuery(t *testing.T) {
 		return
 	}
 
-	connStr, err := mysqlContainer.ConnectionString(ctx)
+	connStr, err := mysqlContainer.ConnectionString(ctx, "parseTime=true")
 	if err != nil {
 		t.Fatalf("failed to get connection string: %s", err)
 		return
