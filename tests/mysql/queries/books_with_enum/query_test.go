@@ -118,21 +118,21 @@ func TestQuery(t *testing.T) {
 			createBook(authors[0].AuthorID, "978-0134757599",
 				models.BooksBookTypeHARDCOVER, "Refactoring: Improving the Design of Existing Code",
 				2018, time.Date(2020, 1, 1, 0, 0, 0, 0, time.UTC), "refactoring, design, code"),
-			createBook(authors[0].AuthorID, "978-0134757599",
+			createBook(authors[0].AuthorID, "978-0321125217",
 				models.BooksBookTypeHARDCOVER, "Patterns of Enterprise Application Architecture",
 				2002, time.Date(2020, 1, 1, 0, 0, 0, 0, time.UTC), "patterns, architecture, enterprise"),
-			createBook(authors[0].AuthorID, "978-0134757599",
+			createBook(authors[0].AuthorID, "978-0321125218",
 				models.BooksBookTypeHARDCOVER, "Domain-Driven Design: Tackling Complexity in the Heart of Software",
 				2004, time.Date(2020, 1, 1, 0, 0, 0, 0, time.UTC), "domain-driven design, software architecture"),
-			createBook(authors[0].AuthorID, "978-0134757599",
+			createBook(authors[0].AuthorID, "978-0321213358",
 				models.BooksBookTypePAPERBACK, "Refactoring to Patterns",
 				2018, time.Date(2020, 1, 1, 0, 0, 0, 0, time.UTC), "refactoring, design, code"),
 
 			// 2 books by Kent Beck
-			createBook(authors[1].AuthorID, "978-0134757599",
+			createBook(authors[1].AuthorID, "978-0321146533",
 				models.BooksBookTypeHARDCOVER, "Test-Driven Development: By Example",
 				2002, time.Date(2020, 1, 1, 0, 0, 0, 0, time.UTC), "tdd, testing, design"),
-			createBook(authors[1].AuthorID, "978-0134757599",
+			createBook(authors[1].AuthorID, "978-0321278654",
 				models.BooksBookTypePAPERBACK, "Extreme Programming Explained: Embrace Change",
 				2004, time.Date(2020, 1, 1, 0, 0, 0, 0, time.UTC), "extreme programming, agile, design"),
 
@@ -142,7 +142,7 @@ func TestQuery(t *testing.T) {
 				2008, time.Date(2020, 1, 1, 0, 0, 0, 0, time.UTC), "clean code, design, craftsmanship"),
 
 			// Dr. Dobb's Journal
-			createBook(authors[4].AuthorID, "978-0134757599",
+			createBook(authors[4].AuthorID, "0888-3076",
 				models.BooksBookTypeMAGAZINE, "Dr. Dobb's Journal",
 				1976, time.Date(1976, 1, 1, 0, 0, 0, 0, time.UTC), "programming, design, journal"),
 		}
