@@ -10,20 +10,20 @@ type Sort interface {
 	Build(*statement.Statement)
 }
 
-type SortIem struct {
+type SortItem struct {
 	column string
 	desc   bool
 }
 
-var _ Sort = (*SortIem)(nil)
+var _ Sort = (*SortItem)(nil)
 
-func NewSortItem(column string, desc bool) *SortIem {
-	return &SortIem{column: column, desc: desc}
+func NewSortItem(column string, desc bool) *SortItem {
+	return &SortItem{column: column, desc: desc}
 }
 
 var ErrEmptySortItem = fmt.Errorf("sort item cannot be empty")
 
-func (s *SortIem) Validate() error {
+func (s *SortItem) Validate() error {
 	if s.column == "" {
 		return ErrEmptySortItem
 	}
@@ -35,14 +35,14 @@ var sortDirections = map[bool]string{
 	true:  "DESC",
 }
 
-func (s *SortIem) Build(st *statement.Statement) {
+func (s *SortItem) Build(st *statement.Statement) {
 	if s.column == "" {
 		return
 	}
 	st.Sort.Add(s.column + " " + sortDirections[s.desc])
 }
 
-type SortItems []*SortIem
+type SortItems []*SortItem
 
 var _ Sort = (SortItems)(nil)
 

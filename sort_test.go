@@ -46,27 +46,27 @@ func TestNewSortItem(t *testing.T) {
 func TestSortIem_Validate(t *testing.T) {
 	tests := []struct {
 		name    string
-		sortIem *SortIem
+		sortIem *SortItem
 		wantErr bool
 	}{
 		{
 			name:    "Valid sort item",
-			sortIem: &SortIem{column: "name", desc: false},
+			sortIem: &SortItem{column: "name", desc: false},
 			wantErr: false,
 		},
 		{
 			name:    "Empty column",
-			sortIem: &SortIem{column: "", desc: true},
+			sortIem: &SortItem{column: "", desc: true},
 			wantErr: true,
 		},
 		{
 			name:    "Column with spaces",
-			sortIem: &SortIem{column: "created_at", desc: false},
+			sortIem: &SortItem{column: "created_at", desc: false},
 			wantErr: false,
 		},
 		{
 			name:    "Column with table prefix",
-			sortIem: &SortIem{column: "u.name", desc: true},
+			sortIem: &SortItem{column: "u.name", desc: true},
 			wantErr: false,
 		},
 	}
@@ -87,31 +87,31 @@ func TestSortIem_Validate(t *testing.T) {
 func TestSortIem_Build(t *testing.T) {
 	tests := []struct {
 		name        string
-		sortIem     *SortIem
+		sortIem     *SortItem
 		wantContent string
 		wantEmpty   bool
 	}{
 		{
 			name:        "Ascending sort",
-			sortIem:     &SortIem{column: "name", desc: false},
+			sortIem:     &SortItem{column: "name", desc: false},
 			wantContent: "name ASC",
 			wantEmpty:   false,
 		},
 		{
 			name:        "Descending sort",
-			sortIem:     &SortIem{column: "created_at", desc: true},
+			sortIem:     &SortItem{column: "created_at", desc: true},
 			wantContent: "created_at DESC",
 			wantEmpty:   false,
 		},
 		{
 			name:        "Empty column (no-op)",
-			sortIem:     &SortIem{column: "", desc: false},
+			sortIem:     &SortItem{column: "", desc: false},
 			wantContent: "",
 			wantEmpty:   true,
 		},
 		{
 			name:        "Complex column with table prefix",
-			sortIem:     &SortIem{column: "users.created_at", desc: true},
+			sortIem:     &SortItem{column: "users.created_at", desc: true},
 			wantContent: "users.created_at DESC",
 			wantEmpty:   false,
 		},
@@ -140,7 +140,6 @@ func TestSortIem_Build(t *testing.T) {
 	}
 }
 
-
 func TestSortItems_Validate(t *testing.T) {
 	tests := []struct {
 		name      string
@@ -151,21 +150,21 @@ func TestSortItems_Validate(t *testing.T) {
 		{
 			name: "Valid sort items",
 			sortItems: SortItems{
-				&SortIem{column: "name", desc: false},
-				&SortIem{column: "created_at", desc: true},
+				&SortItem{column: "name", desc: false},
+				&SortItem{column: "created_at", desc: true},
 			},
 			wantErr: false,
 		},
 		{
-			name: "Empty sort items",
+			name:      "Empty sort items",
 			sortItems: SortItems{},
-			wantErr: false,
+			wantErr:   false,
 		},
 		{
 			name: "Sort item with empty column",
 			sortItems: SortItems{
-				&SortIem{column: "name", desc: false},
-				&SortIem{column: "", desc: true},
+				&SortItem{column: "name", desc: false},
+				&SortItem{column: "", desc: true},
 			},
 			wantErr: true,
 			wantMsg: "sort item cannot be empty",
@@ -173,7 +172,7 @@ func TestSortItems_Validate(t *testing.T) {
 		{
 			name: "Nil sort item",
 			sortItems: SortItems{
-				&SortIem{column: "name", desc: false},
+				&SortItem{column: "name", desc: false},
 				nil,
 			},
 			wantErr: true,
@@ -182,10 +181,10 @@ func TestSortItems_Validate(t *testing.T) {
 		{
 			name: "All valid items",
 			sortItems: SortItems{
-				&SortIem{column: "id", desc: false},
-				&SortIem{column: "name", desc: false},
-				&SortIem{column: "created_at", desc: true},
-				&SortIem{column: "updated_at", desc: true},
+				&SortItem{column: "id", desc: false},
+				&SortItem{column: "name", desc: false},
+				&SortItem{column: "created_at", desc: true},
+				&SortItem{column: "updated_at", desc: true},
 			},
 			wantErr: false,
 		},
@@ -215,15 +214,15 @@ func TestSortItems_Build(t *testing.T) {
 		{
 			name: "Single sort item",
 			sortItems: SortItems{
-				&SortIem{column: "name", desc: false},
+				&SortItem{column: "name", desc: false},
 			},
 			wantContent: "name ASC",
 		},
 		{
 			name: "Multiple sort items",
 			sortItems: SortItems{
-				&SortIem{column: "category", desc: false},
-				&SortIem{column: "price", desc: true},
+				&SortItem{column: "category", desc: false},
+				&SortItem{column: "price", desc: true},
 			},
 			wantContent: "category ASC, price DESC",
 		},
@@ -235,18 +234,18 @@ func TestSortItems_Build(t *testing.T) {
 		{
 			name: "Mixed ascending and descending",
 			sortItems: SortItems{
-				&SortIem{column: "status", desc: false},
-				&SortIem{column: "created_at", desc: true},
-				&SortIem{column: "id", desc: false},
+				&SortItem{column: "status", desc: false},
+				&SortItem{column: "created_at", desc: true},
+				&SortItem{column: "id", desc: false},
 			},
 			wantContent: "status ASC, created_at DESC, id ASC",
 		},
 		{
 			name: "Items with empty columns are skipped",
 			sortItems: SortItems{
-				&SortIem{column: "name", desc: false},
-				&SortIem{column: "", desc: true},
-				&SortIem{column: "date", desc: true},
+				&SortItem{column: "name", desc: false},
+				&SortItem{column: "", desc: true},
+				&SortItem{column: "date", desc: true},
 			},
 			wantContent: "name ASC, date DESC",
 		},
@@ -269,12 +268,11 @@ func TestSortItems_Build(t *testing.T) {
 	}
 }
 
-
 func TestErrEmptySortItem(t *testing.T) {
 	if ErrEmptySortItem == nil {
 		t.Error("ErrEmptySortItem should not be nil")
 	}
-	
+
 	expectedMsg := "sort item cannot be empty"
 	if ErrEmptySortItem.Error() != expectedMsg {
 		t.Errorf("ErrEmptySortItem.Error() = %v, want %v", ErrEmptySortItem.Error(), expectedMsg)
