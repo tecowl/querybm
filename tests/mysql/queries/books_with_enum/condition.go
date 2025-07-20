@@ -1,6 +1,7 @@
 package bookswithenum
 
 import (
+	"mysql-test/models"
 	"time"
 
 	"github.com/tecowl/querybm"
@@ -10,7 +11,7 @@ import (
 
 type Condition struct {
 	IsbnPrefix     string
-	BookTypes      []BookType
+	BookTypes      []models.BooksBookType
 	Title          string
 	YrRange        helpers.Range[int32]
 	AvailableRange helpers.Range[time.Time]
@@ -20,7 +21,7 @@ func (c *Condition) Build(s *querybm.Statement) {
 	if c.IsbnPrefix != "" {
 		s.Where.Add(Field("isbn", LikeStartsWith(c.IsbnPrefix)))
 	}
-	if len(c.BookTypes) > 0 {
+	if len(c.BookTypes) > 0 && !helpers.SliceAll(c.BookTypes, helpers.SliceBind(c.BookTypes, helpers.SliceContains)) {
 		s.Where.Add(Field("book_type", EqOrIn(helpers.GeneralizeSlice(c.BookTypes))))
 	}
 	if c.Title != "" {
@@ -38,4 +39,10 @@ func (c *Condition) Build(s *querybm.Statement) {
 	if c.AvailableRange.End != nil {
 		s.Where.Add(Field("available", Lt(*c.AvailableRange.End)))
 	}
+}
+
+var BookTypeAll = []models.BooksBookType{
+	models.BooksBookTypeMAGAZINE,
+	models.BooksBookTypePAPERBACK,
+	models.BooksBookTypeHARDCOVER,
 }
