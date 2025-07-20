@@ -17,8 +17,7 @@ var columns querybm.FieldMapper[models.Book] = querybm.NewStaticColumns(
 
 var sort = querybm.NewSortItem("title", false)
 
-func New(db *sql.DB, pagination *querybm.Pagination) *querybm.Query[models.Book, *Condition, *querybm.SortItem] {
-	c := &Condition{}
+func New(db *sql.DB, condition *Condition, pagination *querybm.Pagination) *querybm.Query[models.Book, *Condition, *querybm.SortItem] {
 	table := "books"
-	return querybm.New(db, c, sort, table, columns, pagination)
+	return querybm.New(db, condition, sort, table, columns, pagination)
 }
