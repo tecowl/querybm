@@ -48,3 +48,9 @@ dbconsole:
 		--network querybm-mysql-test_network1 \
 		mysql:$(MYSQL_VERSION) \
 		mysql -h mysql -P $(MYSQL_PORT) $(MYSQL_DATABASE)
+
+include ../../Makefiles/sqlc.mk
+
+.PHONY: generate
+generate: $(SQLC_CLI)
+	$(SQLC_CLI) generate
