@@ -151,7 +151,7 @@ func TestQuery(t *testing.T) {
 	t.Run("Query books with conditions", func(t *testing.T) {
 		t.Run("1 item for magazine", func(t *testing.T) {
 			query := New(db, &Condition{
-				BookTypes: []models.BooksBookType{models.BooksBookType(models.BooksBookTypeMAGAZINE)},
+				BookTypes: []models.BooksBookType{models.BooksBookTypeMAGAZINE},
 			}, querybm.NewPagination(10, 0))
 			cnt, err := query.Count(ctx)
 			require.NoError(t, err)
@@ -159,11 +159,11 @@ func TestQuery(t *testing.T) {
 			items, err := query.List(ctx)
 			require.NoError(t, err)
 			require.Len(t, items, 1)
-			require.Equal(t, books[7], items[0].Title)
+			require.Equal(t, books[7].Title, items[0].Title)
 		})
 		t.Run("2 items for paperback", func(t *testing.T) {
 			query := New(db, &Condition{
-				BookTypes: []models.BooksBookType{models.BooksBookType(models.BooksBookTypePAPERBACK)},
+				BookTypes: []models.BooksBookType{models.BooksBookTypePAPERBACK},
 			}, querybm.NewPagination(10, 0))
 			cnt, err := query.Count(ctx)
 			require.NoError(t, err)
@@ -178,8 +178,8 @@ func TestQuery(t *testing.T) {
 		t.Run("3 items for magazine and paperback", func(t *testing.T) {
 			query := New(db, &Condition{
 				BookTypes: []models.BooksBookType{
-					models.BooksBookType(models.BooksBookTypeMAGAZINE),
-					models.BooksBookType(models.BooksBookTypePAPERBACK),
+					models.BooksBookTypeMAGAZINE,
+					models.BooksBookTypePAPERBACK,
 				},
 			}, querybm.NewPagination(10, 0))
 			cnt, err := query.Count(ctx)
@@ -193,14 +193,14 @@ func TestQuery(t *testing.T) {
 		t.Run("all of items for hardcover, magazine and paperback", func(t *testing.T) {
 			query := New(db, &Condition{
 				BookTypes: []models.BooksBookType{
-					models.BooksBookType(models.BooksBookTypeHARDCOVER),
-					models.BooksBookType(models.BooksBookTypeMAGAZINE),
-					models.BooksBookType(models.BooksBookTypePAPERBACK),
+					models.BooksBookTypeHARDCOVER,
+					models.BooksBookTypeMAGAZINE,
+					models.BooksBookTypePAPERBACK,
 				},
 			}, querybm.NewPagination(10, 0))
 			cnt, err := query.Count(ctx)
 			require.NoError(t, err)
-			require.Equal(t, len(books), cnt)
+			require.Equal(t, int64(len(books)), cnt)
 			items, err := query.List(ctx)
 			require.NoError(t, err)
 			require.Len(t, items, len(books))
