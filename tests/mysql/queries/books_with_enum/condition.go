@@ -6,23 +6,26 @@ import (
 
 	"github.com/tecowl/querybm"
 	. "github.com/tecowl/querybm/expr"
-	"github.com/tecowl/querybm/helpers"
+	"github.com/tecowl/querybm/helpers/ranges"
+	"github.com/tecowl/querybm/helpers/slices"
 )
 
 type Condition struct {
 	IsbnPrefix     string
 	BookTypes      []models.BooksBookType
 	Title          string
-	YrRange        helpers.Range[int32]
-	AvailableRange helpers.Range[time.Time]
+	YrRange        ranges.Range[int32]
+	AvailableRange ranges.Range[time.Time]
 }
+
+var _ querybm.Condition = (*Condition)(nil)
 
 func (c *Condition) Build(s *querybm.Statement) {
 	if c.IsbnPrefix != "" {
 		s.Where.Add(Field("isbn", LikeStartsWith(c.IsbnPrefix)))
 	}
-	if len(c.BookTypes) > 0 && !helpers.SliceAll(c.BookTypes, helpers.SliceBind(c.BookTypes, helpers.SliceContains)) {
-		s.Where.Add(Field("book_type", EqOrIn(helpers.GeneralizeSlice(c.BookTypes))))
+	if len(c.BookTypes) > 0 && !slices.All(c.BookTypes, slices.Bind(c.BookTypes, slices.Contains)) {
+		s.Where.Add(Field("book_type", EqOrIn(slices.Generalize(c.BookTypes))))
 	}
 	if c.Title != "" {
 		s.Where.Add(Field("title", LikeContains(c.Title)))
