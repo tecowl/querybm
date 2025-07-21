@@ -3,14 +3,14 @@ package expr
 import "strings"
 
 type Conditions struct {
-	items     []ConditionExpr
-	connector string
+	items      []ConditionExpr
+	connective string
 }
 
 var _ ConditionExpr = (*Conditions)(nil)
 
 func NewConditions(connector string, items ...ConditionExpr) *Conditions {
-	return &Conditions{items: items, connector: connector}
+	return &Conditions{items: items, connective: connector}
 }
 func And(conditions ...ConditionExpr) ConditionExpr { return NewConditions(" AND ", conditions...) }
 func Or(conditions ...ConditionExpr) ConditionExpr  { return NewConditions(" OR ", conditions...) }
@@ -25,10 +25,10 @@ func (c *Conditions) String() string {
 	var sb strings.Builder
 	for i, item := range c.items {
 		if i > 0 {
-			sb.WriteString(c.connector)
+			sb.WriteString(c.connective)
 		}
 		subconditions, ok := item.(*Conditions)
-		if ok && subconditions.connector != c.connector {
+		if ok && subconditions.connective != c.connective {
 			sb.WriteString("(")
 			sb.WriteString(subconditions.String())
 			sb.WriteString(")")
