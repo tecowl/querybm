@@ -9,7 +9,7 @@ func TestCompareCondition(t *testing.T) {
 	field := "field1"
 	tests := []struct {
 		name       string
-		condition  ConditionBody
+		condition  FieldConditionBody
 		wantString string
 		wantValues []any
 	}{
@@ -91,7 +91,7 @@ func TestInCondition(t *testing.T) {
 	field := "field2"
 	tests := []struct {
 		name       string
-		condition  ConditionBody
+		condition  FieldConditionBody
 		wantString string
 		wantValues []any
 	}{
@@ -178,7 +178,7 @@ func TestStaticCondition(t *testing.T) {
 	field := "field4"
 	tests := []struct {
 		name       string
-		condition  ConditionBody
+		condition  FieldConditionBody
 		wantString string
 		wantValues []any
 	}{
