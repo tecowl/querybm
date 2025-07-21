@@ -89,14 +89,14 @@ func EqOrIn(values ...any) FieldConditionBody {
 	return In(values...)
 }
 
-type staticCondition struct {
+type fieldStaticExpr struct {
 	value string
 }
 
-var _ FieldConditionBody = (*staticCondition)(nil)
+var _ FieldConditionBody = (*fieldStaticExpr)(nil)
 
-func (c *staticCondition) Build(field string) string { return fmt.Sprintf("%s %s", field, c.value) }
-func (c *staticCondition) Values() []any             { return []any{} }
+func (c *fieldStaticExpr) Build(field string) string { return fmt.Sprintf("%s %s", field, c.value) }
+func (c *fieldStaticExpr) Values() []any             { return []any{} }
 
-func IsNull() FieldConditionBody    { return &staticCondition{value: "IS NULL"} }
-func IsNotNull() FieldConditionBody { return &staticCondition{value: "IS NOT NULL"} }
+func IsNull() FieldConditionBody    { return &fieldStaticExpr{value: "IS NULL"} }
+func IsNotNull() FieldConditionBody { return &fieldStaticExpr{value: "IS NOT NULL"} }

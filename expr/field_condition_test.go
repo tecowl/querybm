@@ -174,7 +174,7 @@ func TestEqOrIn(t *testing.T) {
 	}
 }
 
-func TestStaticCondition(t *testing.T) {
+func TestFieldStaticExpr(t *testing.T) {
 	field := "field4"
 	tests := []struct {
 		name       string
