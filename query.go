@@ -46,7 +46,7 @@ func (q *Query[M, C, S]) Validate() error {
 }
 
 func (q *Query[M, C, S]) BuildCountSelect() (string, []any) {
-	st := statement.NewStatement(q.Table, statement.NewSimpleFields("COUNT(*) AS count"))
+	st := statement.New(q.Table, statement.NewSimpleFields("COUNT(*) AS count"))
 
 	q.Condition.Build(st)
 
@@ -54,7 +54,7 @@ func (q *Query[M, C, S]) BuildCountSelect() (string, []any) {
 }
 
 func (q *Query[M, C, S]) BuildRowsSelect() (string, []any) {
-	st := statement.NewStatement(q.Table, q.Fields)
+	st := statement.New(q.Table, q.Fields)
 	q.Condition.Build(st)
 	q.Sort.Build(st)
 	q.Pagination.Build(st)
@@ -105,8 +105,11 @@ func (q *Query[M, C, S]) FirstRow(ctx context.Context) (*sql.Row, error) {
 	defer stmt.Close()
 
 	row := stmt.QueryRowContext(ctx, args...)
-	if row.Err() != nil {
-		return nil, row.Err()
+	if err := row.Err(); err != nil {
+		if err == sql.ErrNoRows {
+			return nil, nil // No rows found, return nil
+		}
+		return nil, err
 	}
 	return row, nil
 }
@@ -130,11 +133,14 @@ func (q *Query[M, C, S]) First(ctx context.Context) (*M, error) {
 	if err != nil {
 		return nil, err
 	}
-	if row.Err() != nil {
-		return nil, row.Err()
+	if row == nil {
+		return nil, nil // No rows found, return nil
 	}
 	org := new(M)
 	if err := q.Fields.Mapper()(row, org); err != nil {
+		if err == sql.ErrNoRows {
+			return nil, nil // No rows found, return nil
+		}
 		return nil, err
 	}
 	return org, nil
