@@ -148,75 +148,75 @@ func TestPagination_Validate(t *testing.T) {
 
 func TestPagination_Build(t *testing.T) {
 	tests := []struct {
-		name         string
-		pagination   *Pagination
-		wantContent  string
-		wantValues   []any
+		name        string
+		pagination  *Pagination
+		wantContent string
+		wantValues  []any
 	}{
 		{
-			name:         "Limit only",
-			pagination:   &Pagination{limit: 10, offset: 0},
-			wantContent:  "LIMIT ?",
-			wantValues:   []any{int64(10)},
+			name:        "Limit only",
+			pagination:  &Pagination{limit: 10, offset: 0},
+			wantContent: "LIMIT ?",
+			wantValues:  []any{int64(10)},
 		},
 		{
-			name:         "Limit and offset",
-			pagination:   &Pagination{limit: 20, offset: 40},
-			wantContent:  "LIMIT ? OFFSET ?",
-			wantValues:   []any{int64(20), int64(40)},
+			name:        "Limit and offset",
+			pagination:  &Pagination{limit: 20, offset: 40},
+			wantContent: "LIMIT ? OFFSET ?",
+			wantValues:  []any{int64(20), int64(40)},
 		},
 		{
-			name:         "Zero limit (no pagination added)",
-			pagination:   &Pagination{limit: 0, offset: 50},
-			wantContent:  "",
-			wantValues:   []any{},
+			name:        "Zero limit (no pagination added)",
+			pagination:  &Pagination{limit: 0, offset: 50},
+			wantContent: "",
+			wantValues:  []any{},
 		},
 		{
-			name:         "Negative limit (no pagination added)",
-			pagination:   &Pagination{limit: -10, offset: 50},
-			wantContent:  "",
-			wantValues:   []any{},
+			name:        "Negative limit (no pagination added)",
+			pagination:  &Pagination{limit: -10, offset: 50},
+			wantContent: "",
+			wantValues:  []any{},
 		},
 		{
-			name:         "Large values",
-			pagination:   &Pagination{limit: 1000, offset: 10000},
-			wantContent:  "LIMIT ? OFFSET ?",
-			wantValues:   []any{int64(1000), int64(10000)},
+			name:        "Large values",
+			pagination:  &Pagination{limit: 1000, offset: 10000},
+			wantContent: "LIMIT ? OFFSET ?",
+			wantValues:  []any{int64(1000), int64(10000)},
 		},
 		{
-			name:         "Limit with zero offset (no OFFSET clause)",
-			pagination:   &Pagination{limit: 50, offset: 0},
-			wantContent:  "LIMIT ?",
-			wantValues:   []any{int64(50)},
+			name:        "Limit with zero offset (no OFFSET clause)",
+			pagination:  &Pagination{limit: 50, offset: 0},
+			wantContent: "LIMIT ?",
+			wantValues:  []any{int64(50)},
 		},
 		{
-			name:         "Limit with negative offset (no OFFSET clause)",
-			pagination:   &Pagination{limit: 50, offset: -10},
-			wantContent:  "LIMIT ?",
-			wantValues:   []any{int64(50)},
+			name:        "Limit with negative offset (no OFFSET clause)",
+			pagination:  &Pagination{limit: 50, offset: -10},
+			wantContent: "LIMIT ?",
+			wantValues:  []any{int64(50)},
 		},
 	}
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			stmt := statement.NewStatement("test_table", statement.NewSimpleFields("id"))
+			stmt := statement.New("test_table", statement.NewSimpleFields("id"))
 			tt.pagination.Build(stmt)
-			
+
 			if stmt.Pagination.IsEmpty() && tt.wantContent != "" {
 				t.Error("Build() did not add pagination when expected")
 			}
-			
+
 			// Use reflection to access private fields for testing
 			contentField := reflect.ValueOf(stmt.Pagination).Elem().FieldByName("content")
 			valuesField := reflect.ValueOf(stmt.Pagination).Elem().FieldByName("values")
-			
+
 			if contentField.IsValid() && contentField.CanInterface() {
 				gotContent := contentField.Interface().(string)
 				if gotContent != tt.wantContent {
 					t.Errorf("Build() content = %v, want %v", gotContent, tt.wantContent)
 				}
 			}
-			
+
 			if valuesField.IsValid() && valuesField.CanInterface() {
 				gotValues := valuesField.Interface().([]any)
 				if !reflect.DeepEqual(gotValues, tt.wantValues) {
@@ -226,4 +226,3 @@ func TestPagination_Build(t *testing.T) {
 		})
 	}
 }
-

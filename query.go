@@ -46,7 +46,7 @@ func (q *Query[M, C, S]) Validate() error {
 }
 
 func (q *Query[M, C, S]) BuildCountSelect() (string, []any) {
-	st := statement.NewStatement(q.Table, statement.NewSimpleFields("COUNT(*) AS count"))
+	st := statement.New(q.Table, statement.NewSimpleFields("COUNT(*) AS count"))
 
 	q.Condition.Build(st)
 
@@ -54,7 +54,7 @@ func (q *Query[M, C, S]) BuildCountSelect() (string, []any) {
 }
 
 func (q *Query[M, C, S]) BuildRowsSelect() (string, []any) {
-	st := statement.NewStatement(q.Table, q.Fields)
+	st := statement.New(q.Table, q.Fields)
 	q.Condition.Build(st)
 	q.Sort.Build(st)
 	q.Pagination.Build(st)

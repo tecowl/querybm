@@ -119,7 +119,7 @@ func TestSortIem_Build(t *testing.T) {
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			stmt := statement.NewStatement("test_table", statement.NewSimpleFields("id"))
+			stmt := statement.New("test_table", statement.NewSimpleFields("id"))
 			tt.sortIem.Build(stmt)
 
 			if tt.wantEmpty {
@@ -253,7 +253,7 @@ func TestSortItems_Build(t *testing.T) {
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			stmt := statement.NewStatement("test_table", statement.NewSimpleFields("id"))
+			stmt := statement.New("test_table", statement.NewSimpleFields("id"))
 			tt.sortItems.Build(stmt)
 
 			// Use reflection to access private field

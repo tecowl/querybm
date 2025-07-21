@@ -9,7 +9,7 @@ import (
 
 func TestNewStatement(t *testing.T) {
 	fields := NewSimpleFields("id", "name", "email")
-	s := NewStatement("users", fields)
+	s := New("users", fields)
 
 	if s.Table.content != "users" {
 		t.Errorf("NewStatement() table = %v, want %v", s.Table.content, "users")
@@ -37,7 +37,7 @@ func TestStatement_Build_SimpleSelect(t *testing.T) {
 	}{
 		{
 			name: "Simple SELECT without conditions",
-			statement: NewStatement("users",
+			statement: New("users",
 				NewSimpleFields("id", "name", "email"),
 			),
 			wantSQL:    "SELECT id, name, email FROM users",
@@ -45,7 +45,7 @@ func TestStatement_Build_SimpleSelect(t *testing.T) {
 		},
 		{
 			name: "SELECT with single field",
-			statement: NewStatement("products",
+			statement: New("products",
 				NewSimpleFields("count(*)"),
 			),
 			wantSQL:    "SELECT count(*) FROM products",
@@ -53,7 +53,7 @@ func TestStatement_Build_SimpleSelect(t *testing.T) {
 		},
 		{
 			name: "SELECT all fields",
-			statement: NewStatement("orders",
+			statement: New("orders",
 				NewSimpleFields("*"),
 			),
 			wantSQL:    "SELECT * FROM orders",
@@ -84,7 +84,7 @@ func TestStatement_Build_WithWhere(t *testing.T) {
 		{
 			name: "SELECT with single WHERE condition",
 			setup: func() *Statement {
-				s := NewStatement("users", NewSimpleFields("id", "name"))
+				s := New("users", NewSimpleFields("id", "name"))
 				s.Where.Add(expr.Field("status", expr.Eq("active")))
 				return s
 			},
@@ -94,7 +94,7 @@ func TestStatement_Build_WithWhere(t *testing.T) {
 		{
 			name: "SELECT with multiple WHERE conditions",
 			setup: func() *Statement {
-				s := NewStatement("users", NewSimpleFields("*"))
+				s := New("users", NewSimpleFields("*"))
 				s.Where.Add(expr.Field("age", expr.Gte(18)))
 				s.Where.Add(expr.Field("status", expr.Eq("active")))
 				return s
@@ -105,7 +105,7 @@ func TestStatement_Build_WithWhere(t *testing.T) {
 		{
 			name: "SELECT with IN condition",
 			setup: func() *Statement {
-				s := NewStatement("products", NewSimpleFields("id", "name", "price"))
+				s := New("products", NewSimpleFields("id", "name", "price"))
 				s.Where.Add(expr.Field("category_id", expr.In(1, 2, 3)))
 				return s
 			},
@@ -115,7 +115,7 @@ func TestStatement_Build_WithWhere(t *testing.T) {
 		{
 			name: "SELECT with LIKE condition",
 			setup: func() *Statement {
-				s := NewStatement("users", NewSimpleFields("id", "email"))
+				s := New("users", NewSimpleFields("id", "email"))
 				s.Where.Add(expr.Field("email", expr.LikeContains("@example")))
 				return s
 			},
@@ -125,7 +125,7 @@ func TestStatement_Build_WithWhere(t *testing.T) {
 		{
 			name: "SELECT with IS NULL condition",
 			setup: func() *Statement {
-				s := NewStatement("users", NewSimpleFields("id", "name"))
+				s := New("users", NewSimpleFields("id", "name"))
 				s.Where.Add(expr.Field("deleted_at", expr.IsNull()))
 				return s
 			},
@@ -158,7 +158,7 @@ func TestStatement_Build_WithSort(t *testing.T) {
 		{
 			name: "SELECT with single ORDER BY",
 			setup: func() *Statement {
-				s := NewStatement("users", NewSimpleFields("id", "name"))
+				s := New("users", NewSimpleFields("id", "name"))
 				s.Sort.Add("created_at DESC")
 				return s
 			},
@@ -168,7 +168,7 @@ func TestStatement_Build_WithSort(t *testing.T) {
 		{
 			name: "SELECT with multiple ORDER BY",
 			setup: func() *Statement {
-				s := NewStatement("products", NewSimpleFields("*"))
+				s := New("products", NewSimpleFields("*"))
 				s.Sort.Add("category_id")
 				s.Sort.Add("price DESC")
 				return s
@@ -202,7 +202,7 @@ func TestStatement_Build_WithPagination(t *testing.T) {
 		{
 			name: "SELECT with LIMIT",
 			setup: func() *Statement {
-				s := NewStatement("users", NewSimpleFields("id", "name"))
+				s := New("users", NewSimpleFields("id", "name"))
 				s.Pagination.Add("LIMIT ?", 10)
 				return s
 			},
@@ -212,7 +212,7 @@ func TestStatement_Build_WithPagination(t *testing.T) {
 		{
 			name: "SELECT with LIMIT and OFFSET",
 			setup: func() *Statement {
-				s := NewStatement("products", NewSimpleFields("*"))
+				s := New("products", NewSimpleFields("*"))
 				s.Pagination.Add("LIMIT ?", 20)
 				s.Pagination.Add("OFFSET ?", 40)
 				return s
@@ -246,7 +246,7 @@ func TestStatement_Build_Complex(t *testing.T) {
 		{
 			name: "SELECT with WHERE, ORDER BY, and LIMIT",
 			setup: func() *Statement {
-				s := NewStatement("users", NewSimpleFields("id", "name", "email"))
+				s := New("users", NewSimpleFields("id", "name", "email"))
 				s.Where.Add(expr.Field("status", expr.Eq("active")))
 				s.Where.Add(expr.Field("age", expr.Gte(18)))
 				s.Sort.Add("created_at DESC")
@@ -259,7 +259,7 @@ func TestStatement_Build_Complex(t *testing.T) {
 		{
 			name: "Complex query with multiple conditions and sorting",
 			setup: func() *Statement {
-				s := NewStatement("products", NewSimpleFields("id", "name", "price", "category_id"))
+				s := New("products", NewSimpleFields("id", "name", "price", "category_id"))
 				s.Where.Add(expr.Field("price", expr.Lt(1000)))
 				s.Where.Add(expr.Field("category_id", expr.In(1, 2, 3)))
 				s.Where.Add(expr.Field("deleted_at", expr.IsNull()))

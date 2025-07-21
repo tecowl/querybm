@@ -12,7 +12,7 @@ type Statement struct {
 	Pagination *Block
 }
 
-func NewStatement(table string, fields Fields) *Statement {
+func New(table string, fields Fields) *Statement {
 	return &Statement{
 		Fields: fields,
 		Table:  NewTableBlock(table),
