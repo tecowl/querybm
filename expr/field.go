@@ -82,7 +82,7 @@ type FieldCondition struct {
 
 var _ ConditionExpr = (*FieldCondition)(nil)
 
-func Field(name string, body ConditionBody) *FieldCondition {
+func Field(name string, body ConditionBody) ConditionExpr {
 	return &FieldCondition{Name: name, Body: body}
 }
 

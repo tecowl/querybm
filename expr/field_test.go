@@ -207,7 +207,7 @@ func TestStaticCondition(t *testing.T) {
 func TestFieldCondition(t *testing.T) {
 	tests := []struct {
 		name       string
-		field      *FieldCondition
+		field      ConditionExpr
 		wantString string
 		wantValues []any
 	}{
