@@ -54,3 +54,6 @@ include ../../Makefiles/sqlc.mk
 .PHONY: generate
 generate: $(SQLC_CLI)
 	$(SQLC_CLI) generate
+
+# COVERAGE_GO_PACKAGES_CSV is used in Makefiles/cov-unit.mk
+COVERAGE_GO_PACKAGES_CSV=$(shell make -C ../.. coverage-go-packages --no-print-directory)

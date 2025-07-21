@@ -3,9 +3,9 @@ $(COVERAGE_INTEGRATED_DIR):
 	mkdir -p $(COVERAGE_INTEGRATED_DIR)
 
 .PHONY: test-with-coverage
-test-with-coverage: test-unit-with-coverage
+test-with-coverage: test-unit-with-coverage tests-mysql-test-unit-with-coverage
 
-COVERAGE_DIRS_CSV=$(UNIT_COVERAGE_DIR)
+COVERAGE_DIRS_CSV=$(UNIT_COVERAGE_DIR),tests/mysql/coverages/unit
 
 COVERAGE_PROFILE?=$(COVERAGES_DIR)/coverage.txt
 $(COVERAGE_PROFILE): $(COVERAGE_INTEGRATED_DIR)
