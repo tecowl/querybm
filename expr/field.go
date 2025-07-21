@@ -5,11 +5,6 @@ import (
 	"strings"
 )
 
-type ConditionExpr interface {
-	String() string
-	Values() []any
-}
-
 type ConditionBody interface {
 	String() string
 	Values() []any
