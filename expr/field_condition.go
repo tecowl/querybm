@@ -5,6 +5,30 @@ import (
 	"strings"
 )
 
+type FieldCondition struct {
+	Name string
+	Body FieldConditionBody
+}
+
+var _ ConditionExpr = (*FieldCondition)(nil)
+
+func Field(name string, body FieldConditionBody) ConditionExpr {
+	return &FieldCondition{Name: name, Body: body}
+}
+
+func (fc *FieldCondition) String() string {
+	if fc.Body == nil {
+		return ""
+	}
+	return fc.Body.Build(fc.Name)
+}
+func (fc *FieldCondition) Values() []any {
+	if fc.Body == nil {
+		return []any{}
+	}
+	return fc.Body.Values()
+}
+
 type FieldConditionBody interface {
 	Build(field string) string
 	Values() []any
@@ -76,27 +100,3 @@ func (c *staticCondition) Values() []any             { return []any{} }
 
 func IsNull() FieldConditionBody    { return &staticCondition{value: "IS NULL"} }
 func IsNotNull() FieldConditionBody { return &staticCondition{value: "IS NOT NULL"} }
-
-type FieldCondition struct {
-	Name string
-	Body FieldConditionBody
-}
-
-var _ ConditionExpr = (*FieldCondition)(nil)
-
-func Field(name string, body FieldConditionBody) ConditionExpr {
-	return &FieldCondition{Name: name, Body: body}
-}
-
-func (fc *FieldCondition) String() string {
-	if fc.Body == nil {
-		return ""
-	}
-	return fc.Body.Build(fc.Name)
-}
-func (fc *FieldCondition) Values() []any {
-	if fc.Body == nil {
-		return []any{}
-	}
-	return fc.Body.Values()
-}
