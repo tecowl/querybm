@@ -61,26 +61,26 @@ func LikeStartsWith(value string) FieldConditionBody { return Like(value + "%") 
 func LikeEndsWith(value string) FieldConditionBody   { return Like("%" + value) }
 func LikeContains(value string) FieldConditionBody   { return Like("%" + value + "%") }
 
-type inCondition struct {
+type fieldInExpr struct {
 	values []any
 }
 
-var _ FieldConditionBody = (*inCondition)(nil)
+var _ FieldConditionBody = (*fieldInExpr)(nil)
 
-func (c *inCondition) Build(field string) string {
+func (c *fieldInExpr) Build(field string) string {
 	if len(c.values) == 0 {
 		return ""
 	}
 	return field + " IN (" + strings.Repeat("?,", len(c.values)-1) + "?)"
 }
 
-func (c *inCondition) Values() []any { return c.values }
+func (c *fieldInExpr) Values() []any { return c.values }
 
 func In(values ...any) FieldConditionBody {
 	if values == nil {
 		values = []any{}
 	}
-	return &inCondition{values: values}
+	return &fieldInExpr{values: values}
 }
 func EqOrIn(values ...any) FieldConditionBody {
 	if len(values) == 1 {

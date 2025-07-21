@@ -87,7 +87,7 @@ func TestFieldComparison(t *testing.T) {
 	}
 }
 
-func TestInCondition(t *testing.T) {
+func TestFieldInExpr(t *testing.T) {
 	field := "field2"
 	tests := []struct {
 		name       string
