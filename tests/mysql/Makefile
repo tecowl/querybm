@@ -9,6 +9,9 @@ include ../../Makefiles/test.mk
 include ../../Makefiles/cov-unit.mk
 include ../../Makefiles/wait4x.mk
 
+.PHONY: test
+test: test-unit
+
 MYSQL_VERSION=9.3.0
 MYSQL_DATABASE=querybm-test
 MYSQL_PORT=3306

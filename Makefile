@@ -10,6 +10,9 @@ include ./Makefiles/test.mk
 include ./Makefiles/cov-unit.mk
 include ./Makefiles/cov-integration.mk
 
+.PHONY: test
+test: test-unit tests-test
+
 tests-%:
 	$(MAKE) -C tests $*
 
