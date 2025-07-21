@@ -74,29 +74,29 @@ func Setup(t *testing.T, ctx context.Context, db *sql.DB) ([]*models.Author, []*
 		// 3 books by Martin Fowler
 		createBook(authors[0].AuthorID, "978-0134757599",
 			models.BooksBookTypeHARDCOVER, "Refactoring: Improving the Design of Existing Code",
-			2018, time.Date(2020, 1, 1, 0, 0, 0, 0, time.UTC), "refactoring, design, code"),
+			2018, time.Date(2018, 1, 1, 0, 0, 0, 0, time.UTC), "refactoring, design, code"),
 		createBook(authors[0].AuthorID, "978-0321125217",
 			models.BooksBookTypeHARDCOVER, "Patterns of Enterprise Application Architecture",
-			2002, time.Date(2020, 1, 1, 0, 0, 0, 0, time.UTC), "patterns, architecture, enterprise"),
+			2002, time.Date(2002, 1, 1, 0, 0, 0, 0, time.UTC), "patterns, architecture, enterprise"),
 		createBook(authors[0].AuthorID, "978-0321125218",
 			models.BooksBookTypeHARDCOVER, "Domain-Driven Design: Tackling Complexity in the Heart of Software",
-			2004, time.Date(2020, 1, 1, 0, 0, 0, 0, time.UTC), "domain-driven design, software architecture"),
+			2004, time.Date(2004, 1, 1, 0, 0, 0, 0, time.UTC), "domain-driven design, software architecture"),
 		createBook(authors[0].AuthorID, "978-0321213358",
 			models.BooksBookTypePAPERBACK, "Refactoring to Patterns",
-			2018, time.Date(2020, 1, 1, 0, 0, 0, 0, time.UTC), "refactoring, design, code"),
+			2018, time.Date(2018, 1, 1, 0, 0, 0, 0, time.UTC), "refactoring, design, code"),
 
 		// 2 books by Kent Beck
 		createBook(authors[1].AuthorID, "978-0321146533",
 			models.BooksBookTypeHARDCOVER, "Test-Driven Development: By Example",
-			2002, time.Date(2020, 1, 1, 0, 0, 0, 0, time.UTC), "tdd, testing, design"),
+			2002, time.Date(2002, 1, 1, 0, 0, 0, 0, time.UTC), "tdd, testing, design"),
 		createBook(authors[1].AuthorID, "978-0321278654",
 			models.BooksBookTypePAPERBACK, "Extreme Programming Explained: Embrace Change",
-			2004, time.Date(2020, 1, 1, 0, 0, 0, 0, time.UTC), "extreme programming, agile, design"),
+			2004, time.Date(2004, 1, 1, 0, 0, 0, 0, time.UTC), "extreme programming, agile, design"),
 
 		// 1 book by Robert C. Martin
 		createBook(authors[2].AuthorID, "978-0132350884",
 			models.BooksBookTypeHARDCOVER, "Clean Code: A Handbook of Agile Software Craftsmanship",
-			2008, time.Date(2020, 1, 1, 0, 0, 0, 0, time.UTC), "clean code, design, craftsmanship"),
+			2008, time.Date(2008, 1, 1, 0, 0, 0, 0, time.UTC), "clean code, design, craftsmanship"),
 
 		// Dr. Dobb's Journal
 		createBook(authors[4].AuthorID, "0888-3076",
