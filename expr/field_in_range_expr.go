@@ -6,6 +6,7 @@ type inRangeExpr struct {
 }
 
 var _ FieldConditionBody = (*inRangeExpr)(nil)
+var _ ConnectiveCondition = (*inRangeExpr)(nil)
 
 func (c *inRangeExpr) Build(field string) string {
 	if c.start == nil && c.end == nil {
@@ -30,6 +31,13 @@ func (c *inRangeExpr) Values() []any {
 		values = append(values, c.end)
 	}
 	return values
+}
+
+func (c *inRangeExpr) Connective() string {
+	if c.start != nil && c.end != nil {
+		return " AND "
+	}
+	return ""
 }
 
 func InRange(start, end any) FieldConditionBody {

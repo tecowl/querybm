@@ -6,6 +6,7 @@ type FieldCondition struct {
 }
 
 var _ ConditionExpr = (*FieldCondition)(nil)
+var _ ConnectiveCondition = (*FieldCondition)(nil)
 
 func Field(name string, body FieldConditionBody) ConditionExpr {
 	return &FieldCondition{Name: name, Body: body}
@@ -22,6 +23,13 @@ func (fc *FieldCondition) Values() []any {
 		return []any{}
 	}
 	return fc.Body.Values()
+}
+
+func (fc *FieldCondition) Connective() string {
+	if connective, ok := fc.Body.(ConnectiveCondition); ok {
+		return connective.Connective()
+	}
+	return ""
 }
 
 type FieldConditionBody interface {

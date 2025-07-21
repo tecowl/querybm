@@ -8,6 +8,7 @@ type Conditions struct {
 }
 
 var _ ConditionExpr = (*Conditions)(nil)
+var _ ConnectiveCondition = (*Conditions)(nil)
 
 func NewConditions(connector string, items ...ConditionExpr) *Conditions {
 	return &Conditions{items: items, connective: connector}
@@ -27,10 +28,9 @@ func (c *Conditions) String() string {
 		if i > 0 {
 			sb.WriteString(c.connective)
 		}
-		subconditions, ok := item.(*Conditions)
-		if ok && subconditions.connective != c.connective {
+		if HasDifferentConnective(item, c.connective) {
 			sb.WriteString("(")
-			sb.WriteString(subconditions.String())
+			sb.WriteString(item.String())
 			sb.WriteString(")")
 		} else {
 			sb.WriteString(item.String())
@@ -44,4 +44,8 @@ func (c *Conditions) Values() []any {
 		values = append(values, item.Values()...)
 	}
 	return values
+}
+
+func (c *Conditions) Connective() string {
+	return c.connective
 }
