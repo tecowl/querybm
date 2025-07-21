@@ -5,7 +5,7 @@ import (
 	"testing"
 )
 
-func TestCompareCondition(t *testing.T) {
+func TestFieldComparison(t *testing.T) {
 	field := "field1"
 	tests := []struct {
 		name       string

@@ -34,20 +34,20 @@ type FieldConditionBody interface {
 	Values() []any
 }
 
-type compareCondition struct {
+type fieldComparison struct {
 	operator string
 	value    any
 }
 
-var _ FieldConditionBody = (*compareCondition)(nil)
+var _ FieldConditionBody = (*fieldComparison)(nil)
 
-func newCompare(operator string, value any) *compareCondition {
-	return &compareCondition{operator: operator, value: value}
+func newCompare(operator string, value any) *fieldComparison {
+	return &fieldComparison{operator: operator, value: value}
 }
-func (c *compareCondition) Build(field string) string {
+func (c *fieldComparison) Build(field string) string {
 	return fmt.Sprintf("%s %s ?", field, c.operator)
 }
-func (c *compareCondition) Values() []any { return []any{c.value} }
+func (c *fieldComparison) Values() []any { return []any{c.value} }
 
 func Eq(value any) FieldConditionBody    { return newCompare("=", value) }
 func NotEq(value any) FieldConditionBody { return newCompare("<>", value) }
