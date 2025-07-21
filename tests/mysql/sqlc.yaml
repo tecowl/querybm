@@ -1,0 +1,10 @@
+version: "2"
+sql:
+  - engine: "mysql"
+    queries:
+      - "mutations/*.sql"
+    schema: "schema.sql"
+    gen:
+      go:
+        package: "models"
+        out: "models"

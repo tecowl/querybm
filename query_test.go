@@ -1,0 +1,279 @@
+package querybm
+
+import (
+	"database/sql"
+	"errors"
+	"reflect"
+	"testing"
+
+	"github.com/tecowl/querybm/expr"
+	"github.com/tecowl/querybm/statement"
+)
+
+// Mock types for testing
+type TestModel struct {
+	ID   int
+	Name string
+}
+
+type TestCondition struct {
+	whereAdded bool
+}
+
+func (t *TestCondition) Build(s *statement.Statement) {
+	t.whereAdded = true
+	s.Where.Add(expr.Field("status", expr.Eq("active")))
+}
+
+type TestSort struct {
+	sortAdded bool
+}
+
+func (t *TestSort) Build(s *statement.Statement) {
+	t.sortAdded = true
+	s.Sort.Add("created_at DESC")
+}
+
+type ValidatableCondition struct {
+	TestCondition
+	validateCalled bool
+	validateErr    error
+}
+
+func (v *ValidatableCondition) Validate() error {
+	v.validateCalled = true
+	return v.validateErr
+}
+
+type ValidatableSort struct {
+	TestSort
+	validateCalled bool
+	validateErr    error
+}
+
+func (v *ValidatableSort) Validate() error {
+	v.validateCalled = true
+	return v.validateErr
+}
+
+func TestNew(t *testing.T) {
+	db := &sql.DB{}
+	condition := &TestCondition{}
+	sort := &TestSort{}
+	fields := NewStaticColumns([]string{"id", "name"}, func(s Scanner, m *TestModel) error {
+		return s.Scan(&m.ID, &m.Name)
+	})
+	pagination := NewPagination(10, 0)
+
+	query := New(db, condition, sort, "users", fields, pagination)
+
+	if query.db != db {
+		t.Error("New() db not set correctly")
+	}
+	if query.Table != "users" {
+		t.Errorf("New() Table = %v, want %v", query.Table, "users")
+	}
+	if query.Condition != condition {
+		t.Error("New() Condition not set correctly")
+	}
+	if query.Sort != sort {
+		t.Error("New() Sort not set correctly")
+	}
+	if query.Pagination != pagination {
+		t.Error("New() Pagination not set correctly")
+	}
+}
+
+func TestQuery_Validate(t *testing.T) {
+	tests := []struct {
+		name          string
+		setupQuery    func() *Query[TestModel, Condition, Sort]
+		wantErr       bool
+		wantErrString string
+	}{
+		{
+			name: "All validations pass",
+			setupQuery: func() *Query[TestModel, Condition, Sort] {
+				db := &sql.DB{}
+				condition := &ValidatableCondition{}
+				sort := &ValidatableSort{}
+				fields := NewStaticColumns[TestModel]([]string{"id"}, nil)
+				pagination := NewPagination(10, 0)
+				return New[TestModel, Condition, Sort](db, condition, sort, "users", fields, pagination)
+			},
+			wantErr: false,
+		},
+		{
+			name: "Condition validation fails",
+			setupQuery: func() *Query[TestModel, Condition, Sort] {
+				db := &sql.DB{}
+				condition := &ValidatableCondition{validateErr: errors.New("invalid condition")}
+				sort := &ValidatableSort{}
+				fields := NewStaticColumns[TestModel]([]string{"id"}, nil)
+				pagination := NewPagination(10, 0)
+				return New[TestModel, Condition, Sort](db, condition, sort, "users", fields, pagination)
+			},
+			wantErr:       true,
+			wantErrString: "condition validation failed:",
+		},
+		{
+			name: "Sort validation fails",
+			setupQuery: func() *Query[TestModel, Condition, Sort] {
+				db := &sql.DB{}
+				condition := &ValidatableCondition{}
+				sort := &ValidatableSort{validateErr: errors.New("invalid sort")}
+				fields := NewStaticColumns[TestModel]([]string{"id"}, nil)
+				pagination := NewPagination(10, 0)
+				return New[TestModel, Condition, Sort](db, condition, sort, "users", fields, pagination)
+			},
+			wantErr:       true,
+			wantErrString: "sort validation failed:",
+		},
+		{
+			name: "Non-validatable condition and sort",
+			setupQuery: func() *Query[TestModel, Condition, Sort] {
+				db := &sql.DB{}
+				condition := &TestCondition{}
+				sort := &TestSort{}
+				fields := NewStaticColumns[TestModel]([]string{"id"}, nil)
+				pagination := NewPagination(10, 0)
+				return New[TestModel, Condition, Sort](db, condition, sort, "users", fields, pagination)
+			},
+			wantErr: false,
+		},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			q := tt.setupQuery()
+			err := q.Validate()
+			if (err != nil) != tt.wantErr {
+				t.Errorf("Validate() error = %v, wantErr %v", err, tt.wantErr)
+			}
+			if tt.wantErr && tt.wantErrString != "" && err != nil {
+				if !contains(err.Error(), tt.wantErrString) {
+					t.Errorf("Validate() error = %v, want to contain %v", err, tt.wantErrString)
+				}
+			}
+		})
+	}
+}
+
+func TestQuery_BuildCountSelect(t *testing.T) {
+	tests := []struct {
+		name       string
+		setupQuery func() *Query[TestModel, *TestCondition, *TestSort]
+		wantSQL    string
+		wantValues []any
+	}{
+		{
+			name: "Count without conditions",
+			setupQuery: func() *Query[TestModel, *TestCondition, *TestSort] {
+				db := &sql.DB{}
+				condition := &TestCondition{}
+				sort := &TestSort{}
+				fields := NewStaticColumns[TestModel]([]string{"id", "name"}, nil)
+				pagination := NewPagination(10, 0)
+				return New(db, condition, sort, "users", fields, pagination)
+			},
+			wantSQL:    "SELECT COUNT(*) AS count FROM users WHERE status = ?",
+			wantValues: []any{"active"},
+		},
+		{
+			name: "Count with table name",
+			setupQuery: func() *Query[TestModel, *TestCondition, *TestSort] {
+				db := &sql.DB{}
+				condition := &TestCondition{}
+				sort := &TestSort{}
+				fields := NewStaticColumns[TestModel]([]string{"id", "name"}, nil)
+				pagination := NewPagination(10, 0)
+				return New(db, condition, sort, "products", fields, pagination)
+			},
+			wantSQL:    "SELECT COUNT(*) AS count FROM products WHERE status = ?",
+			wantValues: []any{"active"},
+		},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			q := tt.setupQuery()
+			gotSQL, gotValues := q.BuildCountSelect()
+			if gotSQL != tt.wantSQL {
+				t.Errorf("BuildCountSelect() SQL = %v, want %v", gotSQL, tt.wantSQL)
+			}
+			if !reflect.DeepEqual(gotValues, tt.wantValues) {
+				t.Errorf("BuildCountSelect() values = %v, want %v", gotValues, tt.wantValues)
+			}
+		})
+	}
+}
+
+func TestQuery_BuildRowsSelect(t *testing.T) {
+	tests := []struct {
+		name       string
+		setupQuery func() *Query[TestModel, *TestCondition, *TestSort]
+		wantSQL    string
+		wantValues []any
+	}{
+		{
+			name: "Rows with all components",
+			setupQuery: func() *Query[TestModel, *TestCondition, *TestSort] {
+				db := &sql.DB{}
+				condition := &TestCondition{}
+				sort := &TestSort{}
+				fields := NewStaticColumns[TestModel]([]string{"id", "name", "email"}, nil)
+				pagination := NewPagination(20, 40)
+				return New(db, condition, sort, "users", fields, pagination)
+			},
+			wantSQL:    "SELECT id, name, email FROM users WHERE status = ? ORDER BY created_at DESC LIMIT ? OFFSET ?",
+			wantValues: []any{"active", int64(20), int64(40)},
+		},
+		{
+			name: "Rows without pagination offset",
+			setupQuery: func() *Query[TestModel, *TestCondition, *TestSort] {
+				db := &sql.DB{}
+				condition := &TestCondition{}
+				sort := &TestSort{}
+				fields := NewStaticColumns[TestModel]([]string{"id", "name"}, nil)
+				pagination := NewPagination(10, 0)
+				return New(db, condition, sort, "users", fields, pagination)
+			},
+			wantSQL:    "SELECT id, name FROM users WHERE status = ? ORDER BY created_at DESC LIMIT ?",
+			wantValues: []any{"active", int64(10)},
+		},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			q := tt.setupQuery()
+			gotSQL, gotValues := q.BuildRowsSelect()
+			if gotSQL != tt.wantSQL {
+				t.Errorf("BuildRowsSelect() SQL = %v, want %v", gotSQL, tt.wantSQL)
+			}
+			if !reflect.DeepEqual(gotValues, tt.wantValues) {
+				t.Errorf("BuildRowsSelect() values = %v, want %v", gotValues, tt.wantValues)
+			}
+			// Verify that condition and sort were applied
+			if !q.Condition.whereAdded {
+				t.Error("BuildRowsSelect() did not apply condition")
+			}
+			if !q.Sort.sortAdded {
+				t.Error("BuildRowsSelect() did not apply sort")
+			}
+		})
+	}
+}
+
+// Helper function
+func contains(s, substr string) bool {
+	return len(s) >= len(substr) && (s == substr || len(substr) == 0 || (len(s) > 0 && len(substr) > 0 && findSubstring(s, substr) != -1))
+}
+
+func findSubstring(s, substr string) int {
+	for i := 0; i <= len(s)-len(substr); i++ {
+		if s[i:i+len(substr)] == substr {
+			return i
+		}
+	}
+	return -1
+}
