@@ -6,6 +6,7 @@ import (
 )
 
 func TestCompareCondition(t *testing.T) {
+	field := "field1"
 	tests := []struct {
 		name       string
 		condition  ConditionBody
@@ -15,68 +16,68 @@ func TestCompareCondition(t *testing.T) {
 		{
 			name:       "Eq",
 			condition:  Eq("test"),
-			wantString: "= ?",
+			wantString: field + " = ?",
 			wantValues: []any{"test"},
 		},
 		{
 			name:       "NotEq",
 			condition:  NotEq(123),
-			wantString: "<> ?",
+			wantString: field + " <> ?",
 			wantValues: []any{123},
 		},
 		{
 			name:       "Gt",
 			condition:  Gt(10),
-			wantString: "> ?",
+			wantString: field + " > ?",
 			wantValues: []any{10},
 		},
 		{
 			name:       "Gte",
 			condition:  Gte(10.5),
-			wantString: ">= ?",
+			wantString: field + " >= ?",
 			wantValues: []any{10.5},
 		},
 		{
 			name:       "Lt",
 			condition:  Lt(100),
-			wantString: "< ?",
+			wantString: field + " < ?",
 			wantValues: []any{100},
 		},
 		{
 			name:       "Lte",
 			condition:  Lte(99.9),
-			wantString: "<= ?",
+			wantString: field + " <= ?",
 			wantValues: []any{99.9},
 		},
 		{
 			name:       "Like",
 			condition:  Like("test%"),
-			wantString: "LIKE ?",
+			wantString: field + " LIKE ?",
 			wantValues: []any{"test%"},
 		},
 		{
 			name:       "LikeStartsWith",
 			condition:  LikeStartsWith("prefix"),
-			wantString: "LIKE ?",
+			wantString: field + " LIKE ?",
 			wantValues: []any{"prefix%"},
 		},
 		{
 			name:       "LikeEndsWith",
 			condition:  LikeEndsWith("suffix"),
-			wantString: "LIKE ?",
+			wantString: field + " LIKE ?",
 			wantValues: []any{"%suffix"},
 		},
 		{
 			name:       "LikeContains",
 			condition:  LikeContains("middle"),
-			wantString: "LIKE ?",
+			wantString: field + " LIKE ?",
 			wantValues: []any{"%middle%"},
 		},
 	}
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			if got := tt.condition.String(); got != tt.wantString {
+			if got := tt.condition.String(field); got != tt.wantString {
 				t.Errorf("String() = %v, want %v", got, tt.wantString)
 			}
 			if got := tt.condition.Values(); !reflect.DeepEqual(got, tt.wantValues) {
@@ -87,6 +88,7 @@ func TestCompareCondition(t *testing.T) {
 }
 
 func TestInCondition(t *testing.T) {
+	field := "field2"
 	tests := []struct {
 		name       string
 		condition  ConditionBody
@@ -96,19 +98,19 @@ func TestInCondition(t *testing.T) {
 		{
 			name:       "In with single value",
 			condition:  In(1),
-			wantString: "IN (?)",
+			wantString: field + " IN (?)",
 			wantValues: []any{1},
 		},
 		{
 			name:       "In with multiple values",
 			condition:  In(1, 2, 3),
-			wantString: "IN (?,?,?)",
+			wantString: field + " IN (?,?,?)",
 			wantValues: []any{1, 2, 3},
 		},
 		{
 			name:       "In with string values",
 			condition:  In("a", "b", "c"),
-			wantString: "IN (?,?,?)",
+			wantString: field + " IN (?,?,?)",
 			wantValues: []any{"a", "b", "c"},
 		},
 		{
@@ -121,7 +123,7 @@ func TestInCondition(t *testing.T) {
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			if got := tt.condition.String(); got != tt.wantString {
+			if got := tt.condition.String(field); got != tt.wantString {
 				t.Errorf("String() = %v, want %v", got, tt.wantString)
 			}
 			if got := tt.condition.Values(); !reflect.DeepEqual(got, tt.wantValues) {
@@ -132,6 +134,7 @@ func TestInCondition(t *testing.T) {
 }
 
 func TestEqOrIn(t *testing.T) {
+	field := "field3"
 	tests := []struct {
 		name       string
 		values     []any
@@ -141,13 +144,13 @@ func TestEqOrIn(t *testing.T) {
 		{
 			name:       "Single value uses Eq",
 			values:     []any{"test"},
-			wantString: "= ?",
+			wantString: field + " = ?",
 			wantValues: []any{"test"},
 		},
 		{
 			name:       "Multiple values uses In",
 			values:     []any{1, 2, 3},
-			wantString: "IN (?,?,?)",
+			wantString: field + " IN (?,?,?)",
 			wantValues: []any{1, 2, 3},
 		},
 		{
@@ -161,7 +164,7 @@ func TestEqOrIn(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			condition := EqOrIn(tt.values...)
-			if got := condition.String(); got != tt.wantString {
+			if got := condition.String(field); got != tt.wantString {
 				t.Errorf("String() = %v, want %v", got, tt.wantString)
 			}
 			if got := condition.Values(); !reflect.DeepEqual(got, tt.wantValues) {
@@ -172,6 +175,7 @@ func TestEqOrIn(t *testing.T) {
 }
 
 func TestStaticCondition(t *testing.T) {
+	field := "field4"
 	tests := []struct {
 		name       string
 		condition  ConditionBody
@@ -181,20 +185,20 @@ func TestStaticCondition(t *testing.T) {
 		{
 			name:       "IsNull",
 			condition:  IsNull(),
-			wantString: "IS NULL",
+			wantString: field + " IS NULL",
 			wantValues: []any{},
 		},
 		{
 			name:       "IsNotNull",
 			condition:  IsNotNull(),
-			wantString: "IS NOT NULL",
+			wantString: field + " IS NOT NULL",
 			wantValues: []any{},
 		},
 	}
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			if got := tt.condition.String(); got != tt.wantString {
+			if got := tt.condition.String(field); got != tt.wantString {
 				t.Errorf("String() = %v, want %v", got, tt.wantString)
 			}
 			if got := tt.condition.Values(); !reflect.DeepEqual(got, tt.wantValues) {
