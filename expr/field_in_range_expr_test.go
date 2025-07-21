@@ -17,7 +17,7 @@ func TestFieldInRangeExpr(t *testing.T) {
 		{
 			name:       "InRange with start and end",
 			condition:  InRange(10, 20),
-			wantString: fmt.Sprintf("(%s >= ? AND %s < ?)", field, field),
+			wantString: fmt.Sprintf("%s >= ? AND %s < ?", field, field),
 			wantValues: []any{10, 20},
 		},
 		{
@@ -46,6 +46,10 @@ func TestFieldInRangeExpr(t *testing.T) {
 				t.Errorf("String() = %v, want %v", got, tt.wantString)
 			}
 			if got := tt.condition.Values(); !reflect.DeepEqual(got, tt.wantValues) {
+				// reflect.DeepEqual returns false for empty slices, so we handle that case
+				if len(got) == 0 && len(tt.wantValues) == 0 {
+					return
+				}
 				t.Errorf("Values() = %v, want %v", got, tt.wantValues)
 			}
 		})

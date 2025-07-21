@@ -27,9 +27,14 @@ func (c *Conditions) String() string {
 		if i > 0 {
 			sb.WriteString(c.connector)
 		}
-		sb.WriteString("(")
-		sb.WriteString(item.String())
-		sb.WriteString(")")
+		subconditions, ok := item.(*Conditions)
+		if ok && subconditions.connector != c.connector {
+			sb.WriteString("(")
+			sb.WriteString(subconditions.String())
+			sb.WriteString(")")
+		} else {
+			sb.WriteString(item.String())
+		}
 	}
 	return sb.String()
 }

@@ -30,7 +30,7 @@ func TestConditions(t *testing.T) {
 				Field("name", Eq("John")),
 				Field("age", Gt(18)),
 			),
-			wantString: "(name = ?) AND (age > ?)",
+			wantString: "name = ? AND age > ?",
 			wantValues: []any{"John", 18},
 		},
 		{
@@ -39,7 +39,7 @@ func TestConditions(t *testing.T) {
 				Field("status", Eq("active")),
 				Field("role", Eq("admin")),
 			),
-			wantString: "(status = ?) OR (role = ?)",
+			wantString: "status = ? OR role = ?",
 			wantValues: []any{"active", "admin"},
 		},
 		{
@@ -49,7 +49,7 @@ func TestConditions(t *testing.T) {
 				Field("age", Gte(18)),
 				Field("status", NotEq("deleted")),
 			),
-			wantString: "(name = ?) AND (age >= ?) AND (status <> ?)",
+			wantString: "name = ? AND age >= ? AND status <> ?",
 			wantValues: []any{"John", 18, "deleted"},
 		},
 	}
@@ -85,7 +85,7 @@ func TestAnd(t *testing.T) {
 				Field("name", Eq("John")),
 				Field("active", Eq(true)),
 			},
-			wantString: "(name = ?) AND (active = ?)",
+			wantString: "name = ? AND active = ?",
 			wantValues: []any{"John", true},
 		},
 		{
@@ -94,7 +94,7 @@ func TestAnd(t *testing.T) {
 				Field("id", In(1, 2, 3)),
 				Field("status", In("active", "pending")),
 			},
-			wantString: "(id IN (?,?,?)) AND (status IN (?,?))",
+			wantString: "id IN (?,?,?) AND status IN (?,?)",
 			wantValues: []any{1, 2, 3, "active", "pending"},
 		},
 	}
@@ -131,7 +131,7 @@ func TestOr(t *testing.T) {
 				Field("role", Eq("admin")),
 				Field("role", Eq("moderator")),
 			},
-			wantString: "(role = ?) OR (role = ?)",
+			wantString: "role = ? OR role = ?",
 			wantValues: []any{"admin", "moderator"},
 		},
 		{
@@ -140,7 +140,7 @@ func TestOr(t *testing.T) {
 				Field("status", Eq("active")),
 				Field("premium", Eq(true)),
 			},
-			wantString: "(status = ?) OR (premium = ?)",
+			wantString: "status = ? OR premium = ?",
 			wantValues: []any{"active", true},
 		},
 	}
@@ -177,7 +177,7 @@ func TestNestedConditions(t *testing.T) {
 					Field("verified", Eq(true)),
 				),
 			),
-			wantString: "((name = ?) AND (age >= ?)) OR ((role = ?) AND (verified = ?))",
+			wantString: "(name = ? AND age >= ?) OR (role = ? AND verified = ?)",
 			wantValues: []any{"John", 18, "admin", true},
 		},
 		{
@@ -192,7 +192,22 @@ func TestNestedConditions(t *testing.T) {
 					Field("role", Eq("guest")),
 				),
 			),
-			wantString: "((status = ?) OR (status = ?)) AND ((role = ?) OR (role = ?))",
+			wantString: "(status = ? OR status = ?) AND (role = ? OR role = ?)",
+			wantValues: []any{"active", "pending", "user", "guest"},
+		},
+		{
+			name: "Nested Or and And inside And",
+			condition: And(
+				Or(
+					Field("status", Eq("active")),
+					Field("status", Eq("pending")),
+				),
+				And(
+					Field("role", Eq("user")),
+					Field("role", Eq("guest")),
+				),
+			),
+			wantString: "(status = ? OR status = ?) AND role = ? AND role = ?",
 			wantValues: []any{"active", "pending", "user", "guest"},
 		},
 	}

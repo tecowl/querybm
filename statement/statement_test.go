@@ -99,7 +99,7 @@ func TestStatement_Build_WithWhere(t *testing.T) {
 				s.Where.Add(expr.Field("status", expr.Eq("active")))
 				return s
 			},
-			wantSQL:    "SELECT * FROM users WHERE (age >= ?) AND (status = ?)",
+			wantSQL:    "SELECT * FROM users WHERE age >= ? AND status = ?",
 			wantValues: []any{18, "active"},
 		},
 		{
@@ -253,7 +253,7 @@ func TestStatement_Build_Complex(t *testing.T) {
 				s.Pagination.Add("LIMIT ?", 10)
 				return s
 			},
-			wantSQL:    "SELECT id, name, email FROM users WHERE (status = ?) AND (age >= ?) ORDER BY created_at DESC LIMIT ?",
+			wantSQL:    "SELECT id, name, email FROM users WHERE status = ? AND age >= ? ORDER BY created_at DESC LIMIT ?",
 			wantValues: []any{"active", 18, 10},
 		},
 		{
@@ -269,7 +269,7 @@ func TestStatement_Build_Complex(t *testing.T) {
 				s.Pagination.Add("OFFSET ?", 100)
 				return s
 			},
-			wantSQL:    "SELECT id, name, price, category_id FROM products WHERE (price < ?) AND (category_id IN (?,?,?)) AND (deleted_at IS NULL) ORDER BY category_id, price ASC LIMIT ? OFFSET ?",
+			wantSQL:    "SELECT id, name, price, category_id FROM products WHERE price < ? AND category_id IN (?,?,?) AND deleted_at IS NULL ORDER BY category_id, price ASC LIMIT ? OFFSET ?",
 			wantValues: []any{1000, 1, 2, 3, 20, 100},
 		},
 	}
