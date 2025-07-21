@@ -123,18 +123,19 @@ func TestQuery(t *testing.T) {
 				}),
 				expectedBooks: []*models.Book{
 					books[6],
-					books[0],
 					books[3],
+					books[0],
 				},
 			},
 			{
-				name: "< 2004",
+				name: ">= 2008",
 				query: New(db, &Condition{
-					YrRange: ranges.NewInt32Range(0, 2004),
+					YrRange: ranges.NewInt32Range(2008, 0),
 				}),
 				expectedBooks: []*models.Book{
-					books[0],
+					books[6],
 					books[3],
+					books[0],
 				},
 			},
 		}

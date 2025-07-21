@@ -108,9 +108,24 @@ func NewUint64Range(start, end uint64) *Range[uint64] {
 }
 
 func (r *Range[T]) Build(field string, st *statement.Statement) {
-	if r.useBetween {
-		st.Where.Add(expr.Field(field, expr.Between(r.Start, r.End)))
-	} else {
-		st.Where.Add(expr.Field(field, expr.InRange(r.Start, r.End)))
+	if r.Start == nil && r.End == nil {
+		return
 	}
+	if r.Start != nil && r.End != nil {
+		if r.useBetween {
+			st.Where.Add(expr.Field(field, expr.Between(r.Start, r.End)))
+		} else {
+			st.Where.Add(expr.Field(field, expr.InRange(r.Start, r.End)))
+		}
+		return
+	}
+	if r.End != nil {
+		if r.useBetween {
+			st.Where.Add(expr.Field(field, expr.Lte(*r.End)))
+		} else {
+			st.Where.Add(expr.Field(field, expr.Lt(*r.End)))
+		}
+		return
+	}
+	st.Where.Add(expr.Field(field, expr.Gte(*r.Start)))
 }

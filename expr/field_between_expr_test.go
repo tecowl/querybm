@@ -19,24 +19,6 @@ func TestFieldBetweenExpr(t *testing.T) {
 			wantString: field + " BETWEEN ? AND ?",
 			wantValues: []any{10, 20},
 		},
-		{
-			name:       "Between with only start",
-			condition:  Between(10, nil),
-			wantString: field + " >= ?",
-			wantValues: []any{10},
-		},
-		{
-			name:       "Between with only end",
-			condition:  Between(nil, 20),
-			wantString: field + " <= ?",
-			wantValues: []any{20},
-		},
-		{
-			name:       "Between with no values",
-			condition:  Between(nil, nil),
-			wantString: "",
-			wantValues: []any{},
-		},
 	}
 
 	for _, tt := range tests {

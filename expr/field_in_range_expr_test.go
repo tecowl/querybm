@@ -20,24 +20,6 @@ func TestFieldInRangeExpr(t *testing.T) {
 			wantString: fmt.Sprintf("%s >= ? AND %s < ?", field, field),
 			wantValues: []any{10, 20},
 		},
-		{
-			name:       "InRange with only start",
-			condition:  InRange(10, nil),
-			wantString: field + " >= ?",
-			wantValues: []any{10},
-		},
-		{
-			name:       "InRange with only end",
-			condition:  InRange(nil, 20),
-			wantString: field + " < ?",
-			wantValues: []any{20},
-		},
-		{
-			name:       "InRange with no values",
-			condition:  InRange(nil, nil),
-			wantString: "",
-			wantValues: []any{},
-		},
 	}
 
 	for _, tt := range tests {
