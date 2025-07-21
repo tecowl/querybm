@@ -6,7 +6,7 @@ import (
 )
 
 type ConditionBody interface {
-	String(field string) string
+	Build(field string) string
 	Values() []any
 }
 
@@ -20,7 +20,7 @@ var _ ConditionBody = (*compareCondition)(nil)
 func newCompare(operator string, value any) *compareCondition {
 	return &compareCondition{operator: operator, value: value}
 }
-func (c *compareCondition) String(field string) string {
+func (c *compareCondition) Build(field string) string {
 	return fmt.Sprintf("%s %s ?", field, c.operator)
 }
 func (c *compareCondition) Values() []any { return []any{c.value} }
@@ -43,7 +43,7 @@ type inCondition struct {
 
 var _ ConditionBody = (*inCondition)(nil)
 
-func (c *inCondition) String(field string) string {
+func (c *inCondition) Build(field string) string {
 	if len(c.values) == 0 {
 		return ""
 	}
@@ -71,8 +71,8 @@ type staticCondition struct {
 
 var _ ConditionBody = (*staticCondition)(nil)
 
-func (c *staticCondition) String(field string) string { return fmt.Sprintf("%s %s", field, c.value) }
-func (c *staticCondition) Values() []any              { return []any{} }
+func (c *staticCondition) Build(field string) string { return fmt.Sprintf("%s %s", field, c.value) }
+func (c *staticCondition) Values() []any             { return []any{} }
 
 func IsNull() ConditionBody    { return &staticCondition{value: "IS NULL"} }
 func IsNotNull() ConditionBody { return &staticCondition{value: "IS NOT NULL"} }
@@ -92,7 +92,7 @@ func (fc *FieldCondition) String() string {
 	if fc.Body == nil {
 		return ""
 	}
-	return fc.Body.String(fc.Name)
+	return fc.Body.Build(fc.Name)
 }
 func (fc *FieldCondition) Values() []any {
 	if fc.Body == nil {

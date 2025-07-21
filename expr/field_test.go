@@ -77,7 +77,7 @@ func TestCompareCondition(t *testing.T) {
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			if got := tt.condition.String(field); got != tt.wantString {
+			if got := tt.condition.Build(field); got != tt.wantString {
 				t.Errorf("String() = %v, want %v", got, tt.wantString)
 			}
 			if got := tt.condition.Values(); !reflect.DeepEqual(got, tt.wantValues) {
@@ -123,7 +123,7 @@ func TestInCondition(t *testing.T) {
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			if got := tt.condition.String(field); got != tt.wantString {
+			if got := tt.condition.Build(field); got != tt.wantString {
 				t.Errorf("String() = %v, want %v", got, tt.wantString)
 			}
 			if got := tt.condition.Values(); !reflect.DeepEqual(got, tt.wantValues) {
@@ -164,7 +164,7 @@ func TestEqOrIn(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			condition := EqOrIn(tt.values...)
-			if got := condition.String(field); got != tt.wantString {
+			if got := condition.Build(field); got != tt.wantString {
 				t.Errorf("String() = %v, want %v", got, tt.wantString)
 			}
 			if got := condition.Values(); !reflect.DeepEqual(got, tt.wantValues) {
@@ -198,7 +198,7 @@ func TestStaticCondition(t *testing.T) {
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			if got := tt.condition.String(field); got != tt.wantString {
+			if got := tt.condition.Build(field); got != tt.wantString {
 				t.Errorf("String() = %v, want %v", got, tt.wantString)
 			}
 			if got := tt.condition.Values(); !reflect.DeepEqual(got, tt.wantValues) {
