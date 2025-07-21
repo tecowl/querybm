@@ -164,7 +164,7 @@ func TestWhereBlock_Build(t *testing.T) {
 				w.Add(expr.Field("age", expr.Gte(18)))
 				return w
 			},
-			wantSQL:    "(name = ?) AND (age >= ?)",
+			wantSQL:    "name = ? AND age >= ?",
 			wantValues: []any{"John", 18},
 		},
 		{
@@ -175,7 +175,7 @@ func TestWhereBlock_Build(t *testing.T) {
 				w.Add(expr.Field("status", expr.Eq("pending")))
 				return w
 			},
-			wantSQL:    "(status = ?) OR (status = ?)",
+			wantSQL:    "status = ? OR status = ?",
 			wantValues: []any{"active", "pending"},
 		},
 		{
@@ -186,7 +186,7 @@ func TestWhereBlock_Build(t *testing.T) {
 				w.Add(expr.Field("status", expr.NotEq("deleted")))
 				return w
 			},
-			wantSQL:    "(id IN (?,?,?)) AND (status <> ?)",
+			wantSQL:    "id IN (?,?,?) AND status <> ?",
 			wantValues: []any{1, 2, 3, "deleted"},
 		},
 		{
@@ -197,7 +197,7 @@ func TestWhereBlock_Build(t *testing.T) {
 				w.Add(expr.Field("name", expr.LikeStartsWith("John")))
 				return w
 			},
-			wantSQL:    "(email LIKE ?) AND (name LIKE ?)",
+			wantSQL:    "email LIKE ? AND name LIKE ?",
 			wantValues: []any{"%@example%", "John%"},
 		},
 		{
@@ -208,7 +208,7 @@ func TestWhereBlock_Build(t *testing.T) {
 				w.Add(expr.Field("verified_at", expr.IsNotNull()))
 				return w
 			},
-			wantSQL:    "(deleted_at IS NULL) AND (verified_at IS NOT NULL)",
+			wantSQL:    "deleted_at IS NULL AND verified_at IS NOT NULL",
 			wantValues: []any{},
 		},
 		{
@@ -222,7 +222,7 @@ func TestWhereBlock_Build(t *testing.T) {
 				))
 				return w
 			},
-			wantSQL:    "(active = ?) AND ((role = ?) OR (role = ?))",
+			wantSQL:    "active = ? AND (role = ? OR role = ?)",
 			wantValues: []any{true, "admin", "moderator"},
 		},
 		{
@@ -242,7 +242,7 @@ func TestWhereBlock_Build(t *testing.T) {
 				w.Add(expr.Field("deleted_at", expr.IsNull()))
 				return w
 			},
-			wantSQL:    "(((status = ?) AND (verified = ?)) OR ((status = ?) AND (admin_approved = ?))) AND (deleted_at IS NULL)",
+			wantSQL:    "((status = ? AND verified = ?) OR (status = ? AND admin_approved = ?)) AND deleted_at IS NULL",
 			wantValues: []any{"active", true, "pending", true},
 		},
 	}
