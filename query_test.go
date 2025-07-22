@@ -100,7 +100,7 @@ func TestQuery_Validate(t *testing.T) {
 				sort := &ValidatableSort{}
 				fields := NewFields[TestModel]([]string{"id"}, nil)
 				pagination := NewPagination(10, 0)
-				return New[TestModel, Condition, Sort](db, "users", fields, condition, sort, pagination)
+				return New(db, "users", fields, condition, sort, pagination)
 			},
 			wantErr: false,
 		},
@@ -112,7 +112,7 @@ func TestQuery_Validate(t *testing.T) {
 				sort := &ValidatableSort{}
 				fields := NewFields[TestModel]([]string{"id"}, nil)
 				pagination := NewPagination(10, 0)
-				return New[TestModel, Condition, Sort](db, "users", fields, condition, sort, pagination)
+				return New(db, "users", fields, condition, sort, pagination)
 			},
 			wantErr:       true,
 			wantErrString: "condition validation failed:",
@@ -125,7 +125,7 @@ func TestQuery_Validate(t *testing.T) {
 				sort := &ValidatableSort{validateErr: errors.New("invalid sort")} // nolint:err113
 				fields := NewFields[TestModel]([]string{"id"}, nil)
 				pagination := NewPagination(10, 0)
-				return New[TestModel, Condition, Sort](db, "users", fields, condition, sort, pagination)
+				return New(db, "users", fields, condition, sort, pagination)
 			},
 			wantErr:       true,
 			wantErrString: "sort validation failed:",
@@ -138,7 +138,7 @@ func TestQuery_Validate(t *testing.T) {
 				sort := &TestSort{}
 				fields := NewFields[TestModel]([]string{"id"}, nil)
 				pagination := NewPagination(10, 0)
-				return New[TestModel, Condition, Sort](db, "users", fields, condition, sort, pagination)
+				return New(db, "users", fields, condition, sort, pagination)
 			},
 			wantErr: false,
 		},

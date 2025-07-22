@@ -20,8 +20,14 @@ type Query[M any] struct {
 	Pagination *Pagination
 }
 
-// New creates a new Query instance with the specified database connection, condition, sort, table name, field mapper, and pagination.
-func New[M any, C Condition, S Sort](db *sql.DB, table string, fields FieldMapper[M], c C, s S, pagination *Pagination) *Query[M] {
+// New creates a new Query instance with the provided parameters.
+// db: The database connection to use for executing queries.
+// table: The name of the table to query.
+// fields: The field mapper that defines how to map database rows to model instances.
+// c: The condition to apply to the query.
+// s: The sort item to apply to the query.
+// pagination: The pagination settings for the query.
+func New[M any](db *sql.DB, table string, fields FieldMapper[M], c Condition, s Sort, pagination *Pagination) *Query[M] {
 	return &Query[M]{
 		db:         db,
 		Table:      table,
