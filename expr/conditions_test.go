@@ -6,6 +6,7 @@ import (
 )
 
 func TestConditions(t *testing.T) {
+	t.Parallel()
 	tests := []struct {
 		name       string
 		conditions *Conditions
@@ -56,6 +57,7 @@ func TestConditions(t *testing.T) {
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
+			t.Parallel()
 			if got := tt.conditions.String(); got != tt.wantString {
 				t.Errorf("String() = %v, want %v", got, tt.wantString)
 			}

@@ -27,6 +27,7 @@ type User struct {
 }
 
 func TestNewStaticColumns(t *testing.T) {
+	t.Parallel()
 	names := []string{"id", "name", "email"}
 	mapper := func(s Scanner, u *User) error {
 		return s.Scan(&u.ID, &u.Name, &u.Email)
@@ -46,6 +47,7 @@ func TestNewStaticColumns(t *testing.T) {
 }
 
 func TestStaticColumns_Fields(t *testing.T) {
+	t.Parallel()
 	tests := []struct {
 		name  string
 		names []string
@@ -75,6 +77,7 @@ func TestStaticColumns_Fields(t *testing.T) {
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
+			t.Parallel()
 			sc := &StaticColumns[User]{names: tt.names}
 			got := sc.Fields()
 			if !reflect.DeepEqual(got, tt.want) {
@@ -85,6 +88,7 @@ func TestStaticColumns_Fields(t *testing.T) {
 }
 
 func TestStaticColumns_Mapper(t *testing.T) {
+	t.Parallel()
 	tests := []struct {
 		name     string
 		mapper   Mapper[User]
@@ -132,6 +136,7 @@ func TestStaticColumns_Mapper(t *testing.T) {
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
+			t.Parallel()
 			sc := &StaticColumns[User]{mapper: tt.mapper}
 			mapperFunc := sc.Mapper()
 
@@ -147,8 +152,8 @@ func TestStaticColumns_Mapper(t *testing.T) {
 	}
 }
 
-
 func TestErrNoColumns(t *testing.T) {
+	t.Parallel()
 	if ErrNoColumns == nil {
 		t.Error("ErrNoColumns should not be nil")
 	}

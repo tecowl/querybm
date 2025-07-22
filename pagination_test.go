@@ -8,6 +8,7 @@ import (
 )
 
 func TestDefaultPagination(t *testing.T) {
+	t.Parallel()
 	if DefaultPagination == nil {
 		t.Fatal("DefaultPagination should not be nil")
 	}
@@ -20,6 +21,7 @@ func TestDefaultPagination(t *testing.T) {
 }
 
 func TestNewPagination(t *testing.T) {
+	t.Parallel()
 	tests := []struct {
 		name       string
 		limit      int64
@@ -80,6 +82,7 @@ func TestNewPagination(t *testing.T) {
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
+			t.Parallel()
 			p := NewPagination(tt.limit, tt.offset)
 			if p.limit != tt.wantLimit {
 				t.Errorf("NewPagination() limit = %d, want %d", p.limit, tt.wantLimit)
@@ -92,6 +95,7 @@ func TestNewPagination(t *testing.T) {
 }
 
 func TestPagination_Validate(t *testing.T) {
+	t.Parallel()
 	tests := []struct {
 		name       string
 		pagination *Pagination
@@ -132,6 +136,7 @@ func TestPagination_Validate(t *testing.T) {
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
+			t.Parallel()
 			err := tt.pagination.Validate()
 			if err != nil {
 				t.Errorf("Validate() error = %v, want nil", err)
@@ -147,6 +152,7 @@ func TestPagination_Validate(t *testing.T) {
 }
 
 func TestPagination_Build(t *testing.T) {
+	t.Parallel()
 	tests := []struct {
 		name        string
 		pagination  *Pagination
@@ -199,6 +205,7 @@ func TestPagination_Build(t *testing.T) {
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
+			t.Parallel()
 			stmt := statement.New("test_table", statement.NewSimpleFields("id"))
 			tt.pagination.Build(stmt)
 

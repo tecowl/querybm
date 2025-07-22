@@ -57,6 +57,7 @@ func (v *ValidatableSort) Validate() error {
 }
 
 func TestNew(t *testing.T) {
+	t.Parallel()
 	db := &sql.DB{}
 	condition := &TestCondition{}
 	sort := &TestSort{}
@@ -85,6 +86,7 @@ func TestNew(t *testing.T) {
 }
 
 func TestQuery_Validate(t *testing.T) {
+	t.Parallel()
 	tests := []struct {
 		name          string
 		setupQuery    func() *Query[TestModel, Condition, Sort]
@@ -145,6 +147,7 @@ func TestQuery_Validate(t *testing.T) {
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
+			t.Parallel()
 			q := tt.setupQuery()
 			err := q.Validate()
 			if (err != nil) != tt.wantErr {
@@ -160,6 +163,7 @@ func TestQuery_Validate(t *testing.T) {
 }
 
 func TestQuery_BuildCountSelect(t *testing.T) {
+	t.Parallel()
 	tests := []struct {
 		name       string
 		setupQuery func() *Query[TestModel, *TestCondition, *TestSort]
@@ -196,6 +200,7 @@ func TestQuery_BuildCountSelect(t *testing.T) {
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
+			t.Parallel()
 			q := tt.setupQuery()
 			gotSQL, gotValues := q.BuildCountSelect()
 			if gotSQL != tt.wantSQL {
@@ -209,6 +214,7 @@ func TestQuery_BuildCountSelect(t *testing.T) {
 }
 
 func TestQuery_BuildRowsSelect(t *testing.T) {
+	t.Parallel()
 	tests := []struct {
 		name       string
 		setupQuery func() *Query[TestModel, *TestCondition, *TestSort]
@@ -245,6 +251,7 @@ func TestQuery_BuildRowsSelect(t *testing.T) {
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
+			t.Parallel()
 			q := tt.setupQuery()
 			gotSQL, gotValues := q.BuildRowsSelect()
 			if gotSQL != tt.wantSQL {
