@@ -13,15 +13,15 @@ linters:
     - wrapcheck
     - wsl
 
-# issues:
+issues:
 #   exclude-files:
 #     - example_test.go
-#   exclude-rules:
-#     - path: _test\.go
-#       linters:
+  exclude-rules:
+    - path: _test\.go
+      linters:
 #         - err113
 #         - forcetypeassert
-#         - funlen
+        - funlen
 linters-settings:
 #   cyclop:
 #     skip-tests: true
