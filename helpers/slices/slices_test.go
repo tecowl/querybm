@@ -137,6 +137,5 @@ func TestBind(t *testing.T) {
 				t.Errorf("Bind() = true; want false")
 			}
 		})
-
 	})
 }
