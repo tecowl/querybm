@@ -17,6 +17,7 @@ func NewBlock(delimiter string) *Block {
 func (b *Block) IsEmpty() bool {
 	return b.content == ""
 }
+
 func (b *Block) Add(str string, values ...any) {
 	if str == "" {
 		return

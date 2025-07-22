@@ -50,6 +50,7 @@ func NewIntRange(start, end int) *Range[int] {
 	}
 	return &Range[int]{Start: vStart, End: vEnd}
 }
+
 func NewInt32Range(start, end int32) *Range[int32] {
 	var vStart *int32
 	if start != 0 {
@@ -61,6 +62,7 @@ func NewInt32Range(start, end int32) *Range[int32] {
 	}
 	return &Range[int32]{Start: vStart, End: vEnd}
 }
+
 func NewInt64Range(start, end int64) *Range[int64] {
 	var vStart *int64
 	if start != 0 {
@@ -84,6 +86,7 @@ func NewUintRange(start, end uint) *Range[uint] {
 	}
 	return &Range[uint]{Start: vStart, End: vEnd}
 }
+
 func NewUint32Range(start, end uint32) *Range[uint32] {
 	var vStart *uint32
 	if start != 0 {
@@ -95,6 +98,7 @@ func NewUint32Range(start, end uint32) *Range[uint32] {
 	}
 	return &Range[uint32]{Start: vStart, End: vEnd}
 }
+
 func NewUint64Range(start, end uint64) *Range[uint64] {
 	var vStart *uint64
 	if start != 0 {

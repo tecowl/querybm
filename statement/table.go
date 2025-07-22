@@ -13,6 +13,7 @@ func NewTableBlock(table string) *TableBlock {
 func (b *TableBlock) InnerJoin(table string, condition string, values ...any) {
 	b.Add("INNER JOIN "+table+" ON "+condition, values...)
 }
+
 func (b *TableBlock) LeftOuterJoin(table string, condition string, values ...any) {
 	b.Add("LEFT OUTER JOIN "+table+" ON "+condition, values...)
 }

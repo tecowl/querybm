@@ -5,8 +5,10 @@ type inRangeExpr struct {
 	end   any
 }
 
-var _ FieldConditionBody = (*inRangeExpr)(nil)
-var _ ConnectiveCondition = (*inRangeExpr)(nil)
+var (
+	_ FieldConditionBody  = (*inRangeExpr)(nil)
+	_ ConnectiveCondition = (*inRangeExpr)(nil)
+)
 
 func (c *inRangeExpr) Build(field string) string {
 	r := And(Field(field, Gte(c.start)), Field(field, Lt(c.end)))

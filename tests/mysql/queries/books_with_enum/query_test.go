@@ -119,5 +119,4 @@ func TestQuery(t *testing.T) {
 			require.Len(t, items, len(books))
 		})
 	})
-
 }

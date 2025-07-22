@@ -5,8 +5,10 @@ type FieldCondition struct {
 	Body FieldConditionBody
 }
 
-var _ ConditionExpr = (*FieldCondition)(nil)
-var _ ConnectiveCondition = (*FieldCondition)(nil)
+var (
+	_ ConditionExpr       = (*FieldCondition)(nil)
+	_ ConnectiveCondition = (*FieldCondition)(nil)
+)
 
 func Field(name string, body FieldConditionBody) ConditionExpr { //nolint:ireturn
 	return &FieldCondition{Name: name, Body: body}
@@ -18,6 +20,7 @@ func (fc *FieldCondition) String() string {
 	}
 	return fc.Body.Build(fc.Name)
 }
+
 func (fc *FieldCondition) Values() []any {
 	if fc.Body == nil {
 		return []any{}

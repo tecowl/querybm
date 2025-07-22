@@ -3,9 +3,10 @@ package fixtures
 import (
 	"context"
 	"database/sql"
-	"mysql-test/models"
 	"testing"
 	"time"
+
+	"mysql-test/models"
 
 	"github.com/stretchr/testify/require"
 )

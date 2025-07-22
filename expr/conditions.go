@@ -7,8 +7,10 @@ type Conditions struct {
 	connective string
 }
 
-var _ ConditionExpr = (*Conditions)(nil)
-var _ ConnectiveCondition = (*Conditions)(nil)
+var (
+	_ ConditionExpr       = (*Conditions)(nil)
+	_ ConnectiveCondition = (*Conditions)(nil)
+)
 
 func NewConditions(connector string, items ...ConditionExpr) *Conditions {
 	return &Conditions{items: items, connective: connector}
@@ -38,6 +40,7 @@ func (c *Conditions) String() string {
 	}
 	return sb.String()
 }
+
 func (c *Conditions) Values() []any {
 	values := []any{}
 	for _, item := range c.items {

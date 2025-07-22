@@ -23,6 +23,7 @@ func In(values ...any) FieldConditionBody { //nolint:ireturn
 	}
 	return &fieldInExpr{values: values}
 }
+
 func EqOrIn(values ...any) FieldConditionBody { //nolint:ireturn
 	if len(values) == 1 {
 		return Eq(values[0])

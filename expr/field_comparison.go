@@ -12,6 +12,7 @@ var _ FieldConditionBody = (*fieldComparison)(nil)
 func newCompare(operator string, value any) *fieldComparison {
 	return &fieldComparison{operator: operator, value: value}
 }
+
 func (c *fieldComparison) Build(field string) string {
 	return fmt.Sprintf("%s %s ?", field, c.operator)
 }
