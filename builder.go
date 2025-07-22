@@ -25,8 +25,8 @@ var _ Builder = (*buildFuncWrapper)(nil)
 
 // NewBuilder creates a new Builder from a BuildFunc.
 // This allows you to define how the SQL statement should be built using a function.
-// This is useful for cases where you want to encapsulate the building logic in a function rather
-func NewBuilder(fn BuildFunc) Builder {
+// This is useful for cases where you want to encapsulate the building logic in a function rather than a struct.
+func NewBuilder(fn BuildFunc) Builder { // nolint:ireturn
 	return &buildFuncWrapper{fn: fn}
 }
 

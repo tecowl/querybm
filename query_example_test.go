@@ -6,13 +6,13 @@ import (
 	"fmt"
 
 	"github.com/tecowl/querybm"
-	. "github.com/tecowl/querybm/expr"
+	. "github.com/tecowl/querybm/expr" // nolint:revive
 	"github.com/tecowl/querybm/statement"
 )
 
 // This is an example to show the concept.
 // See https://github.com/tecowl/querybm/tree/main/tests/mysql/queries/authors for a complete test case.
-func ExampleNew() {
+func ExampleNew() { // nolint:testableexamples
 	buildFuncGen := func(name string) func(st *statement.Statement) {
 		return func(st *statement.Statement) {
 			st.Where.Add(Field("name", LikeContains(name)))
