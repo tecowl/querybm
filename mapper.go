@@ -1,7 +1,7 @@
 package querybm
 
 import (
-	"fmt"
+	"errors"
 
 	"github.com/tecowl/querybm/statement"
 )
@@ -24,7 +24,7 @@ type StaticColumns[M any] struct {
 
 var _ FieldMapper[any] = (*StaticColumns[any])(nil)
 
-var ErrNoColumns = fmt.Errorf("no columns defined for static columns query")
+var ErrNoColumns = errors.New("no columns defined for static columns query")
 
 func NewStaticColumns[M any](names []string, scan Mapper[M]) *StaticColumns[M] {
 	return &StaticColumns[M]{names: names, mapper: scan}

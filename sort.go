@@ -1,6 +1,7 @@
 package querybm
 
 import (
+	"errors"
 	"fmt"
 
 	"github.com/tecowl/querybm/statement"
@@ -21,7 +22,7 @@ func NewSortItem(column string, desc bool) *SortItem {
 	return &SortItem{column: column, desc: desc}
 }
 
-var ErrEmptySortItem = fmt.Errorf("sort item cannot be empty")
+var ErrEmptySortItem = errors.New("sort item cannot be empty")
 
 func (s *SortItem) Validate() error {
 	if s.column == "" {
