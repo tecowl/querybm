@@ -22,28 +22,28 @@ type FieldMapper[M any] interface {
 	Mapper() Mapper[M]
 }
 
-// StaticColumns implements FieldMapper with a static list of column names.
-type StaticColumns[M any] struct {
+// Fields implements FieldMapper with a static list of column names.
+type Fields[M any] struct {
 	names  []string
 	mapper Mapper[M]
 }
 
-var _ FieldMapper[any] = (*StaticColumns[any])(nil)
+var _ FieldMapper[any] = (*Fields[any])(nil)
 
 // ErrNoColumns is returned when no columns are defined for a static columns query.
 var ErrNoColumns = errors.New("no columns defined for static columns query")
 
-// NewStaticColumns creates a new StaticColumns instance with the specified column names and mapper function.
-func NewStaticColumns[M any](names []string, scan Mapper[M]) *StaticColumns[M] {
-	return &StaticColumns[M]{names: names, mapper: scan}
+// NewFields creates a new Fields instance with the specified column names and mapper function.
+func NewFields[M any](names []string, scan Mapper[M]) *Fields[M] {
+	return &Fields[M]{names: names, mapper: scan}
 }
 
 // Fields returns the column names for the static columns.
-func (c *StaticColumns[M]) Fields() []string {
+func (c *Fields[M]) Fields() []string {
 	return c.names
 }
 
 // Mapper returns the mapper function for the static columns.
-func (c *StaticColumns[M]) Mapper() Mapper[M] {
+func (c *Fields[M]) Mapper() Mapper[M] {
 	return c.mapper
 }

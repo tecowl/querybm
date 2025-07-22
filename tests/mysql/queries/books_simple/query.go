@@ -25,7 +25,7 @@ func New(db *sql.DB, condition *Condition) *querybm.Query[models.Book, *Conditio
 	return querybm.New(
 		db,
 		"books",
-		querybm.NewStaticColumns(
+		querybm.NewFields(
 			[]string{"book_id", "author_id", "isbn", "book_type", "title", "yr", "available", "tags"},
 			func(rows querybm.Scanner, book *models.Book) error {
 				return rows.Scan(&book.BookID, &book.AuthorID, &book.Isbn, &book.BookType, &book.Title, &book.Yr, &book.Available, &book.Tags)

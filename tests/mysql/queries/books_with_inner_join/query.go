@@ -6,7 +6,7 @@ import (
 	"github.com/tecowl/querybm"
 )
 
-var columns querybm.FieldMapper[Book] = querybm.NewStaticColumns(
+var columns querybm.FieldMapper[Book] = querybm.NewFields(
 	[]string{"book_id", "authors.author_id", "authors.name", "isbn", "book_type", "title", "yr", "available", "tags"},
 	func(rows querybm.Scanner, book *Book) error {
 		return rows.Scan(&book.BookID, &book.AuthorID, &book.AuthorName, &book.Isbn, &book.BookType, &book.Title, &book.Yr, &book.Available, &book.Tags)

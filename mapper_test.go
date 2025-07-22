@@ -24,27 +24,27 @@ type User struct {
 	Email string
 }
 
-func TestNewStaticColumns(t *testing.T) {
+func TestNewFields(t *testing.T) {
 	t.Parallel()
 	names := []string{"id", "name", "email"}
 	mapper := func(s Scanner, u *User) error {
 		return s.Scan(&u.ID, &u.Name, &u.Email)
 	}
 
-	sc := NewStaticColumns(names, mapper)
+	sc := NewFields(names, mapper)
 
 	if sc == nil {
-		t.Fatal("NewStaticColumns() returned nil")
+		t.Fatal("NewFields() returned nil")
 	}
 	if !reflect.DeepEqual(sc.names, names) {
-		t.Errorf("NewStaticColumns() names = %v, want %v", sc.names, names)
+		t.Errorf("NewFields() names = %v, want %v", sc.names, names)
 	}
 	if sc.mapper == nil {
-		t.Error("NewStaticColumns() mapper is nil")
+		t.Error("NewFields() mapper is nil")
 	}
 }
 
-func TestStaticColumns_Fields(t *testing.T) {
+func TestFields_Fields(t *testing.T) {
 	t.Parallel()
 	tests := []struct {
 		name  string
@@ -76,7 +76,7 @@ func TestStaticColumns_Fields(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			t.Parallel()
-			sc := &StaticColumns[User]{names: tt.names}
+			sc := &Fields[User]{names: tt.names}
 			got := sc.Fields()
 			if !reflect.DeepEqual(got, tt.want) {
 				t.Errorf("Fields() = %v, want %v", got, tt.want)
@@ -85,7 +85,7 @@ func TestStaticColumns_Fields(t *testing.T) {
 	}
 }
 
-func TestStaticColumns_Mapper(t *testing.T) {
+func TestFields_Mapper(t *testing.T) {
 	t.Parallel()
 	tests := []struct {
 		name     string
@@ -135,7 +135,7 @@ func TestStaticColumns_Mapper(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			t.Parallel()
-			sc := &StaticColumns[User]{mapper: tt.mapper}
+			sc := &Fields[User]{mapper: tt.mapper}
 			mapperFunc := sc.Mapper()
 
 			err := mapperFunc(tt.scanner, tt.user)

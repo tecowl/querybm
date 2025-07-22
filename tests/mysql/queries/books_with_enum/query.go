@@ -8,7 +8,7 @@ import (
 	"mysql-test/models"
 )
 
-var columns querybm.FieldMapper[models.Book] = querybm.NewStaticColumns(
+var columns querybm.FieldMapper[models.Book] = querybm.NewFields(
 	[]string{"book_id", "author_id", "isbn", "book_type", "title", "yr", "available", "tags"},
 	func(rows querybm.Scanner, book *models.Book) error {
 		return rows.Scan(&book.BookID, &book.AuthorID, &book.Isbn, &book.BookType, &book.Title, &book.Yr, &book.Available, &book.Tags)
