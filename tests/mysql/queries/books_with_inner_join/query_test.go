@@ -3,57 +3,24 @@ package bookswithinnerjoin
 import (
 	"context"
 	"database/sql"
-	"fmt"
-	"path/filepath"
 	"testing"
 
 	_ "github.com/go-sql-driver/mysql"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
-	"github.com/testcontainers/testcontainers-go"
-	"github.com/testcontainers/testcontainers-go/modules/mysql"
 
 	"github.com/tecowl/querybm"
 
 	"mysql-test/fixtures"
 	"mysql-test/models"
+	"mysql-test/queries/testdb"
 )
 
 func TestQuery(t *testing.T) {
 	ctx := context.Background()
 
-	mysqlContainer, err := mysql.Run(ctx,
-		"mysql:8.0.36",
-		mysql.WithConfigFile(filepath.Join("..", "..", "conf.d", "my.cnf")),
-		mysql.WithDatabase("bookswithenum"),
-		mysql.WithUsername("root"),
-		mysql.WithPassword("password"),
-		mysql.WithScripts(filepath.Join("..", "..", "schema.sql")),
-	)
-	defer func() {
-		if err := testcontainers.TerminateContainer(mysqlContainer); err != nil {
-			t.Fatalf("failed to terminate container: %s", err)
-		}
-	}()
-	if err != nil {
-		t.Fatalf("failed to start container: %s", err)
-		return
-	}
-
-	connStr, err := mysqlContainer.ConnectionString(ctx, "parseTime=true")
-	if err != nil {
-		t.Fatalf("failed to get connection string: %s", err)
-		return
-	}
-
-	fmt.Printf("Connection string: %s\n", connStr)
-
-	db, err := sql.Open("mysql", connStr)
-	if err != nil {
-		t.Fatalf("failed to open database: %s", err)
-		return
-	}
-	defer db.Close()
+	db, teardown := testdb.Setup(t, ctx)
+	defer teardown(t)
 
 	var authors []*models.Author
 	var books []*models.Book
