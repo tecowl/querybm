@@ -6,6 +6,7 @@ import (
 )
 
 func TestNewSimpleFields(t *testing.T) {
+	t.Parallel()
 	tests := []struct {
 		name   string
 		fields []string
@@ -45,6 +46,7 @@ func TestNewSimpleFields(t *testing.T) {
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
+			t.Parallel()
 			got := NewSimpleFields(tt.fields...)
 			if !reflect.DeepEqual([]string(got), tt.want) {
 				t.Errorf("NewSimpleFields() = %v, want %v", got, tt.want)
@@ -54,6 +56,7 @@ func TestNewSimpleFields(t *testing.T) {
 }
 
 func TestSimpleFields_Fields(t *testing.T) {
+	t.Parallel()
 	tests := []struct {
 		name       string
 		fields     SimpleFields
@@ -88,6 +91,7 @@ func TestSimpleFields_Fields(t *testing.T) {
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
+			t.Parallel()
 			got := tt.fields.Fields()
 			if !reflect.DeepEqual(got, tt.wantFields) {
 				t.Errorf("Fields() = %v, want %v", got, tt.wantFields)
@@ -95,4 +99,3 @@ func TestSimpleFields_Fields(t *testing.T) {
 		})
 	}
 }
-

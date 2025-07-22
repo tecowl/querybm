@@ -3,6 +3,7 @@ package helpers
 import "testing"
 
 func TestIsCountOnly(t *testing.T) {
+	t.Parallel()
 	tests := []struct {
 		name     string
 		fields   []string
@@ -82,6 +83,7 @@ func TestIsCountOnly(t *testing.T) {
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
+			t.Parallel()
 			result := IsCountOnly(tt.fields)
 			if result != tt.expected {
 				t.Errorf("IsCountOnly(%v) = %v, want %v", tt.fields, result, tt.expected)

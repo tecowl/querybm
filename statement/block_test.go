@@ -6,6 +6,7 @@ import (
 )
 
 func TestNewBlock(t *testing.T) {
+	t.Parallel()
 	tests := []struct {
 		name      string
 		delimiter string
@@ -26,6 +27,7 @@ func TestNewBlock(t *testing.T) {
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
+			t.Parallel()
 			b := NewBlock(tt.delimiter)
 			if b.delimiter != tt.delimiter {
 				t.Errorf("NewBlock() delimiter = %v, want %v", b.delimiter, tt.delimiter)
@@ -41,6 +43,7 @@ func TestNewBlock(t *testing.T) {
 }
 
 func TestBlock_IsEmpty(t *testing.T) {
+	t.Parallel()
 	tests := []struct {
 		name  string
 		block *Block
@@ -64,6 +67,7 @@ func TestBlock_IsEmpty(t *testing.T) {
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
+			t.Parallel()
 			if got := tt.block.IsEmpty(); got != tt.want {
 				t.Errorf("IsEmpty() = %v, want %v", got, tt.want)
 			}
@@ -72,10 +76,11 @@ func TestBlock_IsEmpty(t *testing.T) {
 }
 
 func TestBlock_Add(t *testing.T) {
+	t.Parallel()
 	tests := []struct {
-		name         string
-		delimiter    string
-		adds         []struct {
+		name      string
+		delimiter string
+		adds      []struct {
 			str    string
 			values []any
 		}
@@ -179,6 +184,7 @@ func TestBlock_Add(t *testing.T) {
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
+			t.Parallel()
 			b := NewBlock(tt.delimiter)
 			for _, add := range tt.adds {
 				b.Add(add.str, add.values...)

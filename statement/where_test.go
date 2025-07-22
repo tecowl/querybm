@@ -8,6 +8,7 @@ import (
 )
 
 func TestNewWhere(t *testing.T) {
+	t.Parallel()
 	tests := []struct {
 		name      string
 		connector string
@@ -24,6 +25,7 @@ func TestNewWhere(t *testing.T) {
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
+			t.Parallel()
 			w := newWhere(tt.connector)
 			if w.Connector != tt.connector {
 				t.Errorf("newWhere() Connector = %v, want %v", w.Connector, tt.connector)
@@ -36,6 +38,7 @@ func TestNewWhere(t *testing.T) {
 }
 
 func TestWhereBlock_IsEmpty(t *testing.T) {
+	t.Parallel()
 	tests := []struct {
 		name  string
 		setup func() *WhereBlock
@@ -71,6 +74,7 @@ func TestWhereBlock_IsEmpty(t *testing.T) {
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
+			t.Parallel()
 			w := tt.setup()
 			if got := w.IsEmpty(); got != tt.want {
 				t.Errorf("IsEmpty() = %v, want %v", got, tt.want)
@@ -80,6 +84,7 @@ func TestWhereBlock_IsEmpty(t *testing.T) {
 }
 
 func TestWhereBlock_Add(t *testing.T) {
+	t.Parallel()
 	tests := []struct {
 		name       string
 		connector  string
@@ -120,6 +125,7 @@ func TestWhereBlock_Add(t *testing.T) {
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
+			t.Parallel()
 			w := newWhere(tt.connector)
 			for _, cond := range tt.conditions {
 				w.Add(cond)
@@ -132,6 +138,7 @@ func TestWhereBlock_Add(t *testing.T) {
 }
 
 func TestWhereBlock_Build(t *testing.T) {
+	t.Parallel()
 	tests := []struct {
 		name       string
 		setup      func() *WhereBlock
@@ -249,6 +256,7 @@ func TestWhereBlock_Build(t *testing.T) {
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
+			t.Parallel()
 			w := tt.setup()
 			gotSQL, gotValues := w.Build()
 			if gotSQL != tt.wantSQL {

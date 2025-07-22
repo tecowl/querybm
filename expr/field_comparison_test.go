@@ -6,6 +6,7 @@ import (
 )
 
 func TestFieldComparison(t *testing.T) {
+	t.Parallel()
 	field := "field1"
 	tests := []struct {
 		name       string
@@ -77,6 +78,7 @@ func TestFieldComparison(t *testing.T) {
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
+			t.Parallel()
 			if got := tt.condition.Build(field); got != tt.wantString {
 				t.Errorf("String() = %v, want %v", got, tt.wantString)
 			}
