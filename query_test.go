@@ -65,7 +65,7 @@ func TestNew(t *testing.T) {
 	})
 	pagination := NewPagination(10, 0)
 
-	query := New(db, condition, sort, "users", fields, pagination)
+	query := New(db, "users", fields, condition, sort, pagination)
 
 	if query.db != db {
 		t.Error("New() db not set correctly")
@@ -100,7 +100,7 @@ func TestQuery_Validate(t *testing.T) {
 				sort := &ValidatableSort{}
 				fields := NewStaticColumns[TestModel]([]string{"id"}, nil)
 				pagination := NewPagination(10, 0)
-				return New[TestModel, Condition, Sort](db, condition, sort, "users", fields, pagination)
+				return New[TestModel, Condition, Sort](db, "users", fields, condition, sort, pagination)
 			},
 			wantErr: false,
 		},
@@ -112,7 +112,7 @@ func TestQuery_Validate(t *testing.T) {
 				sort := &ValidatableSort{}
 				fields := NewStaticColumns[TestModel]([]string{"id"}, nil)
 				pagination := NewPagination(10, 0)
-				return New[TestModel, Condition, Sort](db, condition, sort, "users", fields, pagination)
+				return New[TestModel, Condition, Sort](db, "users", fields, condition, sort, pagination)
 			},
 			wantErr:       true,
 			wantErrString: "condition validation failed:",
@@ -125,7 +125,7 @@ func TestQuery_Validate(t *testing.T) {
 				sort := &ValidatableSort{validateErr: errors.New("invalid sort")} // nolint:err113
 				fields := NewStaticColumns[TestModel]([]string{"id"}, nil)
 				pagination := NewPagination(10, 0)
-				return New[TestModel, Condition, Sort](db, condition, sort, "users", fields, pagination)
+				return New[TestModel, Condition, Sort](db, "users", fields, condition, sort, pagination)
 			},
 			wantErr:       true,
 			wantErrString: "sort validation failed:",
@@ -138,7 +138,7 @@ func TestQuery_Validate(t *testing.T) {
 				sort := &TestSort{}
 				fields := NewStaticColumns[TestModel]([]string{"id"}, nil)
 				pagination := NewPagination(10, 0)
-				return New[TestModel, Condition, Sort](db, condition, sort, "users", fields, pagination)
+				return New[TestModel, Condition, Sort](db, "users", fields, condition, sort, pagination)
 			},
 			wantErr: false,
 		},
@@ -177,7 +177,7 @@ func TestQuery_BuildCountSelect(t *testing.T) {
 				sort := &TestSort{}
 				fields := NewStaticColumns[TestModel]([]string{"id", "name"}, nil)
 				pagination := NewPagination(10, 0)
-				return New(db, condition, sort, "users", fields, pagination)
+				return New(db, "users", fields, condition, sort, pagination)
 			},
 			wantSQL:    "SELECT COUNT(*) AS count FROM users WHERE status = ?",
 			wantValues: []any{"active"},
@@ -190,7 +190,7 @@ func TestQuery_BuildCountSelect(t *testing.T) {
 				sort := &TestSort{}
 				fields := NewStaticColumns[TestModel]([]string{"id", "name"}, nil)
 				pagination := NewPagination(10, 0)
-				return New(db, condition, sort, "products", fields, pagination)
+				return New(db, "products", fields, condition, sort, pagination)
 			},
 			wantSQL:    "SELECT COUNT(*) AS count FROM products WHERE status = ?",
 			wantValues: []any{"active"},
@@ -228,7 +228,7 @@ func TestQuery_BuildRowsSelect(t *testing.T) {
 				sort := &TestSort{}
 				fields := NewStaticColumns[TestModel]([]string{"id", "name", "email"}, nil)
 				pagination := NewPagination(20, 40)
-				return New(db, condition, sort, "users", fields, pagination)
+				return New(db, "users", fields, condition, sort, pagination)
 			},
 			wantSQL:    "SELECT id, name, email FROM users WHERE status = ? ORDER BY created_at DESC LIMIT ? OFFSET ?",
 			wantValues: []any{"active", int64(20), int64(40)},
@@ -241,7 +241,7 @@ func TestQuery_BuildRowsSelect(t *testing.T) {
 				sort := &TestSort{}
 				fields := NewStaticColumns[TestModel]([]string{"id", "name"}, nil)
 				pagination := NewPagination(10, 0)
-				return New(db, condition, sort, "users", fields, pagination)
+				return New(db, "users", fields, condition, sort, pagination)
 			},
 			wantSQL:    "SELECT id, name FROM users WHERE status = ? ORDER BY created_at DESC LIMIT ?",
 			wantValues: []any{"active", int64(10)},

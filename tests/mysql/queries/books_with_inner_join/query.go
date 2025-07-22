@@ -17,5 +17,5 @@ var sort = querybm.NewSortItem("title", false)
 
 func New(db *sql.DB, condition *Condition, pagination *querybm.Pagination) *querybm.Query[Book, *Condition, *querybm.SortItem] {
 	table := "books"
-	return querybm.New(db, condition, sort, table, columns, pagination)
+	return querybm.New(db, table, columns, condition, sort, pagination)
 }

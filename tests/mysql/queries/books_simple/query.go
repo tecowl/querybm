@@ -24,8 +24,6 @@ func (c *Condition) Build(s *querybm.Statement) {
 func New(db *sql.DB, condition *Condition) *querybm.Query[models.Book, *Condition, *querybm.SortItem] {
 	return querybm.New(
 		db,
-		condition,
-		querybm.NewSortItem("title", false),
 		"books",
 		querybm.NewStaticColumns(
 			[]string{"book_id", "author_id", "isbn", "book_type", "title", "yr", "available", "tags"},
@@ -33,6 +31,8 @@ func New(db *sql.DB, condition *Condition) *querybm.Query[models.Book, *Conditio
 				return rows.Scan(&book.BookID, &book.AuthorID, &book.Isbn, &book.BookType, &book.Title, &book.Yr, &book.Available, &book.Tags)
 			},
 		),
+		condition,
+		querybm.NewSortItem("title", false),
 		querybm.NewPagination(100, 0),
 	)
 }
