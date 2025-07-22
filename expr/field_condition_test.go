@@ -6,6 +6,7 @@ import (
 )
 
 func TestFieldCondition(t *testing.T) {
+	t.Parallel()
 	tests := []struct {
 		name       string
 		field      ConditionExpr
@@ -46,6 +47,7 @@ func TestFieldCondition(t *testing.T) {
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
+			t.Parallel()
 			if got := tt.field.String(); got != tt.wantString {
 				t.Errorf("String() = %q, want %q", got, tt.wantString)
 			}

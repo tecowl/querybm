@@ -9,3 +9,7 @@ golangci-lint-cli-install:
 .PHONY: lint
 lint: $(GOLANGCI_LINT_CLI)
 	golangci-lint run
+
+.PHONY: linters-enabled
+linters-enabled: $(GOLANGCI_LINT_CLI)
+	@golangci-lint linters | awk '/^Enabled by your configuration linters:$$/{flag=1;next}/^Disabled by your configuration linters:$$/{flag=0}flag{print}'

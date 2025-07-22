@@ -3,6 +3,7 @@ package querybm
 import (
 	"context"
 	"database/sql"
+	"errors"
 	"fmt"
 
 	"github.com/tecowl/querybm/statement"
@@ -89,7 +90,7 @@ func (q *Query[M, C, S]) Count(ctx context.Context) (int64, error) {
 
 	var count int64
 	if err := stmt.QueryRowContext(ctx, args...).Scan(&count); err != nil {
-		if err == sql.ErrNoRows {
+		if errors.Is(err, sql.ErrNoRows) {
 			return 0, nil
 		}
 		return 0, err
@@ -106,14 +107,14 @@ func (q *Query[M, C, S]) FirstRow(ctx context.Context) (*sql.Row, error) {
 
 	row := stmt.QueryRowContext(ctx, args...)
 	if err := row.Err(); err != nil {
-		if err == sql.ErrNoRows {
-			return nil, nil // No rows found, return nil
-		}
 		return nil, err
 	}
 	return row, nil
 }
 
+// Rows executes the query and returns the result set as *sql.Rows.
+// It prepares the statement, executes it, and returns the rows.
+// The caller is responsible for closing the rows.
 func (q *Query[M, C, S]) Rows(ctx context.Context) (*sql.Rows, error) {
 	stmt, args, err := q.RowsStatement(ctx)
 	if err != nil {
@@ -121,7 +122,7 @@ func (q *Query[M, C, S]) Rows(ctx context.Context) (*sql.Rows, error) {
 	}
 	defer stmt.Close()
 
-	rows, err := stmt.QueryContext(ctx, args...)
+	rows, err := stmt.QueryContext(ctx, args...) // nolint:sqlclosecheck
 	if err != nil {
 		return nil, err
 	}
@@ -133,14 +134,8 @@ func (q *Query[M, C, S]) First(ctx context.Context) (*M, error) {
 	if err != nil {
 		return nil, err
 	}
-	if row == nil {
-		return nil, nil // No rows found, return nil
-	}
 	org := new(M)
 	if err := q.Fields.Mapper()(row, org); err != nil {
-		if err == sql.ErrNoRows {
-			return nil, nil // No rows found, return nil
-		}
 		return nil, err
 	}
 	return org, nil

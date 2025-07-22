@@ -17,13 +17,14 @@ func (c *fieldInExpr) Build(field string) string {
 
 func (c *fieldInExpr) Values() []any { return c.values }
 
-func In(values ...any) FieldConditionBody {
+func In(values ...any) FieldConditionBody { //nolint:ireturn
 	if values == nil {
 		values = []any{}
 	}
 	return &fieldInExpr{values: values}
 }
-func EqOrIn(values ...any) FieldConditionBody {
+
+func EqOrIn(values ...any) FieldConditionBody { //nolint:ireturn
 	if len(values) == 1 {
 		return Eq(values[0])
 	}

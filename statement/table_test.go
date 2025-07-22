@@ -6,6 +6,7 @@ import (
 )
 
 func TestNewTableBlock(t *testing.T) {
+	t.Parallel()
 	tests := []struct {
 		name      string
 		tableName string
@@ -26,6 +27,7 @@ func TestNewTableBlock(t *testing.T) {
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
+			t.Parallel()
 			tb := NewTableBlock(tt.tableName)
 			if tb.content != tt.tableName {
 				t.Errorf("NewTableBlock() content = %v, want %v", tb.content, tt.tableName)
@@ -41,10 +43,11 @@ func TestNewTableBlock(t *testing.T) {
 }
 
 func TestTableBlock_InnerJoin(t *testing.T) {
+	t.Parallel()
 	tests := []struct {
-		name       string
-		initial    string
-		joins      []struct {
+		name    string
+		initial string
+		joins   []struct {
 			table     string
 			condition string
 			values    []any
@@ -134,6 +137,7 @@ func TestTableBlock_InnerJoin(t *testing.T) {
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
+			t.Parallel()
 			tb := NewTableBlock(tt.initial)
 			for _, join := range tt.joins {
 				tb.InnerJoin(join.table, join.condition, join.values...)
@@ -149,10 +153,11 @@ func TestTableBlock_InnerJoin(t *testing.T) {
 }
 
 func TestTableBlock_LeftOuterJoin(t *testing.T) {
+	t.Parallel()
 	tests := []struct {
-		name       string
-		initial    string
-		joins      []struct {
+		name    string
+		initial string
+		joins   []struct {
 			table     string
 			condition string
 			values    []any
@@ -220,6 +225,7 @@ func TestTableBlock_LeftOuterJoin(t *testing.T) {
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
+			t.Parallel()
 			tb := NewTableBlock(tt.initial)
 			for _, join := range tt.joins {
 				tb.LeftOuterJoin(join.table, join.condition, join.values...)
@@ -235,20 +241,21 @@ func TestTableBlock_LeftOuterJoin(t *testing.T) {
 }
 
 func TestTableBlock_MixedJoins(t *testing.T) {
+	t.Parallel()
 	tb := NewTableBlock("orders o")
-	
+
 	// Add INNER JOIN
 	tb.InnerJoin("customers c", "o.customer_id = c.id")
-	
+
 	// Add LEFT OUTER JOIN
 	tb.LeftOuterJoin("order_discounts d", "o.id = d.order_id AND d.active = ?", true)
-	
+
 	// Add another INNER JOIN
 	tb.InnerJoin("products p", "o.product_id = p.id AND p.available = ?", true)
-	
+
 	wantContent := "orders o INNER JOIN customers c ON o.customer_id = c.id LEFT OUTER JOIN order_discounts d ON o.id = d.order_id AND d.active = ? INNER JOIN products p ON o.product_id = p.id AND p.available = ?"
 	wantValues := []any{true, true}
-	
+
 	if tb.content != wantContent {
 		t.Errorf("Mixed joins content = %v, want %v", tb.content, wantContent)
 	}

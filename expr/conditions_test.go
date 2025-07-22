@@ -6,6 +6,7 @@ import (
 )
 
 func TestConditions(t *testing.T) {
+	t.Parallel()
 	tests := []struct {
 		name       string
 		conditions *Conditions
@@ -56,6 +57,7 @@ func TestConditions(t *testing.T) {
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
+			t.Parallel()
 			if got := tt.conditions.String(); got != tt.wantString {
 				t.Errorf("String() = %v, want %v", got, tt.wantString)
 			}
@@ -67,6 +69,7 @@ func TestConditions(t *testing.T) {
 }
 
 func TestAnd(t *testing.T) {
+	t.Parallel()
 	tests := []struct {
 		name       string
 		conditions []ConditionExpr
@@ -101,6 +104,7 @@ func TestAnd(t *testing.T) {
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
+			t.Parallel()
 			condition := And(tt.conditions...)
 			if got := condition.String(); got != tt.wantString {
 				t.Errorf("String() = %v, want %v", got, tt.wantString)
@@ -113,6 +117,7 @@ func TestAnd(t *testing.T) {
 }
 
 func TestOr(t *testing.T) {
+	t.Parallel()
 	tests := []struct {
 		name       string
 		conditions []ConditionExpr
@@ -147,6 +152,7 @@ func TestOr(t *testing.T) {
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
+			t.Parallel()
 			condition := Or(tt.conditions...)
 			if got := condition.String(); got != tt.wantString {
 				t.Errorf("String() = %v, want %v", got, tt.wantString)
@@ -159,6 +165,7 @@ func TestOr(t *testing.T) {
 }
 
 func TestNestedConditions(t *testing.T) {
+	t.Parallel()
 	tests := []struct {
 		name       string
 		condition  ConditionExpr
@@ -214,6 +221,7 @@ func TestNestedConditions(t *testing.T) {
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
+			t.Parallel()
 			if got := tt.condition.String(); got != tt.wantString {
 				t.Errorf("String() = %v, want %v", got, tt.wantString)
 			}

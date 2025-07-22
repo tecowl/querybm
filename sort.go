@@ -1,14 +1,12 @@
 package querybm
 
 import (
-	"fmt"
+	"errors"
 
 	"github.com/tecowl/querybm/statement"
 )
 
-type Sort interface {
-	Build(*statement.Statement)
-}
+type Sort = Builder
 
 type SortItem struct {
 	column string
@@ -21,7 +19,7 @@ func NewSortItem(column string, desc bool) *SortItem {
 	return &SortItem{column: column, desc: desc}
 }
 
-var ErrEmptySortItem = fmt.Errorf("sort item cannot be empty")
+var ErrEmptySortItem = errors.New("sort item cannot be empty")
 
 func (s *SortItem) Validate() error {
 	if s.column == "" {
@@ -46,6 +44,8 @@ type SortItems []*SortItem
 
 var _ Sort = (SortItems)(nil)
 
+var ErrNilSortItem = errors.New("sort item cannot be nil")
+
 func (s SortItems) Validate() error {
 	for _, item := range s {
 		if item != nil {
@@ -53,7 +53,7 @@ func (s SortItems) Validate() error {
 				return err
 			}
 		} else {
-			return fmt.Errorf("sort item cannot be nil")
+			return ErrNilSortItem
 		}
 	}
 	return nil

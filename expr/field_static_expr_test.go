@@ -6,6 +6,7 @@ import (
 )
 
 func TestFieldStaticExpr(t *testing.T) {
+	t.Parallel()
 	field := "field4"
 	tests := []struct {
 		name       string
@@ -29,6 +30,7 @@ func TestFieldStaticExpr(t *testing.T) {
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
+			t.Parallel()
 			if got := tt.condition.Build(field); got != tt.wantString {
 				t.Errorf("String() = %v, want %v", got, tt.wantString)
 			}

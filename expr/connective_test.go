@@ -3,6 +3,7 @@ package expr
 import "testing"
 
 func TestHasDifferentConnective(t *testing.T) {
+	t.Parallel()
 	tests := []struct {
 		name     string
 		value    any
@@ -49,6 +50,7 @@ func TestHasDifferentConnective(t *testing.T) {
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
+			t.Parallel()
 			result := HasDifferentConnective(tt.value, tt.target)
 			if result != tt.expected {
 				t.Errorf("expected %v, got %v", tt.expected, result)

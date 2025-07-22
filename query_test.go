@@ -10,7 +10,6 @@ import (
 	"github.com/tecowl/querybm/statement"
 )
 
-// Mock types for testing
 type TestModel struct {
 	ID   int
 	Name string
@@ -57,6 +56,7 @@ func (v *ValidatableSort) Validate() error {
 }
 
 func TestNew(t *testing.T) {
+	t.Parallel()
 	db := &sql.DB{}
 	condition := &TestCondition{}
 	sort := &TestSort{}
@@ -85,6 +85,7 @@ func TestNew(t *testing.T) {
 }
 
 func TestQuery_Validate(t *testing.T) {
+	t.Parallel()
 	tests := []struct {
 		name          string
 		setupQuery    func() *Query[TestModel, Condition, Sort]
@@ -107,7 +108,7 @@ func TestQuery_Validate(t *testing.T) {
 			name: "Condition validation fails",
 			setupQuery: func() *Query[TestModel, Condition, Sort] {
 				db := &sql.DB{}
-				condition := &ValidatableCondition{validateErr: errors.New("invalid condition")}
+				condition := &ValidatableCondition{validateErr: errors.New("invalid condition")} // nolint:err113
 				sort := &ValidatableSort{}
 				fields := NewStaticColumns[TestModel]([]string{"id"}, nil)
 				pagination := NewPagination(10, 0)
@@ -121,7 +122,7 @@ func TestQuery_Validate(t *testing.T) {
 			setupQuery: func() *Query[TestModel, Condition, Sort] {
 				db := &sql.DB{}
 				condition := &ValidatableCondition{}
-				sort := &ValidatableSort{validateErr: errors.New("invalid sort")}
+				sort := &ValidatableSort{validateErr: errors.New("invalid sort")} // nolint:err113
 				fields := NewStaticColumns[TestModel]([]string{"id"}, nil)
 				pagination := NewPagination(10, 0)
 				return New[TestModel, Condition, Sort](db, condition, sort, "users", fields, pagination)
@@ -145,6 +146,7 @@ func TestQuery_Validate(t *testing.T) {
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
+			t.Parallel()
 			q := tt.setupQuery()
 			err := q.Validate()
 			if (err != nil) != tt.wantErr {
@@ -160,6 +162,7 @@ func TestQuery_Validate(t *testing.T) {
 }
 
 func TestQuery_BuildCountSelect(t *testing.T) {
+	t.Parallel()
 	tests := []struct {
 		name       string
 		setupQuery func() *Query[TestModel, *TestCondition, *TestSort]
@@ -196,6 +199,7 @@ func TestQuery_BuildCountSelect(t *testing.T) {
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
+			t.Parallel()
 			q := tt.setupQuery()
 			gotSQL, gotValues := q.BuildCountSelect()
 			if gotSQL != tt.wantSQL {
@@ -209,6 +213,7 @@ func TestQuery_BuildCountSelect(t *testing.T) {
 }
 
 func TestQuery_BuildRowsSelect(t *testing.T) {
+	t.Parallel()
 	tests := []struct {
 		name       string
 		setupQuery func() *Query[TestModel, *TestCondition, *TestSort]
@@ -245,6 +250,7 @@ func TestQuery_BuildRowsSelect(t *testing.T) {
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
+			t.Parallel()
 			q := tt.setupQuery()
 			gotSQL, gotValues := q.BuildRowsSelect()
 			if gotSQL != tt.wantSQL {
@@ -264,7 +270,6 @@ func TestQuery_BuildRowsSelect(t *testing.T) {
 	}
 }
 
-// Helper function
 func contains(s, substr string) bool {
 	return len(s) >= len(substr) && (s == substr || len(substr) == 0 || (len(s) > 0 && len(substr) > 0 && findSubstring(s, substr) != -1))
 }

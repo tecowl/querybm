@@ -8,6 +8,7 @@ import (
 )
 
 func TestNewStatement(t *testing.T) {
+	t.Parallel()
 	fields := NewSimpleFields("id", "name", "email")
 	s := New("users", fields)
 
@@ -29,6 +30,7 @@ func TestNewStatement(t *testing.T) {
 }
 
 func TestStatement_Build_SimpleSelect(t *testing.T) {
+	t.Parallel()
 	tests := []struct {
 		name       string
 		statement  *Statement
@@ -63,6 +65,7 @@ func TestStatement_Build_SimpleSelect(t *testing.T) {
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
+			t.Parallel()
 			gotSQL, gotValues := tt.statement.Build()
 			if gotSQL != tt.wantSQL {
 				t.Errorf("Build() SQL = %v, want %v", gotSQL, tt.wantSQL)
@@ -75,6 +78,7 @@ func TestStatement_Build_SimpleSelect(t *testing.T) {
 }
 
 func TestStatement_Build_WithWhere(t *testing.T) {
+	t.Parallel()
 	tests := []struct {
 		name       string
 		setup      func() *Statement
@@ -136,6 +140,7 @@ func TestStatement_Build_WithWhere(t *testing.T) {
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
+			t.Parallel()
 			s := tt.setup()
 			gotSQL, gotValues := s.Build()
 			if gotSQL != tt.wantSQL {
@@ -149,6 +154,7 @@ func TestStatement_Build_WithWhere(t *testing.T) {
 }
 
 func TestStatement_Build_WithSort(t *testing.T) {
+	t.Parallel()
 	tests := []struct {
 		name       string
 		setup      func() *Statement
@@ -180,6 +186,7 @@ func TestStatement_Build_WithSort(t *testing.T) {
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
+			t.Parallel()
 			s := tt.setup()
 			gotSQL, gotValues := s.Build()
 			if gotSQL != tt.wantSQL {
@@ -193,6 +200,7 @@ func TestStatement_Build_WithSort(t *testing.T) {
 }
 
 func TestStatement_Build_WithPagination(t *testing.T) {
+	t.Parallel()
 	tests := []struct {
 		name       string
 		setup      func() *Statement
@@ -224,6 +232,7 @@ func TestStatement_Build_WithPagination(t *testing.T) {
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
+			t.Parallel()
 			s := tt.setup()
 			gotSQL, gotValues := s.Build()
 			if gotSQL != tt.wantSQL {
@@ -237,6 +246,7 @@ func TestStatement_Build_WithPagination(t *testing.T) {
 }
 
 func TestStatement_Build_Complex(t *testing.T) {
+	t.Parallel()
 	tests := []struct {
 		name       string
 		setup      func() *Statement
@@ -276,6 +286,7 @@ func TestStatement_Build_Complex(t *testing.T) {
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
+			t.Parallel()
 			s := tt.setup()
 			gotSQL, gotValues := s.Build()
 			if gotSQL != tt.wantSQL {

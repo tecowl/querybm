@@ -1,8 +1,9 @@
 package bookswithenum
 
 import (
-	"mysql-test/models"
 	"time"
+
+	"mysql-test/models"
 
 	"github.com/tecowl/querybm"
 	. "github.com/tecowl/querybm/expr"

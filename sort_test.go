@@ -1,6 +1,7 @@
 package querybm
 
 import (
+	"errors"
 	"reflect"
 	"testing"
 
@@ -8,6 +9,7 @@ import (
 )
 
 func TestNewSortItem(t *testing.T) {
+	t.Parallel()
 	tests := []struct {
 		name   string
 		column string
@@ -32,6 +34,7 @@ func TestNewSortItem(t *testing.T) {
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
+			t.Parallel()
 			si := NewSortItem(tt.column, tt.desc)
 			if si.column != tt.column {
 				t.Errorf("NewSortItem() column = %v, want %v", si.column, tt.column)
@@ -44,6 +47,7 @@ func TestNewSortItem(t *testing.T) {
 }
 
 func TestSortIem_Validate(t *testing.T) {
+	t.Parallel()
 	tests := []struct {
 		name    string
 		sortIem *SortItem
@@ -73,11 +77,12 @@ func TestSortIem_Validate(t *testing.T) {
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
+			t.Parallel()
 			err := tt.sortIem.Validate()
 			if (err != nil) != tt.wantErr {
 				t.Errorf("Validate() error = %v, wantErr %v", err, tt.wantErr)
 			}
-			if tt.wantErr && err != ErrEmptySortItem {
+			if tt.wantErr && !errors.Is(err, ErrEmptySortItem) {
 				t.Errorf("Validate() error = %v, want %v", err, ErrEmptySortItem)
 			}
 		})
@@ -85,6 +90,7 @@ func TestSortIem_Validate(t *testing.T) {
 }
 
 func TestSortIem_Build(t *testing.T) {
+	t.Parallel()
 	tests := []struct {
 		name        string
 		sortIem     *SortItem
@@ -119,6 +125,7 @@ func TestSortIem_Build(t *testing.T) {
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
+			t.Parallel()
 			stmt := statement.New("test_table", statement.NewSimpleFields("id"))
 			tt.sortIem.Build(stmt)
 
@@ -126,14 +133,15 @@ func TestSortIem_Build(t *testing.T) {
 				if !stmt.Sort.IsEmpty() {
 					t.Error("Build() added content when it should not have")
 				}
-			} else {
-				// Use reflection to access private field
-				contentField := reflect.ValueOf(stmt.Sort).Elem().FieldByName("content")
-				if contentField.IsValid() && contentField.CanInterface() {
-					gotContent := contentField.Interface().(string)
-					if gotContent != tt.wantContent {
-						t.Errorf("Build() content = %v, want %v", gotContent, tt.wantContent)
-					}
+				return
+			}
+
+			// Use reflection to access private field
+			contentField := reflect.ValueOf(stmt.Sort).Elem().FieldByName("content")
+			if contentField.IsValid() && contentField.CanInterface() {
+				gotContent := contentField.Interface().(string)
+				if gotContent != tt.wantContent {
+					t.Errorf("Build() content = %v, want %v", gotContent, tt.wantContent)
 				}
 			}
 		})
@@ -141,6 +149,7 @@ func TestSortIem_Build(t *testing.T) {
 }
 
 func TestSortItems_Validate(t *testing.T) {
+	t.Parallel()
 	tests := []struct {
 		name      string
 		sortItems SortItems
@@ -192,6 +201,7 @@ func TestSortItems_Validate(t *testing.T) {
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
+			t.Parallel()
 			err := tt.sortItems.Validate()
 			if (err != nil) != tt.wantErr {
 				t.Errorf("Validate() error = %v, wantErr %v", err, tt.wantErr)
@@ -206,6 +216,7 @@ func TestSortItems_Validate(t *testing.T) {
 }
 
 func TestSortItems_Build(t *testing.T) {
+	t.Parallel()
 	tests := []struct {
 		name        string
 		sortItems   SortItems
@@ -253,6 +264,7 @@ func TestSortItems_Build(t *testing.T) {
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
+			t.Parallel()
 			stmt := statement.New("test_table", statement.NewSimpleFields("id"))
 			tt.sortItems.Build(stmt)
 
@@ -269,6 +281,7 @@ func TestSortItems_Build(t *testing.T) {
 }
 
 func TestErrEmptySortItem(t *testing.T) {
+	t.Parallel()
 	if ErrEmptySortItem == nil {
 		t.Error("ErrEmptySortItem should not be nil")
 	}
@@ -280,6 +293,7 @@ func TestErrEmptySortItem(t *testing.T) {
 }
 
 func TestSortDirections(t *testing.T) {
+	t.Parallel()
 	// Test the sortDirections map
 	if sortDirections[false] != "ASC" {
 		t.Errorf("sortDirections[false] = %v, want ASC", sortDirections[false])

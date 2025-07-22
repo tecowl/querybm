@@ -6,6 +6,7 @@ import (
 )
 
 func TestFieldInExpr(t *testing.T) {
+	t.Parallel()
 	field := "field2"
 	tests := []struct {
 		name       string
@@ -41,6 +42,7 @@ func TestFieldInExpr(t *testing.T) {
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
+			t.Parallel()
 			if got := tt.condition.Build(field); got != tt.wantString {
 				t.Errorf("String() = %v, want %v", got, tt.wantString)
 			}
@@ -52,6 +54,7 @@ func TestFieldInExpr(t *testing.T) {
 }
 
 func TestEqOrIn(t *testing.T) {
+	t.Parallel()
 	field := "field3"
 	tests := []struct {
 		name       string
@@ -81,6 +84,7 @@ func TestEqOrIn(t *testing.T) {
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
+			t.Parallel()
 			condition := EqOrIn(tt.values...)
 			if got := condition.Build(field); got != tt.wantString {
 				t.Errorf("String() = %v, want %v", got, tt.wantString)
