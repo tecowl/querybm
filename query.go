@@ -23,10 +23,10 @@ type Query[M any] struct {
 // New creates a new Query instance with the provided parameters.
 // db: The database connection to use for executing queries.
 // table: The name of the table to query.
-// fields: The field mapper that defines how to map database rows to model instances.
-// c: The condition to apply to the query.
-// s: The sort item to apply to the query.
-// pagination: The pagination settings for the query.
+// fields: The field mapper that defines how to map database rows to model instances. This is used for mapping in List method.
+// c: The condition to apply to the query. This is used for List and Count methods.
+// s: The sort item to apply to the query. This is used for ordering the results in List method.
+// pagination: The pagination settings for the query. This is used to limit the number of results returned in List method.
 func New[M any](db *sql.DB, table string, fields FieldMapper[M], c Condition, s Sort, pagination *Pagination) *Query[M] {
 	return &Query[M]{
 		db:         db,
