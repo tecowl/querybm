@@ -1,8 +1,6 @@
 package querybm
 
 import (
-	"errors"
-
 	"github.com/tecowl/querybm/statement"
 )
 
@@ -29,9 +27,6 @@ type Fields[M any] struct {
 }
 
 var _ FieldMapper[any] = (*Fields[any])(nil)
-
-// ErrNoColumns is returned when no columns are defined for a static columns query.
-var ErrNoColumns = errors.New("no columns defined for static columns query")
 
 // NewFields creates a new Fields instance with the specified column names and mapper function.
 func NewFields[M any](names []string, scan Mapper[M]) *Fields[M] {

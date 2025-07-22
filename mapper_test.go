@@ -149,15 +149,3 @@ func TestFields_Mapper(t *testing.T) {
 		})
 	}
 }
-
-func TestErrNoColumns(t *testing.T) {
-	t.Parallel()
-	if ErrNoColumns == nil {
-		t.Error("ErrNoColumns should not be nil")
-	}
-
-	expectedMsg := "no columns defined for static columns query"
-	if ErrNoColumns.Error() != expectedMsg {
-		t.Errorf("ErrNoColumns.Error() = %v, want %v", ErrNoColumns.Error(), expectedMsg)
-	}
-}
