@@ -8,5 +8,5 @@ godoc-cli-install:
 
 .PHONY: godoc
 godoc: $(GODOC_CLI)
-	@echo "Open http://localhost:6060/pkg/github.com/akm/sql-slog"
+	@echo "Open http://localhost:6060/pkg/github.com/tecowl/querybm"
 	godoc -http=:6060
