@@ -8,7 +8,7 @@ import (
 )
 
 type Sort interface {
-	Build(*statement.Statement)
+	Build(st *statement.Statement)
 }
 
 type SortItem struct {
