@@ -4,9 +4,14 @@ import (
 	"github.com/tecowl/querybm/statement"
 )
 
+const (
+	DefaultPaginationLimit  = 100
+	DefaultPaginationOffset = 0
+)
+
 var DefaultPagination = &Pagination{
-	limit:  100,
-	offset: 0,
+	limit:  DefaultPaginationLimit,
+	offset: DefaultPaginationOffset,
 }
 
 type Pagination struct {
