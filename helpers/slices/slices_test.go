@@ -7,6 +7,8 @@ import (
 )
 
 func TestMap(t *testing.T) {
+	t.Parallel()
+
 	slice := []int{1, 2, 3}
 	result := Map(slice, func(v int) string {
 		return strconv.Itoa(v)
@@ -113,6 +115,7 @@ func TestBind(t *testing.T) {
 
 	t.Run("Map", func(t *testing.T) {
 		t.Run("returns mapped values", func(t *testing.T) {
+			t.Parallel()
 			fn := Bind(slice, Map[int, string])
 			result := fn(func(v int) string { return strconv.Itoa(v) })
 			expected := []string{"1", "2", "3"}
