@@ -21,7 +21,7 @@ func (c *Condition) Build(s *querybm.Statement) {
 	}
 }
 
-func New(db *sql.DB, condition *Condition) *querybm.Query[models.Author, *Condition, *querybm.SortItem] {
+func New(db *sql.DB, condition *Condition) *querybm.Query[models.Author] {
 	return querybm.New(
 		db,
 		"authors",

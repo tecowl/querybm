@@ -88,13 +88,13 @@ func TestQuery_Validate(t *testing.T) {
 	t.Parallel()
 	tests := []struct {
 		name          string
-		setupQuery    func() *Query[TestModel, Condition, Sort]
+		setupQuery    func() *Query[TestModel]
 		wantErr       bool
 		wantErrString string
 	}{
 		{
 			name: "All validations pass",
-			setupQuery: func() *Query[TestModel, Condition, Sort] {
+			setupQuery: func() *Query[TestModel] {
 				db := &sql.DB{}
 				condition := &ValidatableCondition{}
 				sort := &ValidatableSort{}
@@ -106,7 +106,7 @@ func TestQuery_Validate(t *testing.T) {
 		},
 		{
 			name: "Condition validation fails",
-			setupQuery: func() *Query[TestModel, Condition, Sort] {
+			setupQuery: func() *Query[TestModel] {
 				db := &sql.DB{}
 				condition := &ValidatableCondition{validateErr: errors.New("invalid condition")} // nolint:err113
 				sort := &ValidatableSort{}
@@ -119,7 +119,7 @@ func TestQuery_Validate(t *testing.T) {
 		},
 		{
 			name: "Sort validation fails",
-			setupQuery: func() *Query[TestModel, Condition, Sort] {
+			setupQuery: func() *Query[TestModel] {
 				db := &sql.DB{}
 				condition := &ValidatableCondition{}
 				sort := &ValidatableSort{validateErr: errors.New("invalid sort")} // nolint:err113
@@ -132,7 +132,7 @@ func TestQuery_Validate(t *testing.T) {
 		},
 		{
 			name: "Non-validatable condition and sort",
-			setupQuery: func() *Query[TestModel, Condition, Sort] {
+			setupQuery: func() *Query[TestModel] {
 				db := &sql.DB{}
 				condition := &TestCondition{}
 				sort := &TestSort{}
@@ -165,13 +165,13 @@ func TestQuery_BuildCountSelect(t *testing.T) {
 	t.Parallel()
 	tests := []struct {
 		name       string
-		setupQuery func() *Query[TestModel, *TestCondition, *TestSort]
+		setupQuery func() *Query[TestModel]
 		wantSQL    string
 		wantValues []any
 	}{
 		{
 			name: "Count without conditions",
-			setupQuery: func() *Query[TestModel, *TestCondition, *TestSort] {
+			setupQuery: func() *Query[TestModel] {
 				db := &sql.DB{}
 				condition := &TestCondition{}
 				sort := &TestSort{}
@@ -184,7 +184,7 @@ func TestQuery_BuildCountSelect(t *testing.T) {
 		},
 		{
 			name: "Count with table name",
-			setupQuery: func() *Query[TestModel, *TestCondition, *TestSort] {
+			setupQuery: func() *Query[TestModel] {
 				db := &sql.DB{}
 				condition := &TestCondition{}
 				sort := &TestSort{}
@@ -216,13 +216,13 @@ func TestQuery_BuildRowsSelect(t *testing.T) {
 	t.Parallel()
 	tests := []struct {
 		name       string
-		setupQuery func() *Query[TestModel, *TestCondition, *TestSort]
+		setupQuery func() *Query[TestModel]
 		wantSQL    string
 		wantValues []any
 	}{
 		{
 			name: "Rows with all components",
-			setupQuery: func() *Query[TestModel, *TestCondition, *TestSort] {
+			setupQuery: func() *Query[TestModel] {
 				db := &sql.DB{}
 				condition := &TestCondition{}
 				sort := &TestSort{}
@@ -235,7 +235,7 @@ func TestQuery_BuildRowsSelect(t *testing.T) {
 		},
 		{
 			name: "Rows without pagination offset",
-			setupQuery: func() *Query[TestModel, *TestCondition, *TestSort] {
+			setupQuery: func() *Query[TestModel] {
 				db := &sql.DB{}
 				condition := &TestCondition{}
 				sort := &TestSort{}
@@ -260,11 +260,19 @@ func TestQuery_BuildRowsSelect(t *testing.T) {
 				t.Errorf("BuildRowsSelect() values = %v, want %v", gotValues, tt.wantValues)
 			}
 			// Verify that condition and sort were applied
-			if !q.Condition.whereAdded {
-				t.Error("BuildRowsSelect() did not apply condition")
+			if tc, ok := q.Condition.(*TestCondition); ok {
+				if !tc.whereAdded {
+					t.Error("BuildRowsSelect() did not apply condition")
+				}
+			} else {
+				t.Error("Condition is not of type TestCondition, cannot verify whereAdded")
 			}
-			if !q.Sort.sortAdded {
-				t.Error("BuildRowsSelect() did not apply sort")
+			if ts, ok := q.Sort.(*TestSort); ok {
+				if !ts.sortAdded {
+					t.Error("BuildRowsSelect() did not apply sort")
+				}
+			} else {
+				t.Error("Sort is not of type TestSort, cannot verify sortAdded")
 			}
 		})
 	}

@@ -63,7 +63,7 @@ func TestQuery(t *testing.T) {
 
 	testCases := []struct {
 		name            string
-		query           *querybm.Query[models.Author, *Condition, *querybm.SortItem]
+		query           *querybm.Query[models.Author]
 		expectedAuthors []*models.Author
 	}{
 		{

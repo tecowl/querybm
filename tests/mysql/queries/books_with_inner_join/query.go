@@ -15,7 +15,7 @@ var columns querybm.FieldMapper[Book] = querybm.NewFields(
 
 var sort = querybm.NewSortItem("title", false)
 
-func New(db *sql.DB, condition *Condition, pagination *querybm.Pagination) *querybm.Query[Book, *Condition, *querybm.SortItem] {
+func New(db *sql.DB, condition *Condition, pagination *querybm.Pagination) *querybm.Query[Book] {
 	table := "books"
 	return querybm.New(db, table, columns, condition, sort, pagination)
 }

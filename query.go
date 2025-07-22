@@ -11,18 +11,18 @@ import (
 
 // Query represents a SQL query builder with generic support for models, conditions, and sorting.
 // It provides methods to build and execute SELECT queries with pagination support.
-type Query[M any, C Condition, S Sort] struct {
+type Query[M any] struct {
 	db         *sql.DB
 	Table      string
 	Fields     FieldMapper[M]
-	Condition  C
-	Sort       S
+	Condition  Condition
+	Sort       Sort
 	Pagination *Pagination
 }
 
 // New creates a new Query instance with the specified database connection, condition, sort, table name, field mapper, and pagination.
-func New[M any, C Condition, S Sort](db *sql.DB, table string, fields FieldMapper[M], c C, s S, pagination *Pagination) *Query[M, C, S] {
-	return &Query[M, C, S]{
+func New[M any, C Condition, S Sort](db *sql.DB, table string, fields FieldMapper[M], c C, s S, pagination *Pagination) *Query[M] {
+	return &Query[M]{
 		db:         db,
 		Table:      table,
 		Fields:     fields,
@@ -34,7 +34,7 @@ func New[M any, C Condition, S Sort](db *sql.DB, table string, fields FieldMappe
 
 // Validate validates the query's condition, sort, and pagination components.
 // It returns an error if any component's validation fails.
-func (q *Query[M, C, S]) Validate() error {
+func (q *Query[M]) Validate() error {
 	if v, ok := any(q.Condition).(Validatable); ok {
 		if err := v.Validate(); err != nil {
 			return fmt.Errorf("condition validation failed: %w", err)
@@ -53,7 +53,7 @@ func (q *Query[M, C, S]) Validate() error {
 
 // BuildCountSelect builds a COUNT(*) query string with the current conditions.
 // It returns the SQL query string and its arguments.
-func (q *Query[M, C, S]) BuildCountSelect() (string, []any) {
+func (q *Query[M]) BuildCountSelect() (string, []any) {
 	st := statement.New(q.Table, statement.NewSimpleFields("COUNT(*) AS count"))
 
 	q.Condition.Build(st)
@@ -63,7 +63,7 @@ func (q *Query[M, C, S]) BuildCountSelect() (string, []any) {
 
 // BuildRowsSelect builds a SELECT query string with all fields, conditions, sorting, and pagination.
 // It returns the SQL query string and its arguments.
-func (q *Query[M, C, S]) BuildRowsSelect() (string, []any) {
+func (q *Query[M]) BuildRowsSelect() (string, []any) {
 	st := statement.New(q.Table, q.Fields)
 	q.Condition.Build(st)
 	q.Sort.Build(st)
@@ -74,7 +74,7 @@ func (q *Query[M, C, S]) BuildRowsSelect() (string, []any) {
 
 // RowsStatement prepares a SELECT statement for retrieving rows.
 // It returns the prepared statement, query arguments, and any error that occurred.
-func (q *Query[M, C, S]) RowsStatement(ctx context.Context) (*sql.Stmt, []any, error) {
+func (q *Query[M]) RowsStatement(ctx context.Context) (*sql.Stmt, []any, error) {
 	queryStr, args := q.BuildRowsSelect()
 	stmt, err := q.db.PrepareContext(ctx, queryStr)
 	if err != nil {
@@ -85,7 +85,7 @@ func (q *Query[M, C, S]) RowsStatement(ctx context.Context) (*sql.Stmt, []any, e
 
 // CountStatement prepares a COUNT statement for counting matching rows.
 // It returns the prepared statement, query arguments, and any error that occurred.
-func (q *Query[M, C, S]) CountStatement(ctx context.Context) (*sql.Stmt, []any, error) {
+func (q *Query[M]) CountStatement(ctx context.Context) (*sql.Stmt, []any, error) {
 	queryStr, args := q.BuildCountSelect()
 	stmt, err := q.db.PrepareContext(ctx, queryStr)
 	if err != nil {
@@ -96,7 +96,7 @@ func (q *Query[M, C, S]) CountStatement(ctx context.Context) (*sql.Stmt, []any, 
 
 // Count executes a COUNT query and returns the number of matching rows.
 // It returns 0 if no rows match the conditions.
-func (q *Query[M, C, S]) Count(ctx context.Context) (int64, error) {
+func (q *Query[M]) Count(ctx context.Context) (int64, error) {
 	stmt, args, err := q.CountStatement(ctx)
 	if err != nil {
 		return 0, err
@@ -115,7 +115,7 @@ func (q *Query[M, C, S]) Count(ctx context.Context) (int64, error) {
 
 // FirstRow executes the query and returns the first row as *sql.Row.
 // The caller is responsible for scanning the row.
-func (q *Query[M, C, S]) FirstRow(ctx context.Context) (*sql.Row, error) {
+func (q *Query[M]) FirstRow(ctx context.Context) (*sql.Row, error) {
 	stmt, args, err := q.RowsStatement(ctx)
 	if err != nil {
 		return nil, err
@@ -132,7 +132,7 @@ func (q *Query[M, C, S]) FirstRow(ctx context.Context) (*sql.Row, error) {
 // Rows executes the query and returns the result set as *sql.Rows.
 // It prepares the statement, executes it, and returns the rows.
 // The caller is responsible for closing the rows.
-func (q *Query[M, C, S]) Rows(ctx context.Context) (*sql.Rows, error) {
+func (q *Query[M]) Rows(ctx context.Context) (*sql.Rows, error) {
 	stmt, args, err := q.RowsStatement(ctx)
 	if err != nil {
 		return nil, err
@@ -148,7 +148,7 @@ func (q *Query[M, C, S]) Rows(ctx context.Context) (*sql.Rows, error) {
 
 // First executes the query and returns the first matching model instance.
 // It returns nil if no rows match the conditions.
-func (q *Query[M, C, S]) First(ctx context.Context) (*M, error) {
+func (q *Query[M]) First(ctx context.Context) (*M, error) {
 	row, err := q.FirstRow(ctx)
 	if err != nil {
 		return nil, err
@@ -162,7 +162,7 @@ func (q *Query[M, C, S]) First(ctx context.Context) (*M, error) {
 
 // List executes the query and returns all matching model instances as a slice.
 // It returns an empty slice if no rows match the conditions.
-func (q *Query[M, C, S]) List(ctx context.Context) ([]*M, error) {
+func (q *Query[M]) List(ctx context.Context) ([]*M, error) {
 	rows, err := q.Rows(ctx)
 	if err != nil {
 		return nil, err
