@@ -20,7 +20,7 @@ issues:
       linters:
         - exhaustruct
 #         - err113
-#         - forcetypeassert
+        - forcetypeassert
         - funlen
 linters-settings:
 #   cyclop:
