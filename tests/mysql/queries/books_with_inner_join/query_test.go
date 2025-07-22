@@ -8,6 +8,7 @@ import (
 	"testing"
 
 	_ "github.com/go-sql-driver/mysql"
+	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 	"github.com/testcontainers/testcontainers-go"
 	"github.com/testcontainers/testcontainers-go/modules/mysql"
@@ -117,11 +118,12 @@ func TestQuery(t *testing.T) {
 			require.ElementsMatch(t, tc.expectedBooks, items)
 
 			item, err := query.First(ctx)
-			require.NoError(t, err)
 			if len(tc.expectedBooks) > 0 {
+				require.NoError(t, err)
 				require.Equal(t, tc.expectedBooks[0], item)
 			} else {
-				require.Nil(t, item)
+				require.Error(t, err)
+				assert.ErrorIs(t, err, sql.ErrNoRows)
 			}
 		})
 	}

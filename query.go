@@ -107,9 +107,6 @@ func (q *Query[M, C, S]) FirstRow(ctx context.Context) (*sql.Row, error) {
 
 	row := stmt.QueryRowContext(ctx, args...)
 	if err := row.Err(); err != nil {
-		if errors.Is(err, sql.ErrNoRows) {
-			return nil, nil // No rows found, return nil
-		}
 		return nil, err
 	}
 	return row, nil
@@ -134,14 +131,8 @@ func (q *Query[M, C, S]) First(ctx context.Context) (*M, error) {
 	if err != nil {
 		return nil, err
 	}
-	if row == nil {
-		return nil, nil // No rows found, return nil
-	}
 	org := new(M)
 	if err := q.Fields.Mapper()(row, org); err != nil {
-		if errors.Is(err, sql.ErrNoRows) {
-			return nil, nil // No rows found, return nil
-		}
 		return nil, err
 	}
 	return org, nil
