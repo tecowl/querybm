@@ -112,6 +112,9 @@ func (q *Query[M, C, S]) FirstRow(ctx context.Context) (*sql.Row, error) {
 	return row, nil
 }
 
+// Rows executes the query and returns the result set as *sql.Rows.
+// It prepares the statement, executes it, and returns the rows.
+// The caller is responsible for closing the rows.
 func (q *Query[M, C, S]) Rows(ctx context.Context) (*sql.Rows, error) {
 	stmt, args, err := q.RowsStatement(ctx)
 	if err != nil {
@@ -119,7 +122,7 @@ func (q *Query[M, C, S]) Rows(ctx context.Context) (*sql.Rows, error) {
 	}
 	defer stmt.Close()
 
-	rows, err := stmt.QueryContext(ctx, args...)
+	rows, err := stmt.QueryContext(ctx, args...) // nolint:sqlclosecheck
 	if err != nil {
 		return nil, err
 	}
