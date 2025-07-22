@@ -3,7 +3,7 @@ linters:
   disable:
     - depguard
   #   - exhaustruct
-  #   - gochecknoglobals
+    - gochecknoglobals
   #   - nlreturn
   #   - nolintlint
     - tenv # The linter 'tenv' is deprecated (since v1.64.0) due to: Duplicate feature in another linter. Replaced by usetesting.
