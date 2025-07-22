@@ -6,7 +6,6 @@ import (
 	"testing"
 )
 
-// Mock Scanner for testing
 type mockScanner struct {
 	scanCalled bool
 	scanArgs   []any
@@ -19,7 +18,6 @@ func (m *mockScanner) Scan(dest ...any) error {
 	return m.scanErr
 }
 
-// Test model
 type User struct {
 	ID    int
 	Name  string

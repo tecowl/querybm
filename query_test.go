@@ -10,7 +10,6 @@ import (
 	"github.com/tecowl/querybm/statement"
 )
 
-// Mock types for testing
 type TestModel struct {
 	ID   int
 	Name string
@@ -271,7 +270,6 @@ func TestQuery_BuildRowsSelect(t *testing.T) {
 	}
 }
 
-// Helper function
 func contains(s, substr string) bool {
 	return len(s) >= len(substr) && (s == substr || len(substr) == 0 || (len(s) > 0 && len(substr) > 0 && findSubstring(s, substr) != -1))
 }
