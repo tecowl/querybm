@@ -11,3 +11,26 @@ type Builder interface {
 
 // Condition is an alias for Builder used specifically for WHERE clause conditions.
 type Condition = Builder
+
+// BuildFunc is a function type that takes a statement and modifies it.
+// It is used to create a Builder from a function.
+// This allows for more flexible and functional-style building of SQL statements.
+type BuildFunc = func(st *statement.Statement)
+
+type buildFuncWrapper struct {
+	fn BuildFunc
+}
+
+var _ Builder = (*buildFuncWrapper)(nil)
+
+// NewBuilder creates a new Builder from a BuildFunc.
+// This allows you to define how the SQL statement should be built using a function.
+// This is useful for cases where you want to encapsulate the building logic in a function rather
+func NewBuilder(fn BuildFunc) Builder {
+	return &buildFuncWrapper{fn: fn}
+}
+
+// Build implements Builder.
+func (b *buildFuncWrapper) Build(st *statement.Statement) {
+	b.fn(st)
+}
