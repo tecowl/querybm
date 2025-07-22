@@ -126,14 +126,15 @@ func TestSortIem_Build(t *testing.T) {
 				if !stmt.Sort.IsEmpty() {
 					t.Error("Build() added content when it should not have")
 				}
-			} else {
-				// Use reflection to access private field
-				contentField := reflect.ValueOf(stmt.Sort).Elem().FieldByName("content")
-				if contentField.IsValid() && contentField.CanInterface() {
-					gotContent := contentField.Interface().(string)
-					if gotContent != tt.wantContent {
-						t.Errorf("Build() content = %v, want %v", gotContent, tt.wantContent)
-					}
+				return
+			}
+
+			// Use reflection to access private field
+			contentField := reflect.ValueOf(stmt.Sort).Elem().FieldByName("content")
+			if contentField.IsValid() && contentField.CanInterface() {
+				gotContent := contentField.Interface().(string)
+				if gotContent != tt.wantContent {
+					t.Errorf("Build() content = %v, want %v", gotContent, tt.wantContent)
 				}
 			}
 		})
