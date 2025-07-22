@@ -9,6 +9,7 @@ include ./Makefiles/godoc.mk
 include ./Makefiles/test.mk
 include ./Makefiles/cov-unit.mk
 include ./Makefiles/cov-integration.mk
+include ./Makefiles/metadata.mk
 
 .PHONY: test
 test: test-unit tests-test
