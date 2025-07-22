@@ -65,7 +65,7 @@ func TestQuery(t *testing.T) {
 	t.Run("Query books with conditions", func(t *testing.T) {
 		testCases := []struct {
 			name          string
-			query         *querybm.Query[models.Book, *Condition, *querybm.SortItem]
+			query         *querybm.Query[models.Book]
 			expectedBooks []*models.Book
 		}{
 			{

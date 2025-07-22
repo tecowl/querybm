@@ -60,12 +60,12 @@ func TestNew(t *testing.T) {
 	db := &sql.DB{}
 	condition := &TestCondition{}
 	sort := &TestSort{}
-	fields := NewStaticColumns([]string{"id", "name"}, func(s Scanner, m *TestModel) error {
+	fields := NewFields([]string{"id", "name"}, func(s Scanner, m *TestModel) error {
 		return s.Scan(&m.ID, &m.Name)
 	})
 	pagination := NewPagination(10, 0)
 
-	query := New(db, condition, sort, "users", fields, pagination)
+	query := New(db, "users", fields, condition, sort, pagination)
 
 	if query.db != db {
 		t.Error("New() db not set correctly")
@@ -88,57 +88,57 @@ func TestQuery_Validate(t *testing.T) {
 	t.Parallel()
 	tests := []struct {
 		name          string
-		setupQuery    func() *Query[TestModel, Condition, Sort]
+		setupQuery    func() *Query[TestModel]
 		wantErr       bool
 		wantErrString string
 	}{
 		{
 			name: "All validations pass",
-			setupQuery: func() *Query[TestModel, Condition, Sort] {
+			setupQuery: func() *Query[TestModel] {
 				db := &sql.DB{}
 				condition := &ValidatableCondition{}
 				sort := &ValidatableSort{}
-				fields := NewStaticColumns[TestModel]([]string{"id"}, nil)
+				fields := NewFields[TestModel]([]string{"id"}, nil)
 				pagination := NewPagination(10, 0)
-				return New[TestModel, Condition, Sort](db, condition, sort, "users", fields, pagination)
+				return New(db, "users", fields, condition, sort, pagination)
 			},
 			wantErr: false,
 		},
 		{
 			name: "Condition validation fails",
-			setupQuery: func() *Query[TestModel, Condition, Sort] {
+			setupQuery: func() *Query[TestModel] {
 				db := &sql.DB{}
 				condition := &ValidatableCondition{validateErr: errors.New("invalid condition")} // nolint:err113
 				sort := &ValidatableSort{}
-				fields := NewStaticColumns[TestModel]([]string{"id"}, nil)
+				fields := NewFields[TestModel]([]string{"id"}, nil)
 				pagination := NewPagination(10, 0)
-				return New[TestModel, Condition, Sort](db, condition, sort, "users", fields, pagination)
+				return New(db, "users", fields, condition, sort, pagination)
 			},
 			wantErr:       true,
 			wantErrString: "condition validation failed:",
 		},
 		{
 			name: "Sort validation fails",
-			setupQuery: func() *Query[TestModel, Condition, Sort] {
+			setupQuery: func() *Query[TestModel] {
 				db := &sql.DB{}
 				condition := &ValidatableCondition{}
 				sort := &ValidatableSort{validateErr: errors.New("invalid sort")} // nolint:err113
-				fields := NewStaticColumns[TestModel]([]string{"id"}, nil)
+				fields := NewFields[TestModel]([]string{"id"}, nil)
 				pagination := NewPagination(10, 0)
-				return New[TestModel, Condition, Sort](db, condition, sort, "users", fields, pagination)
+				return New(db, "users", fields, condition, sort, pagination)
 			},
 			wantErr:       true,
 			wantErrString: "sort validation failed:",
 		},
 		{
 			name: "Non-validatable condition and sort",
-			setupQuery: func() *Query[TestModel, Condition, Sort] {
+			setupQuery: func() *Query[TestModel] {
 				db := &sql.DB{}
 				condition := &TestCondition{}
 				sort := &TestSort{}
-				fields := NewStaticColumns[TestModel]([]string{"id"}, nil)
+				fields := NewFields[TestModel]([]string{"id"}, nil)
 				pagination := NewPagination(10, 0)
-				return New[TestModel, Condition, Sort](db, condition, sort, "users", fields, pagination)
+				return New(db, "users", fields, condition, sort, pagination)
 			},
 			wantErr: false,
 		},
@@ -165,32 +165,32 @@ func TestQuery_BuildCountSelect(t *testing.T) {
 	t.Parallel()
 	tests := []struct {
 		name       string
-		setupQuery func() *Query[TestModel, *TestCondition, *TestSort]
+		setupQuery func() *Query[TestModel]
 		wantSQL    string
 		wantValues []any
 	}{
 		{
 			name: "Count without conditions",
-			setupQuery: func() *Query[TestModel, *TestCondition, *TestSort] {
+			setupQuery: func() *Query[TestModel] {
 				db := &sql.DB{}
 				condition := &TestCondition{}
 				sort := &TestSort{}
-				fields := NewStaticColumns[TestModel]([]string{"id", "name"}, nil)
+				fields := NewFields[TestModel]([]string{"id", "name"}, nil)
 				pagination := NewPagination(10, 0)
-				return New(db, condition, sort, "users", fields, pagination)
+				return New(db, "users", fields, condition, sort, pagination)
 			},
 			wantSQL:    "SELECT COUNT(*) AS count FROM users WHERE status = ?",
 			wantValues: []any{"active"},
 		},
 		{
 			name: "Count with table name",
-			setupQuery: func() *Query[TestModel, *TestCondition, *TestSort] {
+			setupQuery: func() *Query[TestModel] {
 				db := &sql.DB{}
 				condition := &TestCondition{}
 				sort := &TestSort{}
-				fields := NewStaticColumns[TestModel]([]string{"id", "name"}, nil)
+				fields := NewFields[TestModel]([]string{"id", "name"}, nil)
 				pagination := NewPagination(10, 0)
-				return New(db, condition, sort, "products", fields, pagination)
+				return New(db, "products", fields, condition, sort, pagination)
 			},
 			wantSQL:    "SELECT COUNT(*) AS count FROM products WHERE status = ?",
 			wantValues: []any{"active"},
@@ -216,32 +216,32 @@ func TestQuery_BuildRowsSelect(t *testing.T) {
 	t.Parallel()
 	tests := []struct {
 		name       string
-		setupQuery func() *Query[TestModel, *TestCondition, *TestSort]
+		setupQuery func() *Query[TestModel]
 		wantSQL    string
 		wantValues []any
 	}{
 		{
 			name: "Rows with all components",
-			setupQuery: func() *Query[TestModel, *TestCondition, *TestSort] {
+			setupQuery: func() *Query[TestModel] {
 				db := &sql.DB{}
 				condition := &TestCondition{}
 				sort := &TestSort{}
-				fields := NewStaticColumns[TestModel]([]string{"id", "name", "email"}, nil)
+				fields := NewFields[TestModel]([]string{"id", "name", "email"}, nil)
 				pagination := NewPagination(20, 40)
-				return New(db, condition, sort, "users", fields, pagination)
+				return New(db, "users", fields, condition, sort, pagination)
 			},
 			wantSQL:    "SELECT id, name, email FROM users WHERE status = ? ORDER BY created_at DESC LIMIT ? OFFSET ?",
 			wantValues: []any{"active", int64(20), int64(40)},
 		},
 		{
 			name: "Rows without pagination offset",
-			setupQuery: func() *Query[TestModel, *TestCondition, *TestSort] {
+			setupQuery: func() *Query[TestModel] {
 				db := &sql.DB{}
 				condition := &TestCondition{}
 				sort := &TestSort{}
-				fields := NewStaticColumns[TestModel]([]string{"id", "name"}, nil)
+				fields := NewFields[TestModel]([]string{"id", "name"}, nil)
 				pagination := NewPagination(10, 0)
-				return New(db, condition, sort, "users", fields, pagination)
+				return New(db, "users", fields, condition, sort, pagination)
 			},
 			wantSQL:    "SELECT id, name FROM users WHERE status = ? ORDER BY created_at DESC LIMIT ?",
 			wantValues: []any{"active", int64(10)},
@@ -260,11 +260,19 @@ func TestQuery_BuildRowsSelect(t *testing.T) {
 				t.Errorf("BuildRowsSelect() values = %v, want %v", gotValues, tt.wantValues)
 			}
 			// Verify that condition and sort were applied
-			if !q.Condition.whereAdded {
-				t.Error("BuildRowsSelect() did not apply condition")
+			if tc, ok := q.Condition.(*TestCondition); ok {
+				if !tc.whereAdded {
+					t.Error("BuildRowsSelect() did not apply condition")
+				}
+			} else {
+				t.Error("Condition is not of type TestCondition, cannot verify whereAdded")
 			}
-			if !q.Sort.sortAdded {
-				t.Error("BuildRowsSelect() did not apply sort")
+			if ts, ok := q.Sort.(*TestSort); ok {
+				if !ts.sortAdded {
+					t.Error("BuildRowsSelect() did not apply sort")
+				}
+			} else {
+				t.Error("Sort is not of type TestSort, cannot verify sortAdded")
 			}
 		})
 	}

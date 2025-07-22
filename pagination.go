@@ -5,20 +5,27 @@ import (
 )
 
 const (
-	DefaultPaginationLimit  = 100
+	// DefaultPaginationLimit is the default number of rows to return per page.
+	DefaultPaginationLimit = 100
+	// DefaultPaginationOffset is the default starting position for pagination.
 	DefaultPaginationOffset = 0
 )
 
+// DefaultPagination provides a pagination instance with default values.
 var DefaultPagination = &Pagination{
 	limit:  DefaultPaginationLimit,
 	offset: DefaultPaginationOffset,
 }
 
+// Pagination represents pagination parameters for SQL queries.
 type Pagination struct {
 	limit  int64
 	offset int64
 }
 
+// NewPagination creates a new Pagination instance with the specified limit and offset.
+// If limit is <= 0, it uses DefaultPaginationLimit.
+// If offset is < 0, it uses DefaultPaginationOffset.
 func NewPagination(limit, offset int64) *Pagination {
 	if limit <= 0 {
 		limit = DefaultPagination.limit
@@ -32,6 +39,8 @@ func NewPagination(limit, offset int64) *Pagination {
 	}
 }
 
+// Validate ensures the pagination parameters are valid.
+// It sets default values if the current values are invalid.
 func (p *Pagination) Validate() error {
 	if p.limit <= 0 {
 		p.limit = 100 // Default limit
@@ -42,6 +51,7 @@ func (p *Pagination) Validate() error {
 	return nil
 }
 
+// Build adds the LIMIT and OFFSET clauses to the SQL statement.
 func (p *Pagination) Build(st *statement.Statement) {
 	if p.limit > 0 {
 		st.Pagination.Add("LIMIT ?", p.limit)

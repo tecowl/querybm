@@ -2,6 +2,7 @@ package expr
 
 import "strings"
 
+// Conditions represents a collection of condition expressions joined by a logical connective (AND/OR).
 type Conditions struct {
 	items      []ConditionExpr
 	connective string
@@ -12,12 +13,19 @@ var (
 	_ ConnectiveCondition = (*Conditions)(nil)
 )
 
+// NewConditions creates a new Conditions instance with the specified connector and condition expressions.
 func NewConditions(connector string, items ...ConditionExpr) *Conditions {
 	return &Conditions{items: items, connective: connector}
 }
-func And(conditions ...ConditionExpr) ConditionExpr { return NewConditions(" AND ", conditions...) } //nolint:ireturn
-func Or(conditions ...ConditionExpr) ConditionExpr  { return NewConditions(" OR ", conditions...) }  //nolint:ireturn
 
+// And creates a new condition expression that combines the given conditions with AND logic.
+func And(conditions ...ConditionExpr) ConditionExpr { return NewConditions(" AND ", conditions...) } //nolint:ireturn
+
+// Or creates a new condition expression that combines the given conditions with OR logic.
+func Or(conditions ...ConditionExpr) ConditionExpr { return NewConditions(" OR ", conditions...) } //nolint:ireturn
+
+// String returns the SQL representation of the conditions with appropriate parentheses
+// when mixing different connectives.
 func (c *Conditions) String() string {
 	switch len(c.items) {
 	case 0:
@@ -41,6 +49,7 @@ func (c *Conditions) String() string {
 	return sb.String()
 }
 
+// Values returns all placeholder values from all contained condition expressions.
 func (c *Conditions) Values() []any {
 	values := []any{}
 	for _, item := range c.items {
@@ -49,6 +58,7 @@ func (c *Conditions) Values() []any {
 	return values
 }
 
+// Connective returns the logical connective used to join the conditions (AND/OR).
 func (c *Conditions) Connective() string {
 	return c.connective
 }
