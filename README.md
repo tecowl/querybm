@@ -28,7 +28,7 @@ go get -u github.com/tecowl/querybm
 
 ## EXAMPLES
 
-- Simple Dynamic Query
+- [Simple Dynamic Query](./tests/mysql/queries/authors/)
 - [Query with enumerations](./tests/mysql/queries/books_with_enum/)
 - [Query with range](./tests/mysql/queries/books_with_range/)
 - [Query with INNER JOIN](./tests/mysql/queries/books_with_inner_join/)
