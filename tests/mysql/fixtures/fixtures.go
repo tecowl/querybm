@@ -11,11 +11,10 @@ import (
 	"github.com/stretchr/testify/require"
 )
 
-func Setup(t *testing.T, ctx context.Context, db *sql.DB) ([]*models.Author, []*models.Book) {
+func SetupAuthors(t *testing.T, ctx context.Context, db *sql.DB) []*models.Author {
 	t.Helper()
 
 	var authors []*models.Author
-	var books []*models.Book
 
 	mutation := models.New(db)
 
@@ -28,6 +27,26 @@ func Setup(t *testing.T, ctx context.Context, db *sql.DB) ([]*models.Author, []*
 		author.AuthorID = int32(id)
 		return &author
 	}
+
+	authors = []*models.Author{
+		createAuthor("Martin Fowler"),
+		createAuthor("Kent Beck"),
+		createAuthor("Robert C. Martin"),
+		createAuthor("Uncle Bob"),
+		createAuthor("CMP Technology"),
+	}
+	return authors
+}
+
+func Setup(t *testing.T, ctx context.Context, db *sql.DB) ([]*models.Author, []*models.Book) {
+	t.Helper()
+
+	var authors []*models.Author
+	var books []*models.Book
+
+	mutation := models.New(db)
+
+	authors = SetupAuthors(t, ctx, db)
 
 	createBook := func(
 		authorID int32,
@@ -60,14 +79,6 @@ func Setup(t *testing.T, ctx context.Context, db *sql.DB) ([]*models.Author, []*
 			Available: available,
 			Tags:      tags,
 		}
-	}
-
-	authors = []*models.Author{
-		createAuthor("Martin Fowler"),
-		createAuthor("Kent Beck"),
-		createAuthor("Robert C. Martin"),
-		createAuthor("Uncle Bob"),
-		createAuthor("CMP Technology"),
 	}
 
 	// Books
