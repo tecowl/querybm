@@ -7,9 +7,7 @@ import (
 	"github.com/tecowl/querybm/statement"
 )
 
-type Sort interface {
-	Build(st *statement.Statement)
-}
+type Sort = Builder
 
 type SortItem struct {
 	column string
