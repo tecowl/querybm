@@ -1,6 +1,7 @@
 package querybm
 
 import (
+	"errors"
 	"reflect"
 	"testing"
 
@@ -81,7 +82,7 @@ func TestSortIem_Validate(t *testing.T) {
 			if (err != nil) != tt.wantErr {
 				t.Errorf("Validate() error = %v, wantErr %v", err, tt.wantErr)
 			}
-			if tt.wantErr && err != ErrEmptySortItem {
+			if tt.wantErr && !errors.Is(err, ErrEmptySortItem) {
 				t.Errorf("Validate() error = %v, want %v", err, ErrEmptySortItem)
 			}
 		})
