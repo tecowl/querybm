@@ -6,7 +6,7 @@ import (
 
 const (
 	// DefaultPaginationLimit is the default number of rows to return per page.
-	DefaultPaginationLimit  = 100
+	DefaultPaginationLimit = 100
 	// DefaultPaginationOffset is the default starting position for pagination.
 	DefaultPaginationOffset = 0
 )

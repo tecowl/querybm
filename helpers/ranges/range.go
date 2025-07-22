@@ -13,7 +13,7 @@ type Range[T comparable] struct {
 	// Start is the beginning of the range (inclusive).
 	Start *T
 	// End is the end of the range (exclusive by default, inclusive with UseBetween).
-	End   *T
+	End *T
 
 	useBetween bool // Indicates if the range should be used with BETWEEN SQL syntax
 }

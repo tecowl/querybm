@@ -22,7 +22,7 @@ func NewConditions(connector string, items ...ConditionExpr) *Conditions {
 func And(conditions ...ConditionExpr) ConditionExpr { return NewConditions(" AND ", conditions...) } //nolint:ireturn
 
 // Or creates a new condition expression that combines the given conditions with OR logic.
-func Or(conditions ...ConditionExpr) ConditionExpr  { return NewConditions(" OR ", conditions...) }  //nolint:ireturn
+func Or(conditions ...ConditionExpr) ConditionExpr { return NewConditions(" OR ", conditions...) } //nolint:ireturn
 
 // String returns the SQL representation of the conditions with appropriate parentheses
 // when mixing different connectives.

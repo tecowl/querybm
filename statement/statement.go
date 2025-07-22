@@ -8,13 +8,13 @@ type Statement struct {
 	// Fields defines the columns to select.
 	Fields Fields
 	// Table is the FROM clause block.
-	Table  *TableBlock
+	Table *TableBlock
 	// Where is the WHERE clause block.
-	Where  *WhereBlock
+	Where *WhereBlock
 	// GroupBy *Block
 	// Having *Block
 	// Sort is the ORDER BY clause block.
-	Sort       *Block
+	Sort *Block
 	// Pagination holds LIMIT and OFFSET clauses.
 	Pagination *Block
 }
