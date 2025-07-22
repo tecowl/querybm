@@ -31,20 +31,20 @@ func TestQuery(t *testing.T) {
 
 	testCases := []struct {
 		name          string
-		authorName    string
+		query         *querybm.Query[Book]
 		expectedBooks []*Book
 	}{
 		{
-			name:       "Kent Beck's books",
-			authorName: "Kent Beck",
+			name:  "Kent Beck's books",
+			query: New(db, &Condition{AuthorName: "Kent Beck"}, querybm.NewPagination(10, 0)),
 			expectedBooks: []*Book{
 				{Book: *books[5], AuthorName: authors[1].Name},
 				{Book: *books[4], AuthorName: authors[1].Name},
 			},
 		},
 		{
-			name:       "Martin Fowler and Robert C. Martin's books",
-			authorName: "Martin",
+			name:  "Martin Fowler and Robert C. Martin's books",
+			query: New(db, &Condition{AuthorName: "Martin"}, querybm.NewPagination(10, 0)),
 			expectedBooks: []*Book{
 				{Book: *books[6], AuthorName: authors[2].Name},
 				{Book: *books[2], AuthorName: authors[0].Name},
@@ -54,8 +54,8 @@ func TestQuery(t *testing.T) {
 			},
 		},
 		{
-			name:       "no author name specified",
-			authorName: "",
+			name:  "no author name specified",
+			query: New(db, &Condition{AuthorName: ""}, querybm.NewPagination(10, 0)),
 			expectedBooks: []*Book{
 				{Book: *books[6], AuthorName: authors[2].Name},
 				{Book: *books[2], AuthorName: authors[0].Name},
@@ -69,22 +69,21 @@ func TestQuery(t *testing.T) {
 		},
 		{
 			name:          "Not registered author",
-			authorName:    "Thomas",
+			query:         New(db, &Condition{AuthorName: "Thomas"}, querybm.NewPagination(10, 0)),
 			expectedBooks: []*Book{},
 		},
 	}
 
 	for _, tc := range testCases {
 		t.Run(tc.name, func(t *testing.T) {
-			query := New(db, &Condition{AuthorName: tc.authorName}, querybm.NewPagination(10, 0))
-			cnt, err := query.Count(ctx)
+			cnt, err := tc.query.Count(ctx)
 			require.NoError(t, err)
 			require.Equal(t, int64(len(tc.expectedBooks)), cnt)
-			items, err := query.List(ctx)
+			items, err := tc.query.List(ctx)
 			require.NoError(t, err)
 			require.ElementsMatch(t, tc.expectedBooks, items)
 
-			item, err := query.First(ctx)
+			item, err := tc.query.First(ctx)
 			if len(tc.expectedBooks) > 0 {
 				require.NoError(t, err)
 				require.Equal(t, tc.expectedBooks[0], item)
