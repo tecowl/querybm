@@ -9,6 +9,8 @@ import (
 	"github.com/tecowl/querybm/statement"
 )
 
+// Query represents a SQL query builder with generic support for models, conditions, and sorting.
+// It provides methods to build and execute SELECT queries with pagination support.
 type Query[M any, C Condition, S Sort] struct {
 	db         *sql.DB
 	Table      string
@@ -18,6 +20,7 @@ type Query[M any, C Condition, S Sort] struct {
 	Pagination *Pagination
 }
 
+// New creates a new Query instance with the specified database connection, condition, sort, table name, field mapper, and pagination.
 func New[M any, C Condition, S Sort](db *sql.DB, c C, s S, table string, fields FieldMapper[M], pagination *Pagination) *Query[M, C, S] {
 	return &Query[M, C, S]{
 		db:         db,
@@ -29,6 +32,8 @@ func New[M any, C Condition, S Sort](db *sql.DB, c C, s S, table string, fields 
 	}
 }
 
+// Validate validates the query's condition, sort, and pagination components.
+// It returns an error if any component's validation fails.
 func (q *Query[M, C, S]) Validate() error {
 	if v, ok := any(q.Condition).(Validatable); ok {
 		if err := v.Validate(); err != nil {
@@ -46,6 +51,8 @@ func (q *Query[M, C, S]) Validate() error {
 	return nil
 }
 
+// BuildCountSelect builds a COUNT(*) query string with the current conditions.
+// It returns the SQL query string and its arguments.
 func (q *Query[M, C, S]) BuildCountSelect() (string, []any) {
 	st := statement.New(q.Table, statement.NewSimpleFields("COUNT(*) AS count"))
 
@@ -54,6 +61,8 @@ func (q *Query[M, C, S]) BuildCountSelect() (string, []any) {
 	return st.Build()
 }
 
+// BuildRowsSelect builds a SELECT query string with all fields, conditions, sorting, and pagination.
+// It returns the SQL query string and its arguments.
 func (q *Query[M, C, S]) BuildRowsSelect() (string, []any) {
 	st := statement.New(q.Table, q.Fields)
 	q.Condition.Build(st)
@@ -63,6 +72,8 @@ func (q *Query[M, C, S]) BuildRowsSelect() (string, []any) {
 	return st.Build()
 }
 
+// RowsStatement prepares a SELECT statement for retrieving rows.
+// It returns the prepared statement, query arguments, and any error that occurred.
 func (q *Query[M, C, S]) RowsStatement(ctx context.Context) (*sql.Stmt, []any, error) {
 	queryStr, args := q.BuildRowsSelect()
 	stmt, err := q.db.PrepareContext(ctx, queryStr)
@@ -72,6 +83,8 @@ func (q *Query[M, C, S]) RowsStatement(ctx context.Context) (*sql.Stmt, []any, e
 	return stmt, args, nil
 }
 
+// CountStatement prepares a COUNT statement for counting matching rows.
+// It returns the prepared statement, query arguments, and any error that occurred.
 func (q *Query[M, C, S]) CountStatement(ctx context.Context) (*sql.Stmt, []any, error) {
 	queryStr, args := q.BuildCountSelect()
 	stmt, err := q.db.PrepareContext(ctx, queryStr)
@@ -81,6 +94,8 @@ func (q *Query[M, C, S]) CountStatement(ctx context.Context) (*sql.Stmt, []any, 
 	return stmt, args, nil
 }
 
+// Count executes a COUNT query and returns the number of matching rows.
+// It returns 0 if no rows match the conditions.
 func (q *Query[M, C, S]) Count(ctx context.Context) (int64, error) {
 	stmt, args, err := q.CountStatement(ctx)
 	if err != nil {
@@ -98,6 +113,8 @@ func (q *Query[M, C, S]) Count(ctx context.Context) (int64, error) {
 	return count, nil
 }
 
+// FirstRow executes the query and returns the first row as *sql.Row.
+// The caller is responsible for scanning the row.
 func (q *Query[M, C, S]) FirstRow(ctx context.Context) (*sql.Row, error) {
 	stmt, args, err := q.RowsStatement(ctx)
 	if err != nil {
@@ -129,6 +146,8 @@ func (q *Query[M, C, S]) Rows(ctx context.Context) (*sql.Rows, error) {
 	return rows, nil
 }
 
+// First executes the query and returns the first matching model instance.
+// It returns nil if no rows match the conditions.
 func (q *Query[M, C, S]) First(ctx context.Context) (*M, error) {
 	row, err := q.FirstRow(ctx)
 	if err != nil {
@@ -141,6 +160,8 @@ func (q *Query[M, C, S]) First(ctx context.Context) (*M, error) {
 	return org, nil
 }
 
+// List executes the query and returns all matching model instances as a slice.
+// It returns an empty slice if no rows match the conditions.
 func (q *Query[M, C, S]) List(ctx context.Context) ([]*M, error) {
 	rows, err := q.Rows(ctx)
 	if err != nil {
