@@ -22,8 +22,8 @@ linters:
 #         - err113
 #         - forcetypeassert
 #         - funlen
-# linters-settings:
+linters-settings:
 #   cyclop:
 #     skip-tests: true
-#   lll:
-#     line-length: 200
+  lll:
+    line-length: 250
