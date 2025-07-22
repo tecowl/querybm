@@ -4,6 +4,7 @@
 [![codecov](https://codecov.io/gh/tecowl/querybm/graph/badge.svg?token=1KIHO6LA3D)](https://codecov.io/gh/tecowl/querybm)
 [![Go Report Card](https://goreportcard.com/badge/github.com/tecowl/querybm)](https://goreportcard.com/report/github.com/tecowl/querybm)
 [![Go project version](https://badge.fury.io/go/github.com%2Ftecowl%2Fquerybm.svg)](https://badge.fury.io/go/github.com%2Ftecowl%2Fquerybm)
+[![Enabled Linters](https://img.shields.io/badge/dynamic/yaml?url=https%3A%2F%2Fraw.githubusercontent.com%2Ftecowl%2Fquerybm%2Frefs%2Fheads%2Fmain%2F.project.yaml&query=%24.linters&label=enabled%20linters&color=%2317AFC2)](.golangci.yml)
 [![Documentation](https://img.shields.io/badge/go.dev-reference-007d9c?logo=go&logoColor=white&style=flat-square)](https://pkg.go.dev/github.com/tecowl/querybm)
 ![GitHub go.mod Go version](https://img.shields.io/github/go-mod/go-version/tecowl/querybm)
 ![GitHub License](https://img.shields.io/github/license/tecowl/querybm)
