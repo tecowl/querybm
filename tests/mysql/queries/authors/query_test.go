@@ -1,4 +1,4 @@
-package bookssimple
+package authors
 
 import (
 	"context"
@@ -25,7 +25,7 @@ func TestQuery(t *testing.T) {
 	mysqlContainer, err := mysql.Run(ctx,
 		"mysql:8.0.36",
 		mysql.WithConfigFile(filepath.Join("..", "..", "conf.d", "my.cnf")),
-		mysql.WithDatabase("bookswithenum"),
+		mysql.WithDatabase("authors"),
 		mysql.WithUsername("root"),
 		mysql.WithPassword("password"),
 		mysql.WithScripts(filepath.Join("..", "..", "schema.sql")),
@@ -55,33 +55,30 @@ func TestQuery(t *testing.T) {
 	}
 	defer db.Close()
 
-	var books []*models.Book
+	var authors []*models.Author
 
 	t.Run("Setup records", func(t *testing.T) {
-		_, books = fixtures.Setup(t, ctx, db)
+		authors = fixtures.SetupAuthors(t, ctx, db)
 	})
 
 	testCases := []struct {
-		name          string
-		query         *querybm.Query[models.Book, *Condition, *querybm.SortItem]
-		expectedBooks []*models.Book
+		name            string
+		query           *querybm.Query[models.Author, *Condition, *querybm.SortItem]
+		expectedAuthors []*models.Author
 	}{
 		{
-			name:  "refactoring",
-			query: New(db, &Condition{Title: "refactoring"}),
-			expectedBooks: []*models.Book{
-				books[3],
-				books[0],
+			name:  "Beck",
+			query: New(db, &Condition{Name: "Beck"}),
+			expectedAuthors: []*models.Author{
+				authors[1],
 			},
 		},
 		{
-			name:  "ex",
-			query: New(db, &Condition{Title: "ex"}),
-			expectedBooks: []*models.Book{
-				books[2],
-				books[5],
-				books[0],
-				books[4],
+			name:  "Martin",
+			query: New(db, &Condition{Name: "martin"}),
+			expectedAuthors: []*models.Author{
+				authors[0],
+				authors[2],
 			},
 		},
 	}
@@ -90,14 +87,13 @@ func TestQuery(t *testing.T) {
 		t.Run(tc.name, func(t *testing.T) {
 			cnt, err := tc.query.Count(ctx)
 			require.NoError(t, err)
-			require.Equal(t, int64(len(tc.expectedBooks)), cnt)
+			require.Equal(t, int64(len(tc.expectedAuthors)), cnt)
 
 			result, err := tc.query.List(ctx)
 			require.NoError(t, err)
-			require.Len(t, result, len(tc.expectedBooks))
-			for i, book := range result {
-				assert.Equal(t, tc.expectedBooks[i].BookID, book.BookID)
-				assert.Equal(t, tc.expectedBooks[i].Title, book.Title)
+			require.Len(t, result, len(tc.expectedAuthors))
+			for i, author := range result {
+				assert.Equal(t, tc.expectedAuthors[i], author)
 			}
 		})
 	}
