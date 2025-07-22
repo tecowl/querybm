@@ -108,7 +108,7 @@ func TestQuery_Validate(t *testing.T) {
 			name: "Condition validation fails",
 			setupQuery: func() *Query[TestModel, Condition, Sort] {
 				db := &sql.DB{}
-				condition := &ValidatableCondition{validateErr: errors.New("invalid condition")}
+				condition := &ValidatableCondition{validateErr: errors.New("invalid condition")} // nolint:err113
 				sort := &ValidatableSort{}
 				fields := NewStaticColumns[TestModel]([]string{"id"}, nil)
 				pagination := NewPagination(10, 0)
@@ -122,7 +122,7 @@ func TestQuery_Validate(t *testing.T) {
 			setupQuery: func() *Query[TestModel, Condition, Sort] {
 				db := &sql.DB{}
 				condition := &ValidatableCondition{}
-				sort := &ValidatableSort{validateErr: errors.New("invalid sort")}
+				sort := &ValidatableSort{validateErr: errors.New("invalid sort")} // nolint:err113
 				fields := NewStaticColumns[TestModel]([]string{"id"}, nil)
 				pagination := NewPagination(10, 0)
 				return New[TestModel, Condition, Sort](db, condition, sort, "users", fields, pagination)

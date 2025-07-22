@@ -109,7 +109,7 @@ func TestStaticColumns_Mapper(t *testing.T) {
 			mapper: func(s Scanner, u *User) error {
 				return s.Scan(&u.ID, &u.Name, &u.Email)
 			},
-			scanner: &mockScanner{scanErr: errors.New("scan error")},
+			scanner: &mockScanner{scanErr: errors.New("scan error")}, // nolint:err113
 			user:    &User{},
 			wantErr: true,
 		},
