@@ -7,7 +7,7 @@ import (
 
 func TestFieldBetweenExpr(t *testing.T) {
 	t.Parallel()
-	field := "field1"
+	field := "field1" // nolint:goconst
 	tests := []struct {
 		name       string
 		condition  FieldConditionBody
