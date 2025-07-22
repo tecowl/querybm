@@ -10,9 +10,7 @@ func TestMap(t *testing.T) {
 	t.Parallel()
 
 	slice := []int{1, 2, 3}
-	result := Map(slice, func(v int) string {
-		return strconv.Itoa(v)
-	})
+	result := Map(slice, strconv.Itoa)
 
 	expected := []string{"1", "2", "3"}
 	if !reflect.DeepEqual(result, expected) {
@@ -117,7 +115,7 @@ func TestBind(t *testing.T) {
 		t.Run("returns mapped values", func(t *testing.T) {
 			t.Parallel()
 			fn := Bind(slice, Map[int, string])
-			result := fn(func(v int) string { return strconv.Itoa(v) })
+			result := fn(strconv.Itoa)
 			expected := []string{"1", "2", "3"}
 			if !reflect.DeepEqual(result, expected) {
 				t.Errorf("Bind() = %v; want %v", result, expected)
