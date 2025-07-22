@@ -21,6 +21,6 @@ func (c *inRangeExpr) Connective() string {
 	return " AND "
 }
 
-func InRange(start, end any) FieldConditionBody {
+func InRange(start, end any) FieldConditionBody { //nolint:ireturn
 	return &inRangeExpr{start: start, end: end}
 }

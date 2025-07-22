@@ -14,6 +14,6 @@ func (c *fieldBetweenExpr) Values() []any {
 	return []any{c.start, c.end}
 }
 
-func Between(start, end any) FieldConditionBody {
+func Between(start, end any) FieldConditionBody { //nolint:ireturn
 	return &fieldBetweenExpr{start: start, end: end}
 }

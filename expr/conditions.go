@@ -13,8 +13,8 @@ var _ ConnectiveCondition = (*Conditions)(nil)
 func NewConditions(connector string, items ...ConditionExpr) *Conditions {
 	return &Conditions{items: items, connective: connector}
 }
-func And(conditions ...ConditionExpr) ConditionExpr { return NewConditions(" AND ", conditions...) }
-func Or(conditions ...ConditionExpr) ConditionExpr  { return NewConditions(" OR ", conditions...) }
+func And(conditions ...ConditionExpr) ConditionExpr { return NewConditions(" AND ", conditions...) } //nolint:ireturn
+func Or(conditions ...ConditionExpr) ConditionExpr  { return NewConditions(" OR ", conditions...) }  //nolint:ireturn
 
 func (c *Conditions) String() string {
 	switch len(c.items) {

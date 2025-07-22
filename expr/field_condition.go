@@ -8,7 +8,7 @@ type FieldCondition struct {
 var _ ConditionExpr = (*FieldCondition)(nil)
 var _ ConnectiveCondition = (*FieldCondition)(nil)
 
-func Field(name string, body FieldConditionBody) ConditionExpr {
+func Field(name string, body FieldConditionBody) ConditionExpr { //nolint:ireturn
 	return &FieldCondition{Name: name, Body: body}
 }
 
