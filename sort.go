@@ -2,7 +2,6 @@ package querybm
 
 import (
 	"errors"
-	"fmt"
 
 	"github.com/tecowl/querybm/statement"
 )
@@ -45,6 +44,8 @@ type SortItems []*SortItem
 
 var _ Sort = (SortItems)(nil)
 
+var ErrNilSortItem = errors.New("sort item cannot be nil")
+
 func (s SortItems) Validate() error {
 	for _, item := range s {
 		if item != nil {
@@ -52,7 +53,7 @@ func (s SortItems) Validate() error {
 				return err
 			}
 		} else {
-			return fmt.Errorf("sort item cannot be nil")
+			return ErrNilSortItem
 		}
 	}
 	return nil
