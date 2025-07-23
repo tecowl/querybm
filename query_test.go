@@ -290,3 +290,66 @@ func findSubstring(s, substr string) int {
 	}
 	return -1
 }
+
+func TestQuery_Validate_WithValidatableComponents(t *testing.T) {
+	t.Parallel()
+	tests := []struct {
+		name        string
+		setupQuery  func() *Query[TestModel]
+		wantError   bool
+		errorString string
+	}{
+		{
+			name: "condition validation fails",
+			setupQuery: func() *Query[TestModel] {
+				db := &sql.DB{}
+				condition := &ValidatableCondition{validateErr: errors.New("condition error")}
+				sort := &TestSort{}
+				fields := NewFields[TestModel]([]string{"id", "name"}, nil)
+				pagination := NewPagination(10, 0)
+				return New(db, "users", fields, condition, sort, pagination)
+			},
+			wantError:   true,
+			errorString: "condition validation failed: condition error",
+		},
+		{
+			name: "sort validation fails",
+			setupQuery: func() *Query[TestModel] {
+				db := &sql.DB{}
+				condition := &TestCondition{}
+				sort := &ValidatableSort{validateErr: errors.New("sort error")}
+				fields := NewFields[TestModel]([]string{"id", "name"}, nil)
+				pagination := NewPagination(10, 0)
+				return New(db, "users", fields, condition, sort, pagination)
+			},
+			wantError:   true,
+			errorString: "sort validation failed: sort error",
+		},
+		{
+			name: "all validations pass",
+			setupQuery: func() *Query[TestModel] {
+				db := &sql.DB{}
+				condition := &ValidatableCondition{validateErr: nil}
+				sort := &ValidatableSort{validateErr: nil}
+				fields := NewFields[TestModel]([]string{"id", "name"}, nil)
+				pagination := NewPagination(10, 0)
+				return New(db, "users", fields, condition, sort, pagination)
+			},
+			wantError: false,
+		},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			t.Parallel()
+			q := tt.setupQuery()
+			err := q.Validate()
+			if (err != nil) != tt.wantError {
+				t.Errorf("Validate() error = %v, wantError %v", err, tt.wantError)
+			}
+			if err != nil && tt.errorString != "" && !contains(err.Error(), tt.errorString) {
+				t.Errorf("Validate() error = %v, want error containing %v", err, tt.errorString)
+			}
+		})
+	}
+}
