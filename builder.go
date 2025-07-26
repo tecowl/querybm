@@ -34,3 +34,11 @@ func NewBuilder(fn BuildFunc) Builder { // nolint:ireturn
 func (b *buildFuncWrapper) Build(st *statement.Statement) {
 	b.fn(st)
 }
+
+type BuildFuncs []BuildFunc
+
+func (s BuildFuncs) Build(st *statement.Statement) {
+	for _, fn := range s {
+		fn(st)
+	}
+}
