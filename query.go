@@ -71,6 +71,9 @@ func (q *Query[M]) BuildCountSelect() (string, []any) {
 // It returns the SQL query string and its arguments.
 func (q *Query[M]) BuildRowsSelect() (string, []any) {
 	st := statement.New(q.Table, q.Fields)
+	if fb, ok := q.Fields.(Builder); ok {
+		fb.Build(st)
+	}
 	q.Condition.Build(st)
 	q.Sort.Build(st)
 	q.Pagination.Build(st)
