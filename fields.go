@@ -9,8 +9,10 @@ type Fields[M any] struct {
 	buildFuncs BuildFuncs
 }
 
-var _ FieldMapper[any] = (*Fields[any])(nil)
-var _ Builder = (*Fields[any])(nil)
+var (
+	_ FieldMapper[any] = (*Fields[any])(nil)
+	_ Builder          = (*Fields[any])(nil)
+)
 
 // NewFields creates a new Fields instance with the specified column names and mapper function.
 func NewFields[M any](names []string, scan Mapper[M], buildFunc ...BuildFunc) *Fields[M] {
