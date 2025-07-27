@@ -27,9 +27,9 @@ type Query[M any] struct {
 // c: The condition to apply to the query. This is used for List and Count methods.
 // s: The sort item to apply to the query. This is used for ordering the results in List method.
 // pagination: The pagination settings for the query. This is used to limit the number of results returned in List method.
-func New[M any](db DB, table string, fields FieldMapper[M], c Condition, s Sort, pagination *Pagination) *Query[M] {
+func New[M any](db *sql.DB, table string, fields FieldMapper[M], c Condition, s Sort, pagination *Pagination) *Query[M] {
 	return &Query[M]{
-		db:         db,
+		db:         newDBWrapper(db),
 		Table:      table,
 		Fields:     fields,
 		Condition:  c,
@@ -83,7 +83,7 @@ func (q *Query[M]) BuildRowsSelect() (string, []any) {
 
 // RowsStatement prepares a SELECT statement for retrieving rows.
 // It returns the prepared statement, query arguments, and any error that occurred.
-func (q *Query[M]) RowsStatement(ctx context.Context) (*sql.Stmt, []any, error) {
+func (q *Query[M]) RowsStatement(ctx context.Context) (Stmt, []any, error) {
 	queryStr, args := q.BuildRowsSelect()
 	stmt, err := q.db.PrepareContext(ctx, queryStr)
 	if err != nil {
@@ -94,7 +94,7 @@ func (q *Query[M]) RowsStatement(ctx context.Context) (*sql.Stmt, []any, error) 
 
 // CountStatement prepares a COUNT statement for counting matching rows.
 // It returns the prepared statement, query arguments, and any error that occurred.
-func (q *Query[M]) CountStatement(ctx context.Context) (*sql.Stmt, []any, error) {
+func (q *Query[M]) CountStatement(ctx context.Context) (Stmt, []any, error) {
 	queryStr, args := q.BuildCountSelect()
 	stmt, err := q.db.PrepareContext(ctx, queryStr)
 	if err != nil {

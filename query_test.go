@@ -73,9 +73,6 @@ func TestNew(t *testing.T) {
 
 	query := New(db, "users", fields, condition, sort, pagination)
 
-	if query.db != db {
-		t.Error("New() db not set correctly")
-	}
 	if query.Table != "users" {
 		t.Errorf("New() Table = %v, want %v", query.Table, "users")
 	}
