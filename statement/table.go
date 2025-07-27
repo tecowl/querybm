@@ -12,6 +12,11 @@ func NewTableBlock(table string) *TableBlock {
 	}
 }
 
+// Build constructs the FROM clause string and returns it with placeholder values.
+func (b *TableBlock) Build() (string, []any) {
+	return b.content, []any{}
+}
+
 // InnerJoin adds an INNER JOIN clause to the table block.
 func (b *TableBlock) InnerJoin(table string, condition string, values ...any) {
 	b.Add("INNER JOIN "+table+" ON "+condition, values...)
