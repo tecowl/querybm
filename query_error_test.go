@@ -223,3 +223,37 @@ func TestStmtQueryContextRowsError(t *testing.T) {
 		}
 	})
 }
+
+type errorLimitOffset struct {
+	err error
+}
+
+var (
+	_ LimitOffset = (*errorLimitOffset)(nil)
+	_ Validatable = (*errorLimitOffset)(nil)
+)
+
+func (m *errorLimitOffset) Build(*Statement) {
+}
+
+func (m *errorLimitOffset) Validate() error {
+	return m.err
+}
+
+func TestQueryValidateError(t *testing.T) {
+	t.Parallel()
+
+	q := &Query[any]{
+		db:          &MockDB{},
+		Table:       "users",
+		Fields:      NewFields[any]([]string{"id", "name"}, nil),
+		LimitOffset: &errorLimitOffset{err: fmt.Errorf("limit offset error")}, // nolint:err113,perfsprint
+	}
+
+	t.Run("LimitOffset", func(t *testing.T) {
+		t.Parallel()
+		if err := q.Validate(); err == nil {
+			t.Error("Expected error, got nil")
+		}
+	})
+}
