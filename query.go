@@ -16,7 +16,7 @@ type Query[M any] struct {
 	Fields      FieldMapper[M]
 	Condition   Condition
 	Sort        Sort
-	LimitOffset *SimpleLimitOffset
+	LimitOffset LimitOffset
 }
 
 // New creates a new Query instance with the provided parameters.
@@ -26,7 +26,7 @@ type Query[M any] struct {
 // c: The condition to apply to the query. This is used for List and Count methods.
 // s: The sort item to apply to the query. This is used for ordering the results in List method.
 // limitOffset: The limitOffset settings for the query. This is used to limit the number of results returned in List method.
-func New[M any](db *sql.DB, table string, fields FieldMapper[M], c Condition, s Sort, limitOffset *SimpleLimitOffset) *Query[M] {
+func New[M any](db *sql.DB, table string, fields FieldMapper[M], c Condition, s Sort, limitOffset LimitOffset) *Query[M] {
 	return &Query[M]{
 		db:          newDBWrapper(db),
 		Table:       table,
@@ -50,8 +50,10 @@ func (q *Query[M]) Validate() error {
 			return fmt.Errorf("sort validation failed: %w", err)
 		}
 	}
-	if err := q.LimitOffset.Validate(); err != nil {
-		return fmt.Errorf("limitOffset validation failed: %w", err)
+	if v, ok := any(q.LimitOffset).(Validatable); ok {
+		if err := v.Validate(); err != nil {
+			return fmt.Errorf("limitOffset validation failed: %w", err)
+		}
 	}
 	return nil
 }

@@ -4,6 +4,8 @@ import (
 	"github.com/tecowl/querybm/statement"
 )
 
+type LimitOffset = Builder
+
 const (
 	// defaultLimit is the default number of rows to return per page.
 	defaultLimit = 100
@@ -22,6 +24,11 @@ type SimpleLimitOffset struct {
 	limit  int64
 	offset int64
 }
+
+var (
+	_ LimitOffset = (*SimpleLimitOffset)(nil)
+	_ Validatable = (*SimpleLimitOffset)(nil)
+)
 
 // NewLimitOffset creates a new LimitOffset instance with the specified limit and offset.
 // If limit is <= 0, it uses DefaultLimitOffsetLimit.

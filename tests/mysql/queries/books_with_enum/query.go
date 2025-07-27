@@ -17,7 +17,7 @@ var columns querybm.FieldMapper[models.Book] = querybm.NewFields(
 
 var sort = querybm.NewSortItem("title", false)
 
-func New(db *sql.DB, condition *Condition, limitOffset *querybm.LimitOffset) *querybm.Query[models.Book] {
+func New(db *sql.DB, condition *Condition, limitOffset querybm.LimitOffset) *querybm.Query[models.Book] {
 	table := "books"
 	return querybm.New(db, table, columns, condition, sort, limitOffset)
 }

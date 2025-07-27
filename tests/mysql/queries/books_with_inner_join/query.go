@@ -13,7 +13,7 @@ type Book struct {
 	AuthorName string
 }
 
-func New(db *sql.DB, condition *Condition, limitOffset *querybm.LimitOffset) *querybm.Query[Book] {
+func New(db *sql.DB, condition *Condition, limitOffset querybm.LimitOffset) *querybm.Query[Book] {
 	return querybm.New(db, "books", columns, condition,
 		querybm.NewSortItem("title", false), limitOffset,
 	)
