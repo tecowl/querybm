@@ -35,8 +35,10 @@ func (b *buildFuncWrapper) Build(st *statement.Statement) {
 	b.fn(st)
 }
 
+// BuildFuncs is a slice of BuildFunc that implements the Builder interface.
 type BuildFuncs []BuildFunc
 
+// Build implements Builder for BuildFuncs.
 func (s BuildFuncs) Build(st *statement.Statement) {
 	for _, fn := range s {
 		fn(st)
