@@ -62,6 +62,47 @@ func (m *MockRow) Scan(dest ...any) error {
 	return nil // nolint:nilnil
 }
 
+type MockRows struct {
+	close func() error
+	err   func() error
+	next  func() bool
+	scan  func(dest ...any) error
+}
+
+var _ Rows = (*MockRows)(nil)
+
+// Close implements Rows.
+func (m *MockRows) Close() error {
+	if m.close != nil {
+		return m.close()
+	}
+	return nil
+}
+
+// Err implements Rows.
+func (m *MockRows) Err() error {
+	if m.err != nil {
+		return m.err()
+	}
+	return nil
+}
+
+// Next implements Rows.
+func (m *MockRows) Next() bool {
+	if m.next != nil {
+		return m.next()
+	}
+	return false
+}
+
+// Scan implements Rows.
+func (m *MockRows) Scan(dest ...any) error {
+	if m.scan != nil {
+		return m.scan(dest...)
+	}
+	return nil
+}
+
 func TestQueryPrepareContextError(t *testing.T) {
 	t.Parallel()
 
@@ -123,6 +164,61 @@ func TestStmtQueryRowContextError(t *testing.T) {
 	t.Run("First", func(t *testing.T) {
 		t.Parallel()
 		if _, err := q.First(t.Context()); err == nil {
+			t.Error("Expected error, got nil")
+		}
+	})
+}
+
+func TestStmtQueryContextError(t *testing.T) {
+	t.Parallel()
+
+	stmt := &MockStmt{
+		queryContext: func(context.Context, ...any) (Rows, error) {
+			return nil, fmt.Errorf("runtime rows error") // nolint:err113,perfsprint
+		},
+	}
+	db := &MockDB{
+		PrepareContextFunc: func(context.Context, string) (Stmt, error) { return stmt, nil },
+	}
+
+	q := &Query[any]{
+		db:     db,
+		Table:  "users",
+		Fields: NewFields[any]([]string{"id", "name"}, nil),
+	}
+	t.Run("List", func(t *testing.T) {
+		t.Parallel()
+		if _, err := q.List(t.Context()); err == nil {
+			t.Error("Expected error, got nil")
+		}
+	})
+}
+
+func TestStmtQueryContextRowsError(t *testing.T) {
+	t.Parallel()
+
+	rows := &MockRows{
+		err: func() error {
+			return fmt.Errorf("runtime rows error") // nolint:err113,perfsprint
+		},
+	}
+	stmt := &MockStmt{
+		queryContext: func(context.Context, ...any) (Rows, error) {
+			return rows, nil
+		},
+	}
+	db := &MockDB{
+		PrepareContextFunc: func(context.Context, string) (Stmt, error) { return stmt, nil },
+	}
+
+	q := &Query[any]{
+		db:     db,
+		Table:  "users",
+		Fields: NewFields[any]([]string{"id", "name"}, nil),
+	}
+	t.Run("List", func(t *testing.T) {
+		t.Parallel()
+		if _, err := q.List(t.Context()); err == nil {
 			t.Error("Expected error, got nil")
 		}
 	})
