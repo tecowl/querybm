@@ -49,6 +49,20 @@ func TestNewTableBlock(t *testing.T) {
 			expectedAlias: "u",
 			expectedFrom:  "users AS u",
 		},
+		{
+			name:          "Create table block with unexpected spaces 1",
+			tableName:     "users `special users`",
+			expectedTable: "users",
+			expectedAlias: "`special users`",
+			expectedFrom:  "users `special users`",
+		},
+		{
+			name:          "Create table block with unexpected spaces 2",
+			tableName:     "`special users` users",
+			expectedTable: "`special",
+			expectedAlias: "users` users",
+			expectedFrom:  "`special users` users",
+		},
 	}
 
 	for _, tt := range tests {
