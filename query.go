@@ -74,9 +74,15 @@ func (q *Query[M]) BuildRowsSelect() (string, []any) {
 	if fb, ok := q.Fields.(Builder); ok {
 		fb.Build(st)
 	}
-	q.Condition.Build(st)
-	q.Sort.Build(st)
-	q.Pagination.Build(st)
+	if q.Condition != nil {
+		q.Condition.Build(st)
+	}
+	if q.Sort != nil {
+		q.Sort.Build(st)
+	}
+	if q.Pagination != nil {
+		q.Pagination.Build(st)
+	}
 
 	return st.Build()
 }
