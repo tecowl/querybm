@@ -33,14 +33,14 @@ func (m *MockStmt) Close() error {
 	return nil
 }
 
-func (m *MockStmt) QueryContext(ctx context.Context, args ...any) (Rows, error) {
+func (m *MockStmt) QueryContext(ctx context.Context, args ...any) (Rows, error) { // nolint:ireturn
 	if m.queryContext != nil {
 		return m.queryContext(ctx, args...)
 	}
 	return nil, nil // nolint:nilnil
 }
 
-func (m *MockStmt) QueryRowContext(ctx context.Context, args ...any) Row {
+func (m *MockStmt) QueryRowContext(ctx context.Context, args ...any) Row { // nolint:ireturn
 	if m.queryRowContext != nil {
 		return m.queryRowContext(ctx, args...)
 	}
@@ -55,6 +55,7 @@ type MockRow struct {
 func (m *MockRow) Err() error {
 	return m.err
 }
+
 func (m *MockRow) Scan(dest ...any) error {
 	if m.scan != nil {
 		return m.scan(dest...)
@@ -99,7 +100,7 @@ func TestStmtQueryRowContextError(t *testing.T) {
 
 	scanErrors := []error{
 		sql.ErrNoRows,
-		fmt.Errorf("scan error"),
+		fmt.Errorf("scan error"), // nolint:err113,perfsprint
 	}
 
 	for _, scanErr := range scanErrors {
@@ -108,12 +109,12 @@ func TestStmtQueryRowContextError(t *testing.T) {
 
 			row := &MockRow{
 				err: fmt.Errorf("runtime row error"), // nolint:err113,perfsprint
-				scan: func(dest ...any) error {
+				scan: func(...any) error {
 					return fmt.Errorf("scan error") // nolint:err113,perfsprint
 				},
 			}
 			stmt := &MockStmt{
-				queryRowContext: func(ctx context.Context, args ...any) Row { return row },
+				queryRowContext: func(context.Context, ...any) Row { return row },
 			}
 			db := &MockDB{
 				PrepareContextFunc: func(context.Context, string) (Stmt, error) { return stmt, nil },
