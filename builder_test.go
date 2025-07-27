@@ -51,5 +51,4 @@ func TestNewBuilder(t *testing.T) {
 			t.Errorf("BuildFunc was called %d times, expected 2", count)
 		}
 	})
-
 }

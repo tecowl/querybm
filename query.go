@@ -83,7 +83,7 @@ func (q *Query[M]) BuildRowsSelect() (string, []any) {
 
 // RowsStatement prepares a SELECT statement for retrieving rows.
 // It returns the prepared statement, query arguments, and any error that occurred.
-func (q *Query[M]) RowsStatement(ctx context.Context) (Stmt, []any, error) {
+func (q *Query[M]) RowsStatement(ctx context.Context) (Stmt, []any, error) { // nolint:ireturn
 	queryStr, args := q.BuildRowsSelect()
 	stmt, err := q.db.PrepareContext(ctx, queryStr)
 	if err != nil {
@@ -94,7 +94,7 @@ func (q *Query[M]) RowsStatement(ctx context.Context) (Stmt, []any, error) {
 
 // CountStatement prepares a COUNT statement for counting matching rows.
 // It returns the prepared statement, query arguments, and any error that occurred.
-func (q *Query[M]) CountStatement(ctx context.Context) (Stmt, []any, error) {
+func (q *Query[M]) CountStatement(ctx context.Context) (Stmt, []any, error) { // nolint:ireturn
 	queryStr, args := q.BuildCountSelect()
 	stmt, err := q.db.PrepareContext(ctx, queryStr)
 	if err != nil {
@@ -124,7 +124,7 @@ func (q *Query[M]) Count(ctx context.Context) (int64, error) {
 
 // FirstRow executes the query and returns the first row as *sql.Row.
 // The caller is responsible for scanning the row.
-func (q *Query[M]) FirstRow(ctx context.Context) (*sql.Row, error) {
+func (q *Query[M]) FirstRow(ctx context.Context) (Row, error) { // nolint:ireturn
 	stmt, args, err := q.RowsStatement(ctx)
 	if err != nil {
 		return nil, err
@@ -141,7 +141,7 @@ func (q *Query[M]) FirstRow(ctx context.Context) (*sql.Row, error) {
 // Rows executes the query and returns the result set as *sql.Rows.
 // It prepares the statement, executes it, and returns the rows.
 // The caller is responsible for closing the rows.
-func (q *Query[M]) Rows(ctx context.Context) (*sql.Rows, error) {
+func (q *Query[M]) Rows(ctx context.Context) (Rows, error) { // nolint:ireturn
 	stmt, args, err := q.RowsStatement(ctx)
 	if err != nil {
 		return nil, err
