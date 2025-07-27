@@ -46,7 +46,7 @@ func TestQuery(t *testing.T) {
 			name: "1 item for magazine",
 			query: New(db, &Condition{
 				BookTypes: []models.BooksBookType{models.BooksBookTypeMAGAZINE},
-			}, querybm.NewPagination(10, 0)),
+			}, querybm.NewLimitOffset(10, 0)),
 			expectedBooks: []*models.Book{
 				books[7],
 			},
@@ -55,7 +55,7 @@ func TestQuery(t *testing.T) {
 			name: "2 items for paperback",
 			query: New(db, &Condition{
 				BookTypes: []models.BooksBookType{models.BooksBookTypePAPERBACK},
-			}, querybm.NewPagination(10, 0)),
+			}, querybm.NewLimitOffset(10, 0)),
 			expectedBooks: []*models.Book{
 				books[5],
 				books[3],
@@ -68,7 +68,7 @@ func TestQuery(t *testing.T) {
 					models.BooksBookTypeMAGAZINE,
 					models.BooksBookTypePAPERBACK,
 				},
-			}, querybm.NewPagination(10, 0)),
+			}, querybm.NewLimitOffset(10, 0)),
 			expectedBooks: []*models.Book{
 				books[7],
 				books[5],
@@ -83,7 +83,7 @@ func TestQuery(t *testing.T) {
 					models.BooksBookTypeMAGAZINE,
 					models.BooksBookTypePAPERBACK,
 				},
-			}, querybm.NewPagination(10, 0)),
+			}, querybm.NewLimitOffset(10, 0)),
 			expectedBooks: sortedBook,
 		},
 	}

@@ -3,21 +3,20 @@ package querybm
 import (
 	"context"
 	"database/sql"
-	"errors"
 	"fmt"
 
 	"github.com/tecowl/querybm/statement"
 )
 
 // Query represents a SQL query builder with generic support for models, conditions, and sorting.
-// It provides methods to build and execute SELECT queries with pagination support.
+// It provides methods to build and execute SELECT queries with limitOffset support.
 type Query[M any] struct {
-	db         *sql.DB
-	Table      string
-	Fields     FieldMapper[M]
-	Condition  Condition
-	Sort       Sort
-	Pagination *Pagination
+	db          DB
+	Table       string
+	Fields      FieldMapper[M]
+	Condition   Condition
+	Sort        Sort
+	LimitOffset LimitOffset
 }
 
 // New creates a new Query instance with the provided parameters.
@@ -26,19 +25,19 @@ type Query[M any] struct {
 // fields: The field mapper that defines how to map database rows to model instances. This is used for mapping in List method.
 // c: The condition to apply to the query. This is used for List and Count methods.
 // s: The sort item to apply to the query. This is used for ordering the results in List method.
-// pagination: The pagination settings for the query. This is used to limit the number of results returned in List method.
-func New[M any](db *sql.DB, table string, fields FieldMapper[M], c Condition, s Sort, pagination *Pagination) *Query[M] {
+// limitOffset: The limitOffset settings for the query. This is used to limit the number of results returned in List method.
+func New[M any](db *sql.DB, table string, fields FieldMapper[M], c Condition, s Sort, limitOffset LimitOffset) *Query[M] {
 	return &Query[M]{
-		db:         db,
-		Table:      table,
-		Fields:     fields,
-		Condition:  c,
-		Sort:       s,
-		Pagination: pagination,
+		db:          newDBWrapper(db),
+		Table:       table,
+		Fields:      fields,
+		Condition:   c,
+		Sort:        s,
+		LimitOffset: limitOffset,
 	}
 }
 
-// Validate validates the query's condition, sort, and pagination components.
+// Validate validates the query's condition, sort, and limitOffset components.
 // It returns an error if any component's validation fails.
 func (q *Query[M]) Validate() error {
 	if v, ok := any(q.Condition).(Validatable); ok {
@@ -51,8 +50,10 @@ func (q *Query[M]) Validate() error {
 			return fmt.Errorf("sort validation failed: %w", err)
 		}
 	}
-	if err := q.Pagination.Validate(); err != nil {
-		return fmt.Errorf("pagination validation failed: %w", err)
+	if v, ok := any(q.LimitOffset).(Validatable); ok {
+		if err := v.Validate(); err != nil {
+			return fmt.Errorf("limitOffset validation failed: %w", err)
+		}
 	}
 	return nil
 }
@@ -62,28 +63,36 @@ func (q *Query[M]) Validate() error {
 func (q *Query[M]) BuildCountSelect() (string, []any) {
 	st := statement.New(q.Table, statement.NewSimpleFields("COUNT(*) AS count"))
 
-	q.Condition.Build(st)
+	if q.Condition != nil {
+		q.Condition.Build(st)
+	}
 
 	return st.Build()
 }
 
-// BuildRowsSelect builds a SELECT query string with all fields, conditions, sorting, and pagination.
+// BuildRowsSelect builds a SELECT query string with all fields, conditions, sorting, and limitOffset.
 // It returns the SQL query string and its arguments.
 func (q *Query[M]) BuildRowsSelect() (string, []any) {
 	st := statement.New(q.Table, q.Fields)
 	if fb, ok := q.Fields.(Builder); ok {
 		fb.Build(st)
 	}
-	q.Condition.Build(st)
-	q.Sort.Build(st)
-	q.Pagination.Build(st)
+	if q.Condition != nil {
+		q.Condition.Build(st)
+	}
+	if q.Sort != nil {
+		q.Sort.Build(st)
+	}
+	if q.LimitOffset != nil {
+		q.LimitOffset.Build(st)
+	}
 
 	return st.Build()
 }
 
 // RowsStatement prepares a SELECT statement for retrieving rows.
 // It returns the prepared statement, query arguments, and any error that occurred.
-func (q *Query[M]) RowsStatement(ctx context.Context) (*sql.Stmt, []any, error) {
+func (q *Query[M]) RowsStatement(ctx context.Context) (Stmt, []any, error) { // nolint:ireturn
 	queryStr, args := q.BuildRowsSelect()
 	stmt, err := q.db.PrepareContext(ctx, queryStr)
 	if err != nil {
@@ -94,7 +103,7 @@ func (q *Query[M]) RowsStatement(ctx context.Context) (*sql.Stmt, []any, error) 
 
 // CountStatement prepares a COUNT statement for counting matching rows.
 // It returns the prepared statement, query arguments, and any error that occurred.
-func (q *Query[M]) CountStatement(ctx context.Context) (*sql.Stmt, []any, error) {
+func (q *Query[M]) CountStatement(ctx context.Context) (Stmt, []any, error) { // nolint:ireturn
 	queryStr, args := q.BuildCountSelect()
 	stmt, err := q.db.PrepareContext(ctx, queryStr)
 	if err != nil {
@@ -114,9 +123,6 @@ func (q *Query[M]) Count(ctx context.Context) (int64, error) {
 
 	var count int64
 	if err := stmt.QueryRowContext(ctx, args...).Scan(&count); err != nil {
-		if errors.Is(err, sql.ErrNoRows) {
-			return 0, nil
-		}
 		return 0, err
 	}
 	return count, nil
@@ -124,7 +130,7 @@ func (q *Query[M]) Count(ctx context.Context) (int64, error) {
 
 // FirstRow executes the query and returns the first row as *sql.Row.
 // The caller is responsible for scanning the row.
-func (q *Query[M]) FirstRow(ctx context.Context) (*sql.Row, error) {
+func (q *Query[M]) FirstRow(ctx context.Context) (Row, error) { // nolint:ireturn
 	stmt, args, err := q.RowsStatement(ctx)
 	if err != nil {
 		return nil, err
@@ -141,7 +147,7 @@ func (q *Query[M]) FirstRow(ctx context.Context) (*sql.Row, error) {
 // Rows executes the query and returns the result set as *sql.Rows.
 // It prepares the statement, executes it, and returns the rows.
 // The caller is responsible for closing the rows.
-func (q *Query[M]) Rows(ctx context.Context) (*sql.Rows, error) {
+func (q *Query[M]) Rows(ctx context.Context) (Rows, error) { // nolint:ireturn
 	stmt, args, err := q.RowsStatement(ctx)
 	if err != nil {
 		return nil, err

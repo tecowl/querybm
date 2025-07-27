@@ -37,7 +37,7 @@ func ExampleNew() { // nolint:testableexamples
 		),
 		querybm.NewBuilder(buildFuncGen(searchingName)),
 		querybm.NewSortItem("name", false),
-		querybm.NewPagination(100, 0),
+		querybm.NewLimitOffset(100, 0),
 	)
 
 	ctx := context.Background()

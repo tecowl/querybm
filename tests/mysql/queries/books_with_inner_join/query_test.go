@@ -36,7 +36,7 @@ func TestQuery(t *testing.T) {
 	}{
 		{
 			name:  "Kent Beck's books",
-			query: New(db, &Condition{AuthorName: "Kent Beck"}, querybm.NewPagination(10, 0)),
+			query: New(db, &Condition{AuthorName: "Kent Beck"}, querybm.NewLimitOffset(10, 0)),
 			expectedBooks: []*Book{
 				{Book: *books[5], AuthorName: authors[1].Name},
 				{Book: *books[4], AuthorName: authors[1].Name},
@@ -44,7 +44,7 @@ func TestQuery(t *testing.T) {
 		},
 		{
 			name:  "Martin Fowler and Robert C. Martin's books",
-			query: New(db, &Condition{AuthorName: "Martin"}, querybm.NewPagination(10, 0)),
+			query: New(db, &Condition{AuthorName: "Martin"}, querybm.NewLimitOffset(10, 0)),
 			expectedBooks: []*Book{
 				{Book: *books[6], AuthorName: authors[2].Name},
 				{Book: *books[2], AuthorName: authors[0].Name},
@@ -55,7 +55,7 @@ func TestQuery(t *testing.T) {
 		},
 		{
 			name:  "no author name specified",
-			query: New(db, &Condition{AuthorName: ""}, querybm.NewPagination(10, 0)),
+			query: New(db, &Condition{AuthorName: ""}, querybm.NewLimitOffset(10, 0)),
 			expectedBooks: []*Book{
 				{Book: *books[6], AuthorName: authors[2].Name},
 				{Book: *books[2], AuthorName: authors[0].Name},
@@ -69,7 +69,7 @@ func TestQuery(t *testing.T) {
 		},
 		{
 			name:          "Not registered author",
-			query:         New(db, &Condition{AuthorName: "Thomas"}, querybm.NewPagination(10, 0)),
+			query:         New(db, &Condition{AuthorName: "Thomas"}, querybm.NewLimitOffset(10, 0)),
 			expectedBooks: []*Book{},
 		},
 	}

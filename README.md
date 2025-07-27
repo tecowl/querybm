@@ -16,7 +16,7 @@ A simple SQL query builder and mapper. `querybm` works well with models generate
 - [x] No dependencies
 - [x] Build SELECT statement dynamically with struct type
 - [x] Mapping with generics instead of reflection
-- [ ] 100% test coverage
+- [x] 100% test coverage
 
 See [godoc](https://pkg.go.dev/github.com/tecowl/querybm) for more details.
 

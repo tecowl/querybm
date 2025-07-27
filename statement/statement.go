@@ -15,8 +15,8 @@ type Statement struct {
 	// Having *Block
 	// Sort is the ORDER BY clause block.
 	Sort *Block
-	// Pagination holds LIMIT and OFFSET clauses.
-	Pagination *Block
+	// LimitOffset holds LIMIT and OFFSET clauses.
+	LimitOffset *Block
 }
 
 // New creates a new Statement with the specified table name and fields.
@@ -26,9 +26,9 @@ func New(table string, fields Fields) *Statement {
 		Table:  NewTableBlock(table),
 		// GroupBy:   NewBlock(),
 		// Having:    NewBlock(),
-		Where:      newWhere(" AND "),
-		Sort:       NewBlock(", "),
-		Pagination: NewBlock(" "),
+		Where:       newWhere(" AND "),
+		Sort:        NewBlock(", "),
+		LimitOffset: NewBlock(" "),
 	}
 }
 
@@ -54,9 +54,9 @@ func (s *Statement) Build() (string, []any) {
 		args = append(args, s.Sort.values...)
 	}
 
-	if !s.Pagination.IsEmpty() {
-		queryParts = append(queryParts, s.Pagination.content)
-		args = append(args, s.Pagination.values...)
+	if !s.LimitOffset.IsEmpty() {
+		queryParts = append(queryParts, s.LimitOffset.content)
+		args = append(args, s.LimitOffset.values...)
 	}
 
 	return strings.Join(queryParts, " "), args
