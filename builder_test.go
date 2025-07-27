@@ -52,13 +52,4 @@ func TestNewBuilder(t *testing.T) {
 		}
 	})
 
-	// Test case: Builder implements Builder interface
-	t.Run("implements Builder interface", func(t *testing.T) {
-		t.Parallel()
-		builder := NewBuilder(func(_ *statement.Statement) {})
-
-		// This test verifies that NewBuilder returns a Builder interface
-		var _ Builder = builder
-		_ = t // mark t as used
-	})
 }
