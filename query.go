@@ -3,7 +3,6 @@ package querybm
 import (
 	"context"
 	"database/sql"
-	"errors"
 	"fmt"
 
 	"github.com/tecowl/querybm/statement"
@@ -122,9 +121,6 @@ func (q *Query[M]) Count(ctx context.Context) (int64, error) {
 
 	var count int64
 	if err := stmt.QueryRowContext(ctx, args...).Scan(&count); err != nil {
-		if errors.Is(err, sql.ErrNoRows) {
-			return 0, nil
-		}
 		return 0, err
 	}
 	return count, nil
