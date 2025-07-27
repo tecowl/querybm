@@ -5,16 +5,16 @@ import (
 )
 
 const (
-	// DefaultPaginationLimit is the default number of rows to return per page.
-	DefaultPaginationLimit = 100
-	// DefaultPaginationOffset is the default starting position for pagination.
-	DefaultPaginationOffset = 0
+	// defaultLimit is the default number of rows to return per page.
+	defaultLimit = 100
+	// defaultOffset is the default starting position for pagination.
+	defaultOffset = 0
 )
 
 // DefaultPagination provides a pagination instance with default values.
 var DefaultPagination = &Pagination{
-	limit:  DefaultPaginationLimit,
-	offset: DefaultPaginationOffset,
+	limit:  defaultLimit,
+	offset: defaultOffset,
 }
 
 // Pagination represents pagination parameters for SQL queries.
