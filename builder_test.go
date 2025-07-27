@@ -8,8 +8,10 @@ import (
 )
 
 func TestNewBuilder(t *testing.T) {
+	t.Parallel()
 	// Test case: NewBuilder creates a builder that executes the provided function
 	t.Run("executes BuildFunc", func(t *testing.T) {
+		t.Parallel()
 		executed := false
 		builder := NewBuilder(func(st *statement.Statement) {
 			executed = true
@@ -31,6 +33,7 @@ func TestNewBuilder(t *testing.T) {
 
 	// Test case: Builder can be used multiple times
 	t.Run("can be used multiple times", func(t *testing.T) {
+		t.Parallel()
 		count := 0
 		builder := NewBuilder(func(st *statement.Statement) {
 			count++
@@ -40,7 +43,7 @@ func TestNewBuilder(t *testing.T) {
 		fields := statement.NewSimpleFields("id", "name")
 		st1 := statement.New("test_table", fields)
 		builder.Build(st1)
-		
+
 		st2 := statement.New("test_table", fields)
 		builder.Build(st2)
 
@@ -51,9 +54,11 @@ func TestNewBuilder(t *testing.T) {
 
 	// Test case: Builder implements Builder interface
 	t.Run("implements Builder interface", func(t *testing.T) {
-		builder := NewBuilder(func(st *statement.Statement) {})
-		
+		t.Parallel()
+		builder := NewBuilder(func(_ *statement.Statement) {})
+
 		// This test verifies that NewBuilder returns a Builder interface
 		var _ Builder = builder
+		_ = t // mark t as used
 	})
 }

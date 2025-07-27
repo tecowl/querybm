@@ -10,6 +10,12 @@ import (
 	"github.com/tecowl/querybm/statement"
 )
 
+// Define static errors for testing.
+var (
+	errConditionError = errors.New("condition error")
+	errSortError      = errors.New("sort error")
+)
+
 type TestModel struct {
 	ID   int
 	Name string
@@ -303,7 +309,7 @@ func TestQuery_Validate_WithValidatableComponents(t *testing.T) {
 			name: "condition validation fails",
 			setupQuery: func() *Query[TestModel] {
 				db := &sql.DB{}
-				condition := &ValidatableCondition{validateErr: errors.New("condition error")}
+				condition := &ValidatableCondition{validateErr: errConditionError}
 				sort := &TestSort{}
 				fields := NewFields[TestModel]([]string{"id", "name"}, nil)
 				pagination := NewPagination(10, 0)
@@ -317,7 +323,7 @@ func TestQuery_Validate_WithValidatableComponents(t *testing.T) {
 			setupQuery: func() *Query[TestModel] {
 				db := &sql.DB{}
 				condition := &TestCondition{}
-				sort := &ValidatableSort{validateErr: errors.New("sort error")}
+				sort := &ValidatableSort{validateErr: errSortError}
 				fields := NewFields[TestModel]([]string{"id", "name"}, nil)
 				pagination := NewPagination(10, 0)
 				return New(db, "users", fields, condition, sort, pagination)

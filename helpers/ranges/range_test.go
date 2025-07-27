@@ -8,26 +8,41 @@ import (
 	"github.com/tecowl/querybm/statement"
 )
 
+// Helper function to verify range start value.
+func verifyRangeStart[T comparable](t *testing.T, r *Range[T], expected T) {
+	t.Helper()
+	if r.Start == nil || *r.Start != expected {
+		t.Errorf("Start = %v, want %v", r.Start, expected)
+	}
+}
+
+// Helper function to verify range end value.
+func verifyRangeEnd[T comparable](t *testing.T, r *Range[T], expected T) {
+	t.Helper()
+	if r.End == nil || *r.End != expected {
+		t.Errorf("End = %v, want %v", r.End, expected)
+	}
+}
+
 func TestNew(t *testing.T) {
+	t.Parallel()
 	t.Run("creates range with both values", func(t *testing.T) {
+		t.Parallel()
 		start := 10
 		end := 20
 		r := New(&start, &end)
-		
-		if r.Start == nil || *r.Start != start {
-			t.Errorf("Start = %v, want %v", r.Start, start)
-		}
-		if r.End == nil || *r.End != end {
-			t.Errorf("End = %v, want %v", r.End, end)
-		}
+
+		verifyRangeStart(t, r, start)
+		verifyRangeEnd(t, r, end)
 		if r.useBetween {
 			t.Error("useBetween should be false by default")
 		}
 	})
 
 	t.Run("creates range with nil values", func(t *testing.T) {
+		t.Parallel()
 		r := New[int](nil, nil)
-		
+
 		if r.Start != nil {
 			t.Error("Start should be nil")
 		}
@@ -37,26 +52,24 @@ func TestNew(t *testing.T) {
 	})
 
 	t.Run("creates range with string type", func(t *testing.T) {
+		t.Parallel()
 		start := "a"
 		end := "z"
 		r := New(&start, &end)
-		
-		if r.Start == nil || *r.Start != start {
-			t.Errorf("Start = %v, want %v", r.Start, start)
-		}
-		if r.End == nil || *r.End != end {
-			t.Errorf("End = %v, want %v", r.End, end)
-		}
+
+		verifyRangeStart(t, r, start)
+		verifyRangeEnd(t, r, end)
 	})
 }
 
 func TestUseBetween(t *testing.T) {
+	t.Parallel()
 	start := 10
 	end := 20
 	r := New(&start, &end)
-	
+
 	result := r.UseBetween()
-	
+
 	if !r.useBetween {
 		t.Error("useBetween should be true after calling UseBetween")
 	}
@@ -66,11 +79,13 @@ func TestUseBetween(t *testing.T) {
 }
 
 func TestNewTimeRange(t *testing.T) {
+	t.Parallel()
 	t.Run("with non-zero times", func(t *testing.T) {
+		t.Parallel()
 		start := time.Now()
 		end := start.Add(time.Hour)
 		r := NewTimeRange(start, end)
-		
+
 		if r.Start == nil || !r.Start.Equal(start) {
 			t.Errorf("Start = %v, want %v", r.Start, start)
 		}
@@ -80,8 +95,9 @@ func TestNewTimeRange(t *testing.T) {
 	})
 
 	t.Run("with zero times", func(t *testing.T) {
+		t.Parallel()
 		r := NewTimeRange(time.Time{}, time.Time{})
-		
+
 		if r.Start != nil {
 			t.Error("Start should be nil for zero time")
 		}
@@ -91,9 +107,10 @@ func TestNewTimeRange(t *testing.T) {
 	})
 
 	t.Run("with mixed zero and non-zero times", func(t *testing.T) {
+		t.Parallel()
 		now := time.Now()
 		r := NewTimeRange(now, time.Time{})
-		
+
 		if r.Start == nil || !r.Start.Equal(now) {
 			t.Errorf("Start = %v, want %v", r.Start, now)
 		}
@@ -104,9 +121,11 @@ func TestNewTimeRange(t *testing.T) {
 }
 
 func TestNewIntRange(t *testing.T) {
+	t.Parallel()
 	t.Run("with non-zero values", func(t *testing.T) {
+		t.Parallel()
 		r := NewIntRange(100, 200)
-		
+
 		if r.Start == nil || *r.Start != 100 {
 			t.Errorf("Start = %v, want 100", r.Start)
 		}
@@ -116,8 +135,9 @@ func TestNewIntRange(t *testing.T) {
 	})
 
 	t.Run("with zero values", func(t *testing.T) {
+		t.Parallel()
 		r := NewIntRange(0, 0)
-		
+
 		if r.Start != nil {
 			t.Error("Start should be nil for zero value")
 		}
@@ -128,9 +148,11 @@ func TestNewIntRange(t *testing.T) {
 }
 
 func TestNewInt32Range(t *testing.T) {
+	t.Parallel()
 	t.Run("with non-zero values", func(t *testing.T) {
+		t.Parallel()
 		r := NewInt32Range(100, 200)
-		
+
 		if r.Start == nil || *r.Start != 100 {
 			t.Errorf("Start = %v, want 100", r.Start)
 		}
@@ -140,8 +162,9 @@ func TestNewInt32Range(t *testing.T) {
 	})
 
 	t.Run("with zero values", func(t *testing.T) {
+		t.Parallel()
 		r := NewInt32Range(0, 0)
-		
+
 		if r.Start != nil {
 			t.Error("Start should be nil for zero value")
 		}
@@ -152,9 +175,11 @@ func TestNewInt32Range(t *testing.T) {
 }
 
 func TestNewInt64Range(t *testing.T) {
+	t.Parallel()
 	t.Run("with non-zero values", func(t *testing.T) {
+		t.Parallel()
 		r := NewInt64Range(100, 200)
-		
+
 		if r.Start == nil || *r.Start != 100 {
 			t.Errorf("Start = %v, want 100", r.Start)
 		}
@@ -164,8 +189,9 @@ func TestNewInt64Range(t *testing.T) {
 	})
 
 	t.Run("with zero values", func(t *testing.T) {
+		t.Parallel()
 		r := NewInt64Range(0, 0)
-		
+
 		if r.Start != nil {
 			t.Error("Start should be nil for zero value")
 		}
@@ -176,9 +202,11 @@ func TestNewInt64Range(t *testing.T) {
 }
 
 func TestNewUintRange(t *testing.T) {
+	t.Parallel()
 	t.Run("with non-zero values", func(t *testing.T) {
+		t.Parallel()
 		r := NewUintRange(100, 200)
-		
+
 		if r.Start == nil || *r.Start != 100 {
 			t.Errorf("Start = %v, want 100", r.Start)
 		}
@@ -188,8 +216,9 @@ func TestNewUintRange(t *testing.T) {
 	})
 
 	t.Run("with zero values", func(t *testing.T) {
+		t.Parallel()
 		r := NewUintRange(0, 0)
-		
+
 		if r.Start != nil {
 			t.Error("Start should be nil for zero value")
 		}
@@ -200,9 +229,11 @@ func TestNewUintRange(t *testing.T) {
 }
 
 func TestNewUint32Range(t *testing.T) {
+	t.Parallel()
 	t.Run("with non-zero values", func(t *testing.T) {
+		t.Parallel()
 		r := NewUint32Range(100, 200)
-		
+
 		if r.Start == nil || *r.Start != 100 {
 			t.Errorf("Start = %v, want 100", r.Start)
 		}
@@ -212,8 +243,9 @@ func TestNewUint32Range(t *testing.T) {
 	})
 
 	t.Run("with zero values", func(t *testing.T) {
+		t.Parallel()
 		r := NewUint32Range(0, 0)
-		
+
 		if r.Start != nil {
 			t.Error("Start should be nil for zero value")
 		}
@@ -224,9 +256,11 @@ func TestNewUint32Range(t *testing.T) {
 }
 
 func TestNewUint64Range(t *testing.T) {
+	t.Parallel()
 	t.Run("with non-zero values", func(t *testing.T) {
+		t.Parallel()
 		r := NewUint64Range(100, 200)
-		
+
 		if r.Start == nil || *r.Start != 100 {
 			t.Errorf("Start = %v, want 100", r.Start)
 		}
@@ -236,8 +270,9 @@ func TestNewUint64Range(t *testing.T) {
 	})
 
 	t.Run("with zero values", func(t *testing.T) {
+		t.Parallel()
 		r := NewUint64Range(0, 0)
-		
+
 		if r.Start != nil {
 			t.Error("Start should be nil for zero value")
 		}
@@ -247,127 +282,112 @@ func TestNewUint64Range(t *testing.T) {
 	})
 }
 
+// TestRangeBuild tests the Build method of Range.
 func TestRangeBuild(t *testing.T) {
-	t.Run("with nil start and end", func(t *testing.T) {
-		r := New[int](nil, nil)
-		fields := statement.NewSimpleFields("id", "name")
-		st := statement.New("test_table", fields)
-		
-		r.Build("test_field", st)
-		
-		if !st.Where.IsEmpty() {
-			t.Error("Should not add conditions when both start and end are nil")
-		}
-	})
+	t.Parallel()
 
-	t.Run("with both start and end using InRange", func(t *testing.T) {
-		start := 10
-		end := 20
-		r := New(&start, &end)
-		fields := statement.NewSimpleFields("id", "name")
-		st := statement.New("test_table", fields)
-		
-		r.Build("test_field", st)
-		
-		if st.Where.IsEmpty() {
-			t.Error("Should add one condition")
-		}
-		// The condition should be an InRange expression
-		sql, args := st.Build()
-		if !contains(sql, "WHERE") || !contains(sql, "test_field") {
-			t.Errorf("Expected WHERE clause with test_field, got: %s", sql)
-		}
-		if len(args) != 2 {
-			t.Errorf("Expected 2 args for InRange, got %d", len(args))
-		}
-	})
+	// Helper function to create a test case
+	testCases := []struct {
+		name       string
+		start      *int
+		end        *int
+		useBetween bool
+		expectSQL  []string
+		expectArgs int
+	}{
+		{
+			name:       "with nil start and end",
+			start:      nil,
+			end:        nil,
+			useBetween: false,
+			expectSQL:  []string{},
+			expectArgs: 0,
+		},
+		{
+			name:       "with both start and end using InRange",
+			start:      intPtr(10),
+			end:        intPtr(20),
+			useBetween: false,
+			expectSQL:  []string{"WHERE", "test_field"},
+			expectArgs: 2,
+		},
+		{
+			name:       "with both start and end using Between",
+			start:      intPtr(10),
+			end:        intPtr(20),
+			useBetween: true,
+			expectSQL:  []string{"WHERE", "BETWEEN"},
+			expectArgs: 2,
+		},
+		{
+			name:       "with only start",
+			start:      intPtr(10),
+			end:        nil,
+			useBetween: false,
+			expectSQL:  []string{"WHERE", ">="},
+			expectArgs: 1,
+		},
+		{
+			name:       "with only end using Lt",
+			start:      nil,
+			end:        intPtr(20),
+			useBetween: false,
+			expectSQL:  []string{"WHERE", "<"},
+			expectArgs: 1,
+		},
+		{
+			name:       "with only end using Lte (with UseBetween)",
+			start:      nil,
+			end:        intPtr(20),
+			useBetween: true,
+			expectSQL:  []string{"WHERE", "<="},
+			expectArgs: 1,
+		},
+	}
 
-	t.Run("with both start and end using Between", func(t *testing.T) {
-		start := 10
-		end := 20
-		r := New(&start, &end).UseBetween()
-		fields := statement.NewSimpleFields("id", "name")
-		st := statement.New("test_table", fields)
-		
-		r.Build("test_field", st)
-		
-		if st.Where.IsEmpty() {
-			t.Error("Should add one condition")
-		}
-		// The condition should be a Between expression
-		sql, args := st.Build()
-		if !contains(sql, "WHERE") || !contains(sql, "BETWEEN") {
-			t.Errorf("Expected WHERE clause with BETWEEN, got: %s", sql)
-		}
-		if len(args) != 2 {
-			t.Errorf("Expected 2 args for BETWEEN, got %d", len(args))
-		}
-	})
+	for _, tc := range testCases {
+		t.Run(tc.name, func(t *testing.T) {
+			t.Parallel()
 
-	t.Run("with only start", func(t *testing.T) {
-		start := 10
-		r := New(&start, nil)
-		fields := statement.NewSimpleFields("id", "name")
-		st := statement.New("test_table", fields)
-		
-		r.Build("test_field", st)
-		
-		if st.Where.IsEmpty() {
-			t.Error("Should add one condition")
-		}
-		// The condition should be a Gte expression
-		sql, args := st.Build()
-		if !contains(sql, "WHERE") || !contains(sql, ">=") {
-			t.Errorf("Expected WHERE clause with >=, got: %s", sql)
-		}
-		if len(args) != 1 {
-			t.Errorf("Expected 1 arg for >=, got %d", len(args))
-		}
-	})
+			r := New(tc.start, tc.end)
+			if tc.useBetween {
+				r.UseBetween()
+			}
 
-	t.Run("with only end using Lt", func(t *testing.T) {
-		end := 20
-		r := New[int](nil, &end)
-		fields := statement.NewSimpleFields("id", "name")
-		st := statement.New("test_table", fields)
-		
-		r.Build("test_field", st)
-		
-		if st.Where.IsEmpty() {
-			t.Error("Should add one condition")
-		}
-		// The condition should be a Lt expression
-		sql, args := st.Build()
-		if !contains(sql, "WHERE") || !contains(sql, "<") {
-			t.Errorf("Expected WHERE clause with <, got: %s", sql)
-		}
-		if len(args) != 1 {
-			t.Errorf("Expected 1 arg for <, got %d", len(args))
-		}
-	})
+			fields := statement.NewSimpleFields("id", "name")
+			st := statement.New("test_table", fields)
 
-	t.Run("with only end using Lte (with UseBetween)", func(t *testing.T) {
-		end := 20
-		r := New[int](nil, &end).UseBetween()
-		fields := statement.NewSimpleFields("id", "name")
-		st := statement.New("test_table", fields)
-		
-		r.Build("test_field", st)
-		
-		if st.Where.IsEmpty() {
-			t.Error("Should add one condition")
-		}
-		// The condition should be a Lte expression
-		sql, args := st.Build()
-		if !contains(sql, "WHERE") || !contains(sql, "<=") {
-			t.Errorf("Expected WHERE clause with <=, got: %s", sql)
-		}
-		if len(args) != 1 {
-			t.Errorf("Expected 1 arg for <=, got %d", len(args))
-		}
-	})
+			r.Build("test_field", st)
+
+			if len(tc.expectSQL) == 0 {
+				if !st.Where.IsEmpty() {
+					t.Error("Should not add conditions when both start and end are nil")
+				}
+				return
+			}
+
+			if st.Where.IsEmpty() {
+				t.Error("Should add one condition")
+			}
+
+			sql, args := st.Build()
+			for _, expected := range tc.expectSQL {
+				if !contains(sql, expected) {
+					t.Errorf("Expected SQL to contain %q, got: %s", expected, sql)
+				}
+			}
+
+			if len(args) != tc.expectArgs {
+				t.Errorf("Expected %d args, got %d", tc.expectArgs, len(args))
+			}
+		})
+	}
 }
 
 func contains(s, substr string) bool {
 	return strings.Contains(s, substr)
+}
+
+func intPtr(i int) *int {
+	return &i
 }
