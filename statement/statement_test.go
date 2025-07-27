@@ -12,9 +12,19 @@ func TestNewStatement(t *testing.T) {
 	fields := NewSimpleFields("id", "name", "email")
 	s := New("users", fields)
 
-	if s.Table.content != "users" {
-		t.Errorf("NewStatement() table = %v, want %v", s.Table.content, "users")
+	if s.Table == nil {
+		t.Errorf("NewStatement() Table should not be nil")
 	}
+	{
+		r, args := s.Table.Build()
+		if r != "users" {
+			t.Errorf("NewStatement() Table content = %v, want %v", r, "users")
+		}
+		if len(args) != 0 {
+			t.Errorf("NewStatement() Table values = %v, want empty slice", args)
+		}
+	}
+
 	if !reflect.DeepEqual(s.Fields, fields) {
 		t.Errorf("NewStatement() fields = %v, want %v", s.Fields, fields)
 	}
