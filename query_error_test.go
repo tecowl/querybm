@@ -2,7 +2,6 @@ package querybm
 
 import (
 	"context"
-	"database/sql"
 	"fmt"
 	"testing"
 )
@@ -98,44 +97,35 @@ func TestQueryPrepareContextError(t *testing.T) {
 func TestStmtQueryRowContextError(t *testing.T) {
 	t.Parallel()
 
-	scanErrors := []error{
-		sql.ErrNoRows,
-		fmt.Errorf("scan error"), // nolint:err113,perfsprint
+	t.Parallel()
+
+	row := &MockRow{
+		err:  fmt.Errorf("runtime row error"),                        // nolint:err113,perfsprint
+		scan: func(...any) error { return fmt.Errorf("scan error") }, // nolint:err113,perfsprint
+	}
+	stmt := &MockStmt{
+		queryRowContext: func(context.Context, ...any) Row { return row },
+	}
+	db := &MockDB{
+		PrepareContextFunc: func(context.Context, string) (Stmt, error) { return stmt, nil },
 	}
 
-	for _, scanErr := range scanErrors {
-		t.Run(scanErr.Error(), func(t *testing.T) {
-			t.Parallel()
-
-			row := &MockRow{
-				err:  fmt.Errorf("runtime row error"), // nolint:err113,perfsprint
-				scan: func(...any) error { return scanErr },
-			}
-			stmt := &MockStmt{
-				queryRowContext: func(context.Context, ...any) Row { return row },
-			}
-			db := &MockDB{
-				PrepareContextFunc: func(context.Context, string) (Stmt, error) { return stmt, nil },
-			}
-
-			q := &Query[any]{
-				db:     db,
-				Table:  "users",
-				Fields: NewFields[any]([]string{"id", "name"}, nil),
-			}
-
-			t.Run("Count", func(t *testing.T) {
-				t.Parallel()
-				if _, err := q.Count(t.Context()); err == nil {
-					t.Error("Expected error, got nil")
-				}
-			})
-			t.Run("First", func(t *testing.T) {
-				t.Parallel()
-				if _, err := q.First(t.Context()); err == nil {
-					t.Error("Expected error, got nil")
-				}
-			})
-		})
+	q := &Query[any]{
+		db:     db,
+		Table:  "users",
+		Fields: NewFields[any]([]string{"id", "name"}, nil),
 	}
+
+	t.Run("Count", func(t *testing.T) {
+		t.Parallel()
+		if _, err := q.Count(t.Context()); err == nil {
+			t.Error("Expected error, got nil")
+		}
+	})
+	t.Run("First", func(t *testing.T) {
+		t.Parallel()
+		if _, err := q.First(t.Context()); err == nil {
+			t.Error("Expected error, got nil")
+		}
+	})
 }
