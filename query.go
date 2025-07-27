@@ -9,7 +9,7 @@ import (
 )
 
 // Query represents a SQL query builder with generic support for models, conditions, and sorting.
-// It provides methods to build and execute SELECT queries with pagination support.
+// It provides methods to build and execute SELECT queries with limitOffset support.
 type Query[M any] struct {
 	db         DB
 	Table      string
@@ -25,19 +25,19 @@ type Query[M any] struct {
 // fields: The field mapper that defines how to map database rows to model instances. This is used for mapping in List method.
 // c: The condition to apply to the query. This is used for List and Count methods.
 // s: The sort item to apply to the query. This is used for ordering the results in List method.
-// pagination: The pagination settings for the query. This is used to limit the number of results returned in List method.
-func New[M any](db *sql.DB, table string, fields FieldMapper[M], c Condition, s Sort, pagination *LimitOffset) *Query[M] {
+// limitOffset: The limitOffset settings for the query. This is used to limit the number of results returned in List method.
+func New[M any](db *sql.DB, table string, fields FieldMapper[M], c Condition, s Sort, limitOffset *LimitOffset) *Query[M] {
 	return &Query[M]{
 		db:         newDBWrapper(db),
 		Table:      table,
 		Fields:     fields,
 		Condition:  c,
 		Sort:       s,
-		LimitOffset: pagination,
+		LimitOffset: limitOffset,
 	}
 }
 
-// Validate validates the query's condition, sort, and pagination components.
+// Validate validates the query's condition, sort, and limitOffset components.
 // It returns an error if any component's validation fails.
 func (q *Query[M]) Validate() error {
 	if v, ok := any(q.Condition).(Validatable); ok {
@@ -51,7 +51,7 @@ func (q *Query[M]) Validate() error {
 		}
 	}
 	if err := q.LimitOffset.Validate(); err != nil {
-		return fmt.Errorf("pagination validation failed: %w", err)
+		return fmt.Errorf("limitOffset validation failed: %w", err)
 	}
 	return nil
 }
@@ -68,7 +68,7 @@ func (q *Query[M]) BuildCountSelect() (string, []any) {
 	return st.Build()
 }
 
-// BuildRowsSelect builds a SELECT query string with all fields, conditions, sorting, and pagination.
+// BuildRowsSelect builds a SELECT query string with all fields, conditions, sorting, and limitOffset.
 // It returns the SQL query string and its arguments.
 func (q *Query[M]) BuildRowsSelect() (string, []any) {
 	st := statement.New(q.Table, q.Fields)

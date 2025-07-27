@@ -98,37 +98,37 @@ func TestLimitOffset_Validate(t *testing.T) {
 	t.Parallel()
 	tests := []struct {
 		name       string
-		pagination *LimitOffset
+		limitOffset *LimitOffset
 		wantLimit  int64
 		wantOffset int64
 	}{
 		{
-			name:       "Valid pagination",
-			pagination: &LimitOffset{limit: 50, offset: 10},
+			name:       "Valid limitOffset",
+			limitOffset: &LimitOffset{limit: 50, offset: 10},
 			wantLimit:  50,
 			wantOffset: 10,
 		},
 		{
 			name:       "Zero limit corrected to default",
-			pagination: &LimitOffset{limit: 0, offset: 20},
+			limitOffset: &LimitOffset{limit: 0, offset: 20},
 			wantLimit:  100,
 			wantOffset: 20,
 		},
 		{
 			name:       "Negative limit corrected to default",
-			pagination: &LimitOffset{limit: -5, offset: 30},
+			limitOffset: &LimitOffset{limit: -5, offset: 30},
 			wantLimit:  100,
 			wantOffset: 30,
 		},
 		{
 			name:       "Negative offset corrected to zero",
-			pagination: &LimitOffset{limit: 25, offset: -10},
+			limitOffset: &LimitOffset{limit: 25, offset: -10},
 			wantLimit:  25,
 			wantOffset: 0,
 		},
 		{
 			name:       "Both invalid corrected",
-			pagination: &LimitOffset{limit: -1, offset: -1},
+			limitOffset: &LimitOffset{limit: -1, offset: -1},
 			wantLimit:  100,
 			wantOffset: 0,
 		},
@@ -137,15 +137,15 @@ func TestLimitOffset_Validate(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			t.Parallel()
-			err := tt.pagination.Validate()
+			err := tt.limitOffset.Validate()
 			if err != nil {
 				t.Errorf("Validate() error = %v, want nil", err)
 			}
-			if tt.pagination.limit != tt.wantLimit {
-				t.Errorf("Validate() limit = %d, want %d", tt.pagination.limit, tt.wantLimit)
+			if tt.limitOffset.limit != tt.wantLimit {
+				t.Errorf("Validate() limit = %d, want %d", tt.limitOffset.limit, tt.wantLimit)
 			}
-			if tt.pagination.offset != tt.wantOffset {
-				t.Errorf("Validate() offset = %d, want %d", tt.pagination.offset, tt.wantOffset)
+			if tt.limitOffset.offset != tt.wantOffset {
+				t.Errorf("Validate() offset = %d, want %d", tt.limitOffset.offset, tt.wantOffset)
 			}
 		})
 	}
@@ -155,49 +155,49 @@ func TestLimitOffset_Build(t *testing.T) {
 	t.Parallel()
 	tests := []struct {
 		name        string
-		pagination  *LimitOffset
+		limitOffset  *LimitOffset
 		wantContent string
 		wantValues  []any
 	}{
 		{
 			name:        "Limit only",
-			pagination:  &LimitOffset{limit: 10, offset: 0},
+			limitOffset:  &LimitOffset{limit: 10, offset: 0},
 			wantContent: "LIMIT ?",
 			wantValues:  []any{int64(10)},
 		},
 		{
 			name:        "Limit and offset",
-			pagination:  &LimitOffset{limit: 20, offset: 40},
+			limitOffset:  &LimitOffset{limit: 20, offset: 40},
 			wantContent: "LIMIT ? OFFSET ?",
 			wantValues:  []any{int64(20), int64(40)},
 		},
 		{
-			name:        "Zero limit (no pagination added)",
-			pagination:  &LimitOffset{limit: 0, offset: 50},
+			name:        "Zero limit (no limitOffset added)",
+			limitOffset:  &LimitOffset{limit: 0, offset: 50},
 			wantContent: "",
 			wantValues:  []any{},
 		},
 		{
-			name:        "Negative limit (no pagination added)",
-			pagination:  &LimitOffset{limit: -10, offset: 50},
+			name:        "Negative limit (no limitOffset added)",
+			limitOffset:  &LimitOffset{limit: -10, offset: 50},
 			wantContent: "",
 			wantValues:  []any{},
 		},
 		{
 			name:        "Large values",
-			pagination:  &LimitOffset{limit: 1000, offset: 10000},
+			limitOffset:  &LimitOffset{limit: 1000, offset: 10000},
 			wantContent: "LIMIT ? OFFSET ?",
 			wantValues:  []any{int64(1000), int64(10000)},
 		},
 		{
 			name:        "Limit with zero offset (no OFFSET clause)",
-			pagination:  &LimitOffset{limit: 50, offset: 0},
+			limitOffset:  &LimitOffset{limit: 50, offset: 0},
 			wantContent: "LIMIT ?",
 			wantValues:  []any{int64(50)},
 		},
 		{
 			name:        "Limit with negative offset (no OFFSET clause)",
-			pagination:  &LimitOffset{limit: 50, offset: -10},
+			limitOffset:  &LimitOffset{limit: 50, offset: -10},
 			wantContent: "LIMIT ?",
 			wantValues:  []any{int64(50)},
 		},
@@ -207,10 +207,10 @@ func TestLimitOffset_Build(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			t.Parallel()
 			stmt := statement.New("test_table", statement.NewSimpleFields("id"))
-			tt.pagination.Build(stmt)
+			tt.limitOffset.Build(stmt)
 
 			if stmt.LimitOffset.IsEmpty() && tt.wantContent != "" {
-				t.Error("Build() did not add pagination when expected")
+				t.Error("Build() did not add limitOffset when expected")
 			}
 
 			// Use reflection to access private fields for testing

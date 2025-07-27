@@ -85,9 +85,9 @@ func TestQueryDatabaseMethods(t *testing.T) {
 
 		condition := &ValidatableTestCondition{shouldFail: true}
 		sort := &TestSort{}
-		pagination := querybm.NewLimitOffset(10, 0)
+		limitOffset := querybm.NewLimitOffset(10, 0)
 
-		query := querybm.New(db, "authors", fields, condition, sort, pagination)
+		query := querybm.New(db, "authors", fields, condition, sort, limitOffset)
 
 		err := query.Validate()
 		assert.Error(t, err)
@@ -104,9 +104,9 @@ func TestQueryDatabaseMethods(t *testing.T) {
 
 		condition := &TestCondition{}
 		sort := &ValidatableTestSort{shouldFail: true}
-		pagination := querybm.NewLimitOffset(10, 0)
+		limitOffset := querybm.NewLimitOffset(10, 0)
 
-		query := querybm.New(db, "authors", fields, condition, sort, pagination)
+		query := querybm.New(db, "authors", fields, condition, sort, limitOffset)
 
 		err := query.Validate()
 		assert.Error(t, err)
@@ -123,9 +123,9 @@ func TestQueryDatabaseMethods(t *testing.T) {
 
 		condition := &TestCondition{}
 		sort := &TestSort{}
-		pagination := querybm.NewLimitOffset(10, 0)
+		limitOffset := querybm.NewLimitOffset(10, 0)
 
-		query := querybm.New(db, "authors", fields, condition, sort, pagination)
+		query := querybm.New(db, "authors", fields, condition, sort, limitOffset)
 
 		stmt, args, err := query.RowsStatement(ctx)
 		require.NoError(t, err)
@@ -144,10 +144,10 @@ func TestQueryDatabaseMethods(t *testing.T) {
 
 		condition := &TestCondition{}
 		sort := &TestSort{}
-		pagination := querybm.NewLimitOffset(10, 0)
+		limitOffset := querybm.NewLimitOffset(10, 0)
 
 		// Use invalid table name to trigger error
-		query := querybm.New(db, "invalid_table_name_that_does_not_exist", fields, condition, sort, pagination)
+		query := querybm.New(db, "invalid_table_name_that_does_not_exist", fields, condition, sort, limitOffset)
 
 		stmt, args, err := query.RowsStatement(ctx)
 		assert.Error(t, err)
@@ -165,9 +165,9 @@ func TestQueryDatabaseMethods(t *testing.T) {
 
 		condition := &TestCondition{}
 		sort := &TestSort{}
-		pagination := querybm.NewLimitOffset(10, 0)
+		limitOffset := querybm.NewLimitOffset(10, 0)
 
-		query := querybm.New(db, "authors", fields, condition, sort, pagination)
+		query := querybm.New(db, "authors", fields, condition, sort, limitOffset)
 
 		stmt, args, err := query.CountStatement(ctx)
 		require.NoError(t, err)
@@ -186,10 +186,10 @@ func TestQueryDatabaseMethods(t *testing.T) {
 
 		condition := &TestCondition{}
 		sort := &TestSort{}
-		pagination := querybm.NewLimitOffset(10, 0)
+		limitOffset := querybm.NewLimitOffset(10, 0)
 
 		// Use invalid table name to trigger error
-		query := querybm.New(db, "invalid_table_name_that_does_not_exist", fields, condition, sort, pagination)
+		query := querybm.New(db, "invalid_table_name_that_does_not_exist", fields, condition, sort, limitOffset)
 
 		stmt, args, err := query.CountStatement(ctx)
 		assert.Error(t, err)
@@ -207,9 +207,9 @@ func TestQueryDatabaseMethods(t *testing.T) {
 
 		condition := &TestCondition{}
 		sort := &TestSort{}
-		pagination := querybm.NewLimitOffset(10, 0)
+		limitOffset := querybm.NewLimitOffset(10, 0)
 
-		query := querybm.New(db, "authors", fields, condition, sort, pagination)
+		query := querybm.New(db, "authors", fields, condition, sort, limitOffset)
 
 		count, err := query.Count(ctx)
 		require.NoError(t, err)
@@ -226,10 +226,10 @@ func TestQueryDatabaseMethods(t *testing.T) {
 
 		condition := &TestCondition{}
 		sort := &TestSort{}
-		pagination := querybm.NewLimitOffset(10, 0)
+		limitOffset := querybm.NewLimitOffset(10, 0)
 
 		// Use invalid table name to trigger error
-		query := querybm.New(db, "invalid_table_name", fields, condition, sort, pagination)
+		query := querybm.New(db, "invalid_table_name", fields, condition, sort, limitOffset)
 
 		count, err := query.Count(ctx)
 		assert.Error(t, err)
@@ -247,9 +247,9 @@ func TestQueryDatabaseMethods(t *testing.T) {
 		// Create a condition that will match no rows
 		condition := &TestCondition{whereClause: "impossible_name_that_does_not_exist"}
 		sort := &TestSort{}
-		pagination := querybm.NewLimitOffset(10, 0)
+		limitOffset := querybm.NewLimitOffset(10, 0)
 
-		query := querybm.New(db, "authors", fields, condition, sort, pagination)
+		query := querybm.New(db, "authors", fields, condition, sort, limitOffset)
 
 		count, err := query.Count(ctx)
 		require.NoError(t, err)
@@ -266,9 +266,9 @@ func TestQueryDatabaseMethods(t *testing.T) {
 
 		condition := &TestCondition{}
 		sort := &TestSort{}
-		pagination := querybm.NewLimitOffset(1, 0)
+		limitOffset := querybm.NewLimitOffset(1, 0)
 
-		query := querybm.New(db, "authors", fields, condition, sort, pagination)
+		query := querybm.New(db, "authors", fields, condition, sort, limitOffset)
 
 		row, err := query.FirstRow(ctx)
 		require.NoError(t, err)
@@ -290,10 +290,10 @@ func TestQueryDatabaseMethods(t *testing.T) {
 
 		condition := &TestCondition{}
 		sort := &TestSort{}
-		pagination := querybm.NewLimitOffset(1, 0)
+		limitOffset := querybm.NewLimitOffset(1, 0)
 
 		// Use invalid table name to trigger error
-		query := querybm.New(db, "invalid_table_name", fields, condition, sort, pagination)
+		query := querybm.New(db, "invalid_table_name", fields, condition, sort, limitOffset)
 
 		row, err := query.FirstRow(ctx)
 		assert.Error(t, err)
@@ -310,9 +310,9 @@ func TestQueryDatabaseMethods(t *testing.T) {
 
 		condition := &TestCondition{}
 		sort := &TestSort{}
-		pagination := querybm.NewLimitOffset(10, 0)
+		limitOffset := querybm.NewLimitOffset(10, 0)
 
-		query := querybm.New(db, "authors", fields, condition, sort, pagination)
+		query := querybm.New(db, "authors", fields, condition, sort, limitOffset)
 
 		rows, err := query.Rows(ctx)
 		require.NoError(t, err)
@@ -330,10 +330,10 @@ func TestQueryDatabaseMethods(t *testing.T) {
 
 		condition := &TestCondition{}
 		sort := &TestSort{}
-		pagination := querybm.NewLimitOffset(10, 0)
+		limitOffset := querybm.NewLimitOffset(10, 0)
 
 		// Use invalid table name to trigger error
-		query := querybm.New(db, "invalid_table_name", fields, condition, sort, pagination)
+		query := querybm.New(db, "invalid_table_name", fields, condition, sort, limitOffset)
 
 		rows, err := query.Rows(ctx)
 		assert.Error(t, err)
@@ -350,9 +350,9 @@ func TestQueryDatabaseMethods(t *testing.T) {
 
 		condition := &TestCondition{}
 		sort := &TestSort{}
-		pagination := querybm.NewLimitOffset(1, 0)
+		limitOffset := querybm.NewLimitOffset(1, 0)
 
-		query := querybm.New(db, "authors", fields, condition, sort, pagination)
+		query := querybm.New(db, "authors", fields, condition, sort, limitOffset)
 
 		author, err := query.First(ctx)
 		require.NoError(t, err)
@@ -369,10 +369,10 @@ func TestQueryDatabaseMethods(t *testing.T) {
 
 		condition := &TestCondition{}
 		sort := &TestSort{}
-		pagination := querybm.NewLimitOffset(1, 0)
+		limitOffset := querybm.NewLimitOffset(1, 0)
 
 		// Use invalid table name to trigger error
-		query := querybm.New(db, "invalid_table_name", fields, condition, sort, pagination)
+		query := querybm.New(db, "invalid_table_name", fields, condition, sort, limitOffset)
 
 		author, err := query.First(ctx)
 		assert.Error(t, err)
@@ -390,9 +390,9 @@ func TestQueryDatabaseMethods(t *testing.T) {
 
 		condition := &TestCondition{}
 		sort := &TestSort{}
-		pagination := querybm.NewLimitOffset(1, 0)
+		limitOffset := querybm.NewLimitOffset(1, 0)
 
-		query := querybm.New(db, "authors", fields, condition, sort, pagination)
+		query := querybm.New(db, "authors", fields, condition, sort, limitOffset)
 
 		author, err := query.First(ctx)
 		assert.Error(t, err)
@@ -410,9 +410,9 @@ func TestQueryDatabaseMethods(t *testing.T) {
 
 		condition := &TestCondition{}
 		sort := &TestSort{}
-		pagination := querybm.NewLimitOffset(10, 0)
+		limitOffset := querybm.NewLimitOffset(10, 0)
 
-		query := querybm.New(db, "authors", fields, condition, sort, pagination)
+		query := querybm.New(db, "authors", fields, condition, sort, limitOffset)
 
 		list, err := query.List(ctx)
 		require.NoError(t, err)
@@ -430,10 +430,10 @@ func TestQueryDatabaseMethods(t *testing.T) {
 
 		condition := &TestCondition{}
 		sort := &TestSort{}
-		pagination := querybm.NewLimitOffset(10, 0)
+		limitOffset := querybm.NewLimitOffset(10, 0)
 
 		// Use invalid table name to trigger error
-		query := querybm.New(db, "invalid_table_name", fields, condition, sort, pagination)
+		query := querybm.New(db, "invalid_table_name", fields, condition, sort, limitOffset)
 
 		list, err := query.List(ctx)
 		assert.Error(t, err)
@@ -451,9 +451,9 @@ func TestQueryDatabaseMethods(t *testing.T) {
 
 		condition := &TestCondition{}
 		sort := &TestSort{}
-		pagination := querybm.NewLimitOffset(10, 0)
+		limitOffset := querybm.NewLimitOffset(10, 0)
 
-		query := querybm.New(db, "authors", fields, condition, sort, pagination)
+		query := querybm.New(db, "authors", fields, condition, sort, limitOffset)
 
 		list, err := query.List(ctx)
 		assert.Error(t, err)
@@ -481,9 +481,9 @@ func TestRowErrorHandling(t *testing.T) {
 			st.Where.Add(expr.Field("invalid_column", expr.Eq("value")))
 		})
 		sort := &TestSort{}
-		pagination := querybm.NewLimitOffset(1, 0)
+		limitOffset := querybm.NewLimitOffset(1, 0)
 
-		query := querybm.New(db, "authors", fields, condition, sort, pagination)
+		query := querybm.New(db, "authors", fields, condition, sort, limitOffset)
 
 		// This should fail during statement preparation
 		stmt, args, err := query.RowsStatement(ctx)

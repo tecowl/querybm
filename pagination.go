@@ -7,17 +7,17 @@ import (
 const (
 	// defaultLimit is the default number of rows to return per page.
 	defaultLimit = 100
-	// defaultOffset is the default starting position for pagination.
+	// defaultOffset is the default starting position for limitOffset.
 	defaultOffset = 0
 )
 
-// DefaultLimitOffset provides a pagination instance with default values.
+// DefaultLimitOffset provides a limitOffset instance with default values.
 var DefaultLimitOffset = &LimitOffset{
 	limit:  defaultLimit,
 	offset: defaultOffset,
 }
 
-// LimitOffset represents pagination parameters for SQL queries.
+// LimitOffset represents limitOffset parameters for SQL queries.
 type LimitOffset struct {
 	limit  int64
 	offset int64
@@ -39,7 +39,7 @@ func NewLimitOffset(limit, offset int64) *LimitOffset {
 	}
 }
 
-// Validate ensures the pagination parameters are valid.
+// Validate ensures the limitOffset parameters are valid.
 // It sets default values if the current values are invalid.
 func (p *LimitOffset) Validate() error {
 	if p.limit <= 0 {

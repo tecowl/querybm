@@ -69,9 +69,9 @@ func TestNew(t *testing.T) {
 	fields := NewFields([]string{"id", "name"}, func(s Scanner, m *TestModel) error {
 		return s.Scan(&m.ID, &m.Name)
 	})
-	pagination := NewLimitOffset(10, 0)
+	limitOffset := NewLimitOffset(10, 0)
 
-	query := New(db, "users", fields, condition, sort, pagination)
+	query := New(db, "users", fields, condition, sort, limitOffset)
 
 	if query.Table != "users" {
 		t.Errorf("New() Table = %v, want %v", query.Table, "users")
@@ -82,7 +82,7 @@ func TestNew(t *testing.T) {
 	if query.Sort != sort {
 		t.Error("New() Sort not set correctly")
 	}
-	if query.LimitOffset != pagination {
+	if query.LimitOffset != limitOffset {
 		t.Error("New() LimitOffset not set correctly")
 	}
 }
@@ -102,8 +102,8 @@ func TestQuery_Validate(t *testing.T) {
 				condition := &ValidatableCondition{}
 				sort := &ValidatableSort{}
 				fields := NewFields[TestModel]([]string{"id"}, nil)
-				pagination := NewLimitOffset(10, 0)
-				return New(db, "users", fields, condition, sort, pagination)
+				limitOffset := NewLimitOffset(10, 0)
+				return New(db, "users", fields, condition, sort, limitOffset)
 			},
 			wantErr: false,
 		},
@@ -114,8 +114,8 @@ func TestQuery_Validate(t *testing.T) {
 				condition := &ValidatableCondition{validateErr: errors.New("invalid condition")} // nolint:err113
 				sort := &ValidatableSort{}
 				fields := NewFields[TestModel]([]string{"id"}, nil)
-				pagination := NewLimitOffset(10, 0)
-				return New(db, "users", fields, condition, sort, pagination)
+				limitOffset := NewLimitOffset(10, 0)
+				return New(db, "users", fields, condition, sort, limitOffset)
 			},
 			wantErr:       true,
 			wantErrString: "condition validation failed:",
@@ -127,8 +127,8 @@ func TestQuery_Validate(t *testing.T) {
 				condition := &ValidatableCondition{}
 				sort := &ValidatableSort{validateErr: errors.New("invalid sort")} // nolint:err113
 				fields := NewFields[TestModel]([]string{"id"}, nil)
-				pagination := NewLimitOffset(10, 0)
-				return New(db, "users", fields, condition, sort, pagination)
+				limitOffset := NewLimitOffset(10, 0)
+				return New(db, "users", fields, condition, sort, limitOffset)
 			},
 			wantErr:       true,
 			wantErrString: "sort validation failed:",
@@ -140,8 +140,8 @@ func TestQuery_Validate(t *testing.T) {
 				condition := &TestCondition{}
 				sort := &TestSort{}
 				fields := NewFields[TestModel]([]string{"id"}, nil)
-				pagination := NewLimitOffset(10, 0)
-				return New(db, "users", fields, condition, sort, pagination)
+				limitOffset := NewLimitOffset(10, 0)
+				return New(db, "users", fields, condition, sort, limitOffset)
 			},
 			wantErr: false,
 		},
@@ -179,8 +179,8 @@ func TestQuery_BuildCountSelect(t *testing.T) {
 				condition := &TestCondition{}
 				sort := &TestSort{}
 				fields := NewFields[TestModel]([]string{"id", "name"}, nil)
-				pagination := NewLimitOffset(10, 0)
-				return New(db, "users", fields, condition, sort, pagination)
+				limitOffset := NewLimitOffset(10, 0)
+				return New(db, "users", fields, condition, sort, limitOffset)
 			},
 			wantSQL:    "SELECT COUNT(*) AS count FROM users WHERE status = ?",
 			wantValues: []any{"active"},
@@ -192,8 +192,8 @@ func TestQuery_BuildCountSelect(t *testing.T) {
 				condition := &TestCondition{}
 				sort := &TestSort{}
 				fields := NewFields[TestModel]([]string{"id", "name"}, nil)
-				pagination := NewLimitOffset(10, 0)
-				return New(db, "products", fields, condition, sort, pagination)
+				limitOffset := NewLimitOffset(10, 0)
+				return New(db, "products", fields, condition, sort, limitOffset)
 			},
 			wantSQL:    "SELECT COUNT(*) AS count FROM products WHERE status = ?",
 			wantValues: []any{"active"},
@@ -230,21 +230,21 @@ func TestQuery_BuildRowsSelect(t *testing.T) {
 				condition := &TestCondition{}
 				sort := &TestSort{}
 				fields := NewFields[TestModel]([]string{"id", "name", "email"}, nil)
-				pagination := NewLimitOffset(20, 40)
-				return New(db, "users", fields, condition, sort, pagination)
+				limitOffset := NewLimitOffset(20, 40)
+				return New(db, "users", fields, condition, sort, limitOffset)
 			},
 			wantSQL:    "SELECT id, name, email FROM users WHERE status = ? ORDER BY created_at DESC LIMIT ? OFFSET ?",
 			wantValues: []any{"active", int64(20), int64(40)},
 		},
 		{
-			name: "Rows without pagination offset",
+			name: "Rows without limitOffset offset",
 			setupQuery: func() *Query[TestModel] {
 				db := &sql.DB{}
 				condition := &TestCondition{}
 				sort := &TestSort{}
 				fields := NewFields[TestModel]([]string{"id", "name"}, nil)
-				pagination := NewLimitOffset(10, 0)
-				return New(db, "users", fields, condition, sort, pagination)
+				limitOffset := NewLimitOffset(10, 0)
+				return New(db, "users", fields, condition, sort, limitOffset)
 			},
 			wantSQL:    "SELECT id, name FROM users WHERE status = ? ORDER BY created_at DESC LIMIT ?",
 			wantValues: []any{"active", int64(10)},
@@ -309,8 +309,8 @@ func TestQuery_Validate_WithValidatableComponents(t *testing.T) {
 				condition := &ValidatableCondition{validateErr: errConditionError}
 				sort := &TestSort{}
 				fields := NewFields[TestModel]([]string{"id", "name"}, nil)
-				pagination := NewLimitOffset(10, 0)
-				return New(db, "users", fields, condition, sort, pagination)
+				limitOffset := NewLimitOffset(10, 0)
+				return New(db, "users", fields, condition, sort, limitOffset)
 			},
 			wantError:   true,
 			errorString: "condition validation failed: condition error",
@@ -322,8 +322,8 @@ func TestQuery_Validate_WithValidatableComponents(t *testing.T) {
 				condition := &TestCondition{}
 				sort := &ValidatableSort{validateErr: errSortError}
 				fields := NewFields[TestModel]([]string{"id", "name"}, nil)
-				pagination := NewLimitOffset(10, 0)
-				return New(db, "users", fields, condition, sort, pagination)
+				limitOffset := NewLimitOffset(10, 0)
+				return New(db, "users", fields, condition, sort, limitOffset)
 			},
 			wantError:   true,
 			errorString: "sort validation failed: sort error",
@@ -335,8 +335,8 @@ func TestQuery_Validate_WithValidatableComponents(t *testing.T) {
 				condition := &ValidatableCondition{validateErr: nil}
 				sort := &ValidatableSort{validateErr: nil}
 				fields := NewFields[TestModel]([]string{"id", "name"}, nil)
-				pagination := NewLimitOffset(10, 0)
-				return New(db, "users", fields, condition, sort, pagination)
+				limitOffset := NewLimitOffset(10, 0)
+				return New(db, "users", fields, condition, sort, limitOffset)
 			},
 			wantError: false,
 		},
