@@ -120,6 +120,50 @@ func TestTableBlock_InnerJoin(t *testing.T) {
 			wantValues:  []any{"active"},
 		},
 		{
+			name:    "INNER JOIN duplicated alias name",
+			initial: "orders o",
+			joins: []struct {
+				table     string
+				condition string
+				values    []any
+			}{
+				{
+					table:     "customers c",
+					condition: "o.customer_id = c.id AND c.status = ?",
+					values:    []any{"active"},
+				},
+				{
+					table:     "customers c",
+					condition: "o.customer_id = c.id AND c.status = ? AND c.value IS NULL", // This will be ignored
+					values:    []any{"inactive"},                                           // This will be ignored
+				},
+			},
+			wantContent: "orders o INNER JOIN customers c ON o.customer_id = c.id AND c.status = ?",
+			wantValues:  []any{"active"},
+		},
+		{
+			name:    "INNER JOIN duplicated table name",
+			initial: "orders",
+			joins: []struct {
+				table     string
+				condition string
+				values    []any
+			}{
+				{
+					table:     "customers",
+					condition: "orders.customer_id = customers.id AND customers.status = ?",
+					values:    []any{"active"},
+				},
+				{
+					table:     "customers",
+					condition: "orders.customer_id = customers.id AND customers.status = ? AND customers.value IS NULL", // This will be ignored
+					values:    []any{"inactive"},                                                                        // This will be ignored
+				},
+			},
+			wantContent: "orders INNER JOIN customers ON orders.customer_id = customers.id AND customers.status = ?",
+			wantValues:  []any{"active"},
+		},
+		{
 			name:    "Multiple INNER JOINs",
 			initial: "orders o",
 			joins: []struct {
