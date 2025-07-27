@@ -6,14 +6,16 @@ import (
 	"github.com/tecowl/querybm"
 )
 
+func addAuthorsJoin(s *querybm.Statement) {
+	s.Table.InnerJoin("authors", "books.author_id = authors.author_id")
+}
+
 var columns querybm.FieldMapper[Book] = querybm.NewFields(
 	[]string{"book_id", "authors.author_id", "authors.name", "isbn", "book_type", "title", "yr", "available", "tags"},
 	func(rows querybm.Scanner, book *Book) error {
 		return rows.Scan(&book.BookID, &book.AuthorID, &book.AuthorName, &book.Isbn, &book.BookType, &book.Title, &book.Yr, &book.Available, &book.Tags)
 	},
-	func(s *querybm.Statement) {
-		s.Table.InnerJoin("authors", "books.author_id = authors.author_id")
-	},
+	addAuthorsJoin,
 )
 
 var sort = querybm.NewSortItem("title", false)
