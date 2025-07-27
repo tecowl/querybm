@@ -11,6 +11,9 @@ var columns querybm.FieldMapper[Book] = querybm.NewFields(
 	func(rows querybm.Scanner, book *Book) error {
 		return rows.Scan(&book.BookID, &book.AuthorID, &book.AuthorName, &book.Isbn, &book.BookType, &book.Title, &book.Yr, &book.Available, &book.Tags)
 	},
+	func(s *querybm.Statement) {
+		s.Table.InnerJoin("authors", "books.author_id = authors.author_id")
+	},
 )
 
 var sort = querybm.NewSortItem("title", false)
