@@ -97,40 +97,40 @@ func TestNewLimitOffset(t *testing.T) {
 func TestLimitOffset_Validate(t *testing.T) {
 	t.Parallel()
 	tests := []struct {
-		name       string
-		limitOffset *LimitOffset
-		wantLimit  int64
-		wantOffset int64
+		name        string
+		limitOffset *SimpleLimitOffset
+		wantLimit   int64
+		wantOffset  int64
 	}{
 		{
-			name:       "Valid limitOffset",
-			limitOffset: &LimitOffset{limit: 50, offset: 10},
-			wantLimit:  50,
-			wantOffset: 10,
+			name:        "Valid limitOffset",
+			limitOffset: &SimpleLimitOffset{limit: 50, offset: 10},
+			wantLimit:   50,
+			wantOffset:  10,
 		},
 		{
-			name:       "Zero limit corrected to default",
-			limitOffset: &LimitOffset{limit: 0, offset: 20},
-			wantLimit:  100,
-			wantOffset: 20,
+			name:        "Zero limit corrected to default",
+			limitOffset: &SimpleLimitOffset{limit: 0, offset: 20},
+			wantLimit:   100,
+			wantOffset:  20,
 		},
 		{
-			name:       "Negative limit corrected to default",
-			limitOffset: &LimitOffset{limit: -5, offset: 30},
-			wantLimit:  100,
-			wantOffset: 30,
+			name:        "Negative limit corrected to default",
+			limitOffset: &SimpleLimitOffset{limit: -5, offset: 30},
+			wantLimit:   100,
+			wantOffset:  30,
 		},
 		{
-			name:       "Negative offset corrected to zero",
-			limitOffset: &LimitOffset{limit: 25, offset: -10},
-			wantLimit:  25,
-			wantOffset: 0,
+			name:        "Negative offset corrected to zero",
+			limitOffset: &SimpleLimitOffset{limit: 25, offset: -10},
+			wantLimit:   25,
+			wantOffset:  0,
 		},
 		{
-			name:       "Both invalid corrected",
-			limitOffset: &LimitOffset{limit: -1, offset: -1},
-			wantLimit:  100,
-			wantOffset: 0,
+			name:        "Both invalid corrected",
+			limitOffset: &SimpleLimitOffset{limit: -1, offset: -1},
+			wantLimit:   100,
+			wantOffset:  0,
 		},
 	}
 
@@ -155,49 +155,49 @@ func TestLimitOffset_Build(t *testing.T) {
 	t.Parallel()
 	tests := []struct {
 		name        string
-		limitOffset  *LimitOffset
+		limitOffset *SimpleLimitOffset
 		wantContent string
 		wantValues  []any
 	}{
 		{
 			name:        "Limit only",
-			limitOffset:  &LimitOffset{limit: 10, offset: 0},
+			limitOffset: &SimpleLimitOffset{limit: 10, offset: 0},
 			wantContent: "LIMIT ?",
 			wantValues:  []any{int64(10)},
 		},
 		{
 			name:        "Limit and offset",
-			limitOffset:  &LimitOffset{limit: 20, offset: 40},
+			limitOffset: &SimpleLimitOffset{limit: 20, offset: 40},
 			wantContent: "LIMIT ? OFFSET ?",
 			wantValues:  []any{int64(20), int64(40)},
 		},
 		{
 			name:        "Zero limit (no limitOffset added)",
-			limitOffset:  &LimitOffset{limit: 0, offset: 50},
+			limitOffset: &SimpleLimitOffset{limit: 0, offset: 50},
 			wantContent: "",
 			wantValues:  []any{},
 		},
 		{
 			name:        "Negative limit (no limitOffset added)",
-			limitOffset:  &LimitOffset{limit: -10, offset: 50},
+			limitOffset: &SimpleLimitOffset{limit: -10, offset: 50},
 			wantContent: "",
 			wantValues:  []any{},
 		},
 		{
 			name:        "Large values",
-			limitOffset:  &LimitOffset{limit: 1000, offset: 10000},
+			limitOffset: &SimpleLimitOffset{limit: 1000, offset: 10000},
 			wantContent: "LIMIT ? OFFSET ?",
 			wantValues:  []any{int64(1000), int64(10000)},
 		},
 		{
 			name:        "Limit with zero offset (no OFFSET clause)",
-			limitOffset:  &LimitOffset{limit: 50, offset: 0},
+			limitOffset: &SimpleLimitOffset{limit: 50, offset: 0},
 			wantContent: "LIMIT ?",
 			wantValues:  []any{int64(50)},
 		},
 		{
 			name:        "Limit with negative offset (no OFFSET clause)",
-			limitOffset:  &LimitOffset{limit: 50, offset: -10},
+			limitOffset: &SimpleLimitOffset{limit: 50, offset: -10},
 			wantContent: "LIMIT ?",
 			wantValues:  []any{int64(50)},
 		},

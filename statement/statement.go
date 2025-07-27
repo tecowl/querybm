@@ -26,8 +26,8 @@ func New(table string, fields Fields) *Statement {
 		Table:  NewTableBlock(table),
 		// GroupBy:   NewBlock(),
 		// Having:    NewBlock(),
-		Where:      newWhere(" AND "),
-		Sort:       NewBlock(", "),
+		Where:       newWhere(" AND "),
+		Sort:        NewBlock(", "),
 		LimitOffset: NewBlock(" "),
 	}
 }

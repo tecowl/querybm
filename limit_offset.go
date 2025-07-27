@@ -12,13 +12,13 @@ const (
 )
 
 // DefaultLimitOffset provides a limitOffset instance with default values.
-var DefaultLimitOffset = &LimitOffset{
+var DefaultLimitOffset = &SimpleLimitOffset{
 	limit:  defaultLimit,
 	offset: defaultOffset,
 }
 
-// LimitOffset represents limitOffset parameters for SQL queries.
-type LimitOffset struct {
+// SimpleLimitOffset represents limitOffset parameters for SQL queries.
+type SimpleLimitOffset struct {
 	limit  int64
 	offset int64
 }
@@ -26,14 +26,14 @@ type LimitOffset struct {
 // NewLimitOffset creates a new LimitOffset instance with the specified limit and offset.
 // If limit is <= 0, it uses DefaultLimitOffsetLimit.
 // If offset is < 0, it uses DefaultLimitOffsetOffset.
-func NewLimitOffset(limit, offset int64) *LimitOffset {
+func NewLimitOffset(limit, offset int64) *SimpleLimitOffset {
 	if limit <= 0 {
 		limit = DefaultLimitOffset.limit
 	}
 	if offset < 0 {
 		offset = DefaultLimitOffset.offset
 	}
-	return &LimitOffset{
+	return &SimpleLimitOffset{
 		limit:  limit,
 		offset: offset,
 	}
@@ -41,7 +41,7 @@ func NewLimitOffset(limit, offset int64) *LimitOffset {
 
 // Validate ensures the limitOffset parameters are valid.
 // It sets default values if the current values are invalid.
-func (p *LimitOffset) Validate() error {
+func (p *SimpleLimitOffset) Validate() error {
 	if p.limit <= 0 {
 		p.limit = 100 // Default limit
 	}
@@ -52,7 +52,7 @@ func (p *LimitOffset) Validate() error {
 }
 
 // Build adds the LIMIT and OFFSET clauses to the SQL statement.
-func (p *LimitOffset) Build(st *statement.Statement) {
+func (p *SimpleLimitOffset) Build(st *statement.Statement) {
 	if p.limit > 0 {
 		st.LimitOffset.Add("LIMIT ?", p.limit)
 		if p.offset > 0 {
