@@ -108,10 +108,8 @@ func TestStmtQueryRowContextError(t *testing.T) {
 			t.Parallel()
 
 			row := &MockRow{
-				err: fmt.Errorf("runtime row error"), // nolint:err113,perfsprint
-				scan: func(...any) error {
-					return fmt.Errorf("scan error") // nolint:err113,perfsprint
-				},
+				err:  fmt.Errorf("runtime row error"), // nolint:err113,perfsprint
+				scan: func(...any) error { return scanErr },
 			}
 			stmt := &MockStmt{
 				queryRowContext: func(context.Context, ...any) Row { return row },
