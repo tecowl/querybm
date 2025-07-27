@@ -33,6 +33,6 @@ func New(db *sql.DB, condition *Condition) *querybm.Query[models.Author] {
 		),
 		condition,
 		querybm.NewSortItem("name", false),
-		querybm.NewPagination(100, 0),
+		querybm.NewLimitOffset(100, 0),
 	)
 }

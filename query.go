@@ -16,7 +16,7 @@ type Query[M any] struct {
 	Fields     FieldMapper[M]
 	Condition  Condition
 	Sort       Sort
-	Pagination *Pagination
+	LimitOffset *LimitOffset
 }
 
 // New creates a new Query instance with the provided parameters.
@@ -26,14 +26,14 @@ type Query[M any] struct {
 // c: The condition to apply to the query. This is used for List and Count methods.
 // s: The sort item to apply to the query. This is used for ordering the results in List method.
 // pagination: The pagination settings for the query. This is used to limit the number of results returned in List method.
-func New[M any](db *sql.DB, table string, fields FieldMapper[M], c Condition, s Sort, pagination *Pagination) *Query[M] {
+func New[M any](db *sql.DB, table string, fields FieldMapper[M], c Condition, s Sort, pagination *LimitOffset) *Query[M] {
 	return &Query[M]{
 		db:         newDBWrapper(db),
 		Table:      table,
 		Fields:     fields,
 		Condition:  c,
 		Sort:       s,
-		Pagination: pagination,
+		LimitOffset: pagination,
 	}
 }
 
@@ -50,7 +50,7 @@ func (q *Query[M]) Validate() error {
 			return fmt.Errorf("sort validation failed: %w", err)
 		}
 	}
-	if err := q.Pagination.Validate(); err != nil {
+	if err := q.LimitOffset.Validate(); err != nil {
 		return fmt.Errorf("pagination validation failed: %w", err)
 	}
 	return nil
@@ -81,8 +81,8 @@ func (q *Query[M]) BuildRowsSelect() (string, []any) {
 	if q.Sort != nil {
 		q.Sort.Build(st)
 	}
-	if q.Pagination != nil {
-		q.Pagination.Build(st)
+	if q.LimitOffset != nil {
+		q.LimitOffset.Build(st)
 	}
 
 	return st.Build()

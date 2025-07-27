@@ -11,29 +11,29 @@ const (
 	defaultOffset = 0
 )
 
-// DefaultPagination provides a pagination instance with default values.
-var DefaultPagination = &Pagination{
+// DefaultLimitOffset provides a pagination instance with default values.
+var DefaultLimitOffset = &LimitOffset{
 	limit:  defaultLimit,
 	offset: defaultOffset,
 }
 
-// Pagination represents pagination parameters for SQL queries.
-type Pagination struct {
+// LimitOffset represents pagination parameters for SQL queries.
+type LimitOffset struct {
 	limit  int64
 	offset int64
 }
 
-// NewPagination creates a new Pagination instance with the specified limit and offset.
-// If limit is <= 0, it uses DefaultPaginationLimit.
-// If offset is < 0, it uses DefaultPaginationOffset.
-func NewPagination(limit, offset int64) *Pagination {
+// NewLimitOffset creates a new LimitOffset instance with the specified limit and offset.
+// If limit is <= 0, it uses DefaultLimitOffsetLimit.
+// If offset is < 0, it uses DefaultLimitOffsetOffset.
+func NewLimitOffset(limit, offset int64) *LimitOffset {
 	if limit <= 0 {
-		limit = DefaultPagination.limit
+		limit = DefaultLimitOffset.limit
 	}
 	if offset < 0 {
-		offset = DefaultPagination.offset
+		offset = DefaultLimitOffset.offset
 	}
-	return &Pagination{
+	return &LimitOffset{
 		limit:  limit,
 		offset: offset,
 	}
@@ -41,7 +41,7 @@ func NewPagination(limit, offset int64) *Pagination {
 
 // Validate ensures the pagination parameters are valid.
 // It sets default values if the current values are invalid.
-func (p *Pagination) Validate() error {
+func (p *LimitOffset) Validate() error {
 	if p.limit <= 0 {
 		p.limit = 100 // Default limit
 	}
@@ -52,11 +52,11 @@ func (p *Pagination) Validate() error {
 }
 
 // Build adds the LIMIT and OFFSET clauses to the SQL statement.
-func (p *Pagination) Build(st *statement.Statement) {
+func (p *LimitOffset) Build(st *statement.Statement) {
 	if p.limit > 0 {
-		st.Pagination.Add("LIMIT ?", p.limit)
+		st.LimitOffset.Add("LIMIT ?", p.limit)
 		if p.offset > 0 {
-			st.Pagination.Add("OFFSET ?", p.offset)
+			st.LimitOffset.Add("OFFSET ?", p.offset)
 		}
 	}
 }

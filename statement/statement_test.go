@@ -34,8 +34,8 @@ func TestNewStatement(t *testing.T) {
 	if s.Sort == nil {
 		t.Errorf("NewStatement() Sort should not be nil")
 	}
-	if s.Pagination == nil {
-		t.Errorf("NewStatement() Pagination should not be nil")
+	if s.LimitOffset == nil {
+		t.Errorf("NewStatement() LimitOffset should not be nil")
 	}
 }
 
@@ -209,7 +209,7 @@ func TestStatement_Build_WithSort(t *testing.T) {
 	}
 }
 
-func TestStatement_Build_WithPagination(t *testing.T) {
+func TestStatement_Build_WithLimitOffset(t *testing.T) {
 	t.Parallel()
 	tests := []struct {
 		name       string
@@ -221,7 +221,7 @@ func TestStatement_Build_WithPagination(t *testing.T) {
 			name: "SELECT with LIMIT",
 			setup: func() *Statement {
 				s := New("users", NewSimpleFields("id", "name"))
-				s.Pagination.Add("LIMIT ?", 10)
+				s.LimitOffset.Add("LIMIT ?", 10)
 				return s
 			},
 			wantSQL:    "SELECT id, name FROM users LIMIT ?",
@@ -231,8 +231,8 @@ func TestStatement_Build_WithPagination(t *testing.T) {
 			name: "SELECT with LIMIT and OFFSET",
 			setup: func() *Statement {
 				s := New("products", NewSimpleFields("*"))
-				s.Pagination.Add("LIMIT ?", 20)
-				s.Pagination.Add("OFFSET ?", 40)
+				s.LimitOffset.Add("LIMIT ?", 20)
+				s.LimitOffset.Add("OFFSET ?", 40)
 				return s
 			},
 			wantSQL:    "SELECT * FROM products LIMIT ? OFFSET ?",
@@ -270,7 +270,7 @@ func TestStatement_Build_Complex(t *testing.T) {
 				s.Where.Add(expr.Field("status", expr.Eq("active")))
 				s.Where.Add(expr.Field("age", expr.Gte(18)))
 				s.Sort.Add("created_at DESC")
-				s.Pagination.Add("LIMIT ?", 10)
+				s.LimitOffset.Add("LIMIT ?", 10)
 				return s
 			},
 			wantSQL:    "SELECT id, name, email FROM users WHERE status = ? AND age >= ? ORDER BY created_at DESC LIMIT ?",
@@ -285,8 +285,8 @@ func TestStatement_Build_Complex(t *testing.T) {
 				s.Where.Add(expr.Field("deleted_at", expr.IsNull()))
 				s.Sort.Add("category_id")
 				s.Sort.Add("price ASC")
-				s.Pagination.Add("LIMIT ?", 20)
-				s.Pagination.Add("OFFSET ?", 100)
+				s.LimitOffset.Add("LIMIT ?", 20)
+				s.LimitOffset.Add("OFFSET ?", 100)
 				return s
 			},
 			wantSQL:    "SELECT id, name, price, category_id FROM products WHERE price < ? AND category_id IN (?,?,?) AND deleted_at IS NULL ORDER BY category_id, price ASC LIMIT ? OFFSET ?",
