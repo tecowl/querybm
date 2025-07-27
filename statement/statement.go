@@ -34,8 +34,14 @@ func New(table string, fields Fields) *Statement {
 
 // Build constructs the complete SQL query string and returns it along with the placeholder values.
 func (s *Statement) Build() (string, []any) {
-	queryParts := []string{"SELECT", strings.Join(s.Fields.Fields(), ", "), "FROM", s.Table.content}
+	queryParts := []string{"SELECT", strings.Join(s.Fields.Fields(), ", ")}
 	args := make([]any, 0)
+
+	{
+		s, values := s.Table.Build()
+		queryParts = append(queryParts, "FROM", s)
+		args = append(args, values...)
+	}
 
 	if !s.Where.IsEmpty() {
 		content, values := s.Where.Build()

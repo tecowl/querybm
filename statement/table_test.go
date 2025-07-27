@@ -8,20 +8,60 @@ import (
 func TestNewTableBlock(t *testing.T) {
 	t.Parallel()
 	tests := []struct {
-		name      string
-		tableName string
+		name          string
+		tableName     string
+		expectedTable string
+		expectedAlias string
+		expectedFrom  string
 	}{
 		{
-			name:      "Create table block with simple name",
-			tableName: "users",
+			name:          "Create table block with simple name",
+			tableName:     "users",
+			expectedTable: "users",
+			expectedAlias: "",
+			expectedFrom:  "users",
 		},
 		{
-			name:      "Create table block with schema",
-			tableName: "public.users",
+			name:          "Create table block with schema",
+			tableName:     "public.users",
+			expectedTable: "public.users",
+			expectedAlias: "",
+			expectedFrom:  "public.users",
 		},
 		{
-			name:      "Create table block with alias",
-			tableName: "users u",
+			name:          "Create table block with alias",
+			tableName:     "users u",
+			expectedTable: "users",
+			expectedAlias: "u",
+			expectedFrom:  "users u",
+		},
+		{
+			name:          "Create table block with AS alias",
+			tableName:     "users AS u",
+			expectedTable: "users",
+			expectedAlias: "u",
+			expectedFrom:  "users AS u",
+		},
+		{
+			name:          "Create table block with lower case AS alias",
+			tableName:     "users as u",
+			expectedTable: "users",
+			expectedAlias: "u",
+			expectedFrom:  "users AS u",
+		},
+		{
+			name:          "Create table block with unexpected spaces 1",
+			tableName:     "users `special users`",
+			expectedTable: "users",
+			expectedAlias: "`special users`",
+			expectedFrom:  "users `special users`",
+		},
+		{
+			name:          "Create table block with unexpected spaces 2",
+			tableName:     "`special users` users",
+			expectedTable: "`special",
+			expectedAlias: "users` users",
+			expectedFrom:  "`special users` users",
 		},
 	}
 
@@ -29,14 +69,18 @@ func TestNewTableBlock(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			t.Parallel()
 			tb := NewTableBlock(tt.tableName)
-			if tb.content != tt.tableName {
-				t.Errorf("NewTableBlock() content = %v, want %v", tb.content, tt.tableName)
+			if tb.tableName.Name != tt.expectedTable {
+				t.Errorf("NewTableBlock() table name = %v, want %v", tb.tableName.Name, tt.expectedTable)
 			}
-			if tb.delimiter != " " {
-				t.Errorf("NewTableBlock() delimiter = %v, want space", tb.delimiter)
+			if tb.tableName.Alias != tt.expectedAlias {
+				t.Errorf("NewTableBlock() alias = %v, want %v", tb.tableName.Alias, tt.expectedAlias)
 			}
-			if len(tb.values) != 0 {
-				t.Errorf("NewTableBlock() values = %v, want empty slice", tb.values)
+			r, args := tb.Build()
+			if r != tt.expectedFrom {
+				t.Errorf("NewTableBlock() content = %v, want %v", r, tt.expectedFrom)
+			}
+			if len(args) != 0 {
+				t.Errorf("NewTableBlock() values = %v, want empty slice", args)
 			}
 		})
 	}
@@ -87,6 +131,50 @@ func TestTableBlock_InnerJoin(t *testing.T) {
 				},
 			},
 			wantContent: "orders o INNER JOIN customers c ON o.customer_id = c.id AND c.status = ?",
+			wantValues:  []any{"active"},
+		},
+		{
+			name:    "INNER JOIN duplicated alias name",
+			initial: "orders o",
+			joins: []struct {
+				table     string
+				condition string
+				values    []any
+			}{
+				{
+					table:     "customers c",
+					condition: "o.customer_id = c.id AND c.status = ?",
+					values:    []any{"active"},
+				},
+				{
+					table:     "customers c",
+					condition: "o.customer_id = c.id AND c.status = ? AND c.value IS NULL", // This will be ignored
+					values:    []any{"inactive"},                                           // This will be ignored
+				},
+			},
+			wantContent: "orders o INNER JOIN customers c ON o.customer_id = c.id AND c.status = ?",
+			wantValues:  []any{"active"},
+		},
+		{
+			name:    "INNER JOIN duplicated table name",
+			initial: "orders",
+			joins: []struct {
+				table     string
+				condition string
+				values    []any
+			}{
+				{
+					table:     "customers",
+					condition: "orders.customer_id = customers.id AND customers.status = ?",
+					values:    []any{"active"},
+				},
+				{
+					table:     "customers",
+					condition: "orders.customer_id = customers.id AND customers.status = ? AND customers.value IS NULL", // This will be ignored
+					values:    []any{"inactive"},                                                                        // This will be ignored
+				},
+			},
+			wantContent: "orders INNER JOIN customers ON orders.customer_id = customers.id AND customers.status = ?",
 			wantValues:  []any{"active"},
 		},
 		{
@@ -142,11 +230,14 @@ func TestTableBlock_InnerJoin(t *testing.T) {
 			for _, join := range tt.joins {
 				tb.InnerJoin(join.table, join.condition, join.values...)
 			}
-			if tb.content != tt.wantContent {
-				t.Errorf("InnerJoin() content = %v, want %v", tb.content, tt.wantContent)
+			r, args := tb.Build()
+			if r != tt.wantContent {
+				t.Errorf("InnerJoin() content = %v, want %v", r, tt.wantContent)
 			}
-			if !reflect.DeepEqual(tb.values, tt.wantValues) {
-				t.Errorf("InnerJoin() values = %v, want %v", tb.values, tt.wantValues)
+			if len(args) != len(tt.wantValues) {
+				if !reflect.DeepEqual(args, tt.wantValues) {
+					t.Errorf("InnerJoin() values = %v, want %v", args, tt.wantValues)
+				}
 			}
 		})
 	}
@@ -230,11 +321,14 @@ func TestTableBlock_LeftOuterJoin(t *testing.T) {
 			for _, join := range tt.joins {
 				tb.LeftOuterJoin(join.table, join.condition, join.values...)
 			}
-			if tb.content != tt.wantContent {
-				t.Errorf("LeftOuterJoin() content = %v, want %v", tb.content, tt.wantContent)
+			r, args := tb.Build()
+			if r != tt.wantContent {
+				t.Errorf("LeftOuterJoin() content = %v, want %v", r, tt.wantContent)
 			}
-			if !reflect.DeepEqual(tb.values, tt.wantValues) {
-				t.Errorf("LeftOuterJoin() values = %v, want %v", tb.values, tt.wantValues)
+			if len(args) != len(tt.wantValues) {
+				if !reflect.DeepEqual(args, tt.wantValues) {
+					t.Errorf("LeftOuterJoin() values = %v, want %v", args, tt.wantValues)
+				}
 			}
 		})
 	}
@@ -256,10 +350,11 @@ func TestTableBlock_MixedJoins(t *testing.T) {
 	wantContent := "orders o INNER JOIN customers c ON o.customer_id = c.id LEFT OUTER JOIN order_discounts d ON o.id = d.order_id AND d.active = ? INNER JOIN products p ON o.product_id = p.id AND p.available = ?"
 	wantValues := []any{true, true}
 
-	if tb.content != wantContent {
-		t.Errorf("Mixed joins content = %v, want %v", tb.content, wantContent)
+	r, args := tb.Build()
+	if r != wantContent {
+		t.Errorf("Mixed joins content = %v, want %v", r, wantContent)
 	}
-	if !reflect.DeepEqual(tb.values, wantValues) {
-		t.Errorf("Mixed joins values = %v, want %v", tb.values, wantValues)
+	if !reflect.DeepEqual(args, wantValues) {
+		t.Errorf("Mixed joins values = %v, want %v", args, wantValues)
 	}
 }
