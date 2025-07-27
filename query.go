@@ -62,7 +62,9 @@ func (q *Query[M]) Validate() error {
 func (q *Query[M]) BuildCountSelect() (string, []any) {
 	st := statement.New(q.Table, statement.NewSimpleFields("COUNT(*) AS count"))
 
-	q.Condition.Build(st)
+	if q.Condition != nil {
+		q.Condition.Build(st)
+	}
 
 	return st.Build()
 }

@@ -125,9 +125,19 @@ func TestStmtQueryRowContextError(t *testing.T) {
 				Table:  "users",
 				Fields: NewFields[any]([]string{"id", "name"}, nil),
 			}
-			if _, err := q.Count(t.Context()); err == nil {
-				t.Error("Expected error, got nil")
-			}
+
+			t.Run("Count", func(t *testing.T) {
+				t.Parallel()
+				if _, err := q.Count(t.Context()); err == nil {
+					t.Error("Expected error, got nil")
+				}
+			})
+			t.Run("First", func(t *testing.T) {
+				t.Parallel()
+				if _, err := q.First(t.Context()); err == nil {
+					t.Error("Expected error, got nil")
+				}
+			})
 		})
 	}
 }
